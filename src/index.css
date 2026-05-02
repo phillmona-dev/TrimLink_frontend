@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 0%; /* Pure Black */
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 65%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --primary: 25 100% 50%; /* Vibrant Orange #ff6600 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 25 100% 30%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 25 100% 50%;
+  --success: 154 55% 46%;
+  --warning: 36 93% 60%;
+  --danger: 0 78% 67%;
+}
+
+.dark {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 100%;
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 65%;
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+  --primary: 25 100% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 25 100% 30%;
+  --accent-foreground: 0 0% 100%;
+  --ring: 25 100% 50%;
+  --success: 154 55% 46%;
+  --warning: 36 93% 60%;
+  --danger: 0 78% 67%;
+}
+
+* {
+  @apply border-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background font-sans text-base text-foreground antialiased;
+  background-color: #1a1518;
+  background-image: 
+    radial-gradient(circle at 85% 10%, rgba(210, 140, 80, 0.4), transparent 40%),
+    radial-gradient(circle at 10% 90%, rgba(60, 50, 70, 0.5), transparent 50%),
+    linear-gradient(135deg, rgba(20, 15, 20, 0.9), rgba(40, 30, 35, 0.9));
+  min-height: 100vh;
+}
+
+.dark body {
+  background-color: #1a1518;
+  background-image: 
+    radial-gradient(circle at 85% 10%, rgba(210, 140, 80, 0.3), transparent 40%),
+    radial-gradient(circle at 10% 90%, rgba(60, 50, 70, 0.4), transparent 50%),
+    linear-gradient(135deg, rgba(15, 10, 15, 0.95), rgba(30, 20, 25, 0.95));
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-border;
+}
+
+.glass-panel {
+  @apply border border-white/20 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-white/5;
+}
+
+.section-title {
+  @apply text-4xl font-extrabold tracking-tight md:text-5xl;
+}
+
+.section-copy {
+  @apply max-w-2xl text-base leading-8 text-muted-foreground md:text-lg;
+}
