@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Client } from "@stomp/stompjs";
-import { Bell, Calendar, User, Scissors, CheckCircle2, XCircle } from "lucide-react";
+import { Bell, Calendar, User, Scissors, CheckCircle2, XCircle, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { WS_BASE_URL } from "@/utils/constants";
 import { Button } from "@/components/common/button";
@@ -10,6 +10,8 @@ import { AnimatedIcon } from "@/components/common/animated-icon";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/common/badge";
+
+import { useQueryClient } from "@tanstack/react-query";
 
 interface BookingNotification {
   id: string;
@@ -20,11 +22,14 @@ interface BookingNotification {
   status: string;
   timestamp: number;
   read: boolean;
+  type?: string;
+  displayTitle?: string;
 }
 
 export function NotificationCenter() {
   const { session } = useAuth();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [notifications, setNotifications] = useState<BookingNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const stompClient = useRef<Client | null>(null);
@@ -32,15 +37,30 @@ export function NotificationCenter() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
-    if (!session?.userId) return;
+    if (!session?.userId || !session?.accessToken) {
+      console.log("No session or token, skipping WebSocket connection");
+      return;
+    }
+
+    console.log("Initializing WebSocket connection for user:", session.userId, "Role:", session.role);
 
     const client = new Client({
       brokerURL: WS_BASE_URL,
+      connectHeaders: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      debug: (str) => {
+        console.log("STOMP Debug:", str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
       onConnect: () => {
-        console.log("Connected to WebSocket");
+        console.log("STOMP Connected successfully");
         
         // Subscribe to staff notifications
         if (session.role === "STAFF" || session.role === "OWNER") {
+          console.log("Subscribing to staff topics...");
           client.subscribe(`/topic/staffs/${session.userId}/bookings`, (message) => {
             const booking = JSON.parse(message.body);
             addNotification(booking);
@@ -49,24 +69,45 @@ export function NotificationCenter() {
 
         // Subscribe to customer notifications
         if (session.role === "CUSTOMER") {
+          console.log("Subscribing to customer topics...");
           client.subscribe(`/topic/customers/${session.userId}/bookings`, (message) => {
             const booking = JSON.parse(message.body);
             addNotification(booking);
           });
         }
+
+        // Subscribe to admin notifications
+        if (session.role === "ADMIN") {
+          console.log("Subscribing to admin topics: /topic/admin/approvals");
+          client.subscribe(`/topic/admin/approvals`, (message) => {
+            console.log("Received admin notification:", message.body);
+            const payload = JSON.parse(message.body);
+            addAdminNotification(payload);
+            
+            // Invalidate admin pending shops query to show it in the list immediately
+            queryClient.invalidateQueries({ queryKey: ["admin-pending-shops"] });
+          });
+        }
       },
       onStompError: (frame) => {
-        console.error("STOMP error", frame);
+        console.error("STOMP Error Frame:", frame);
       },
+      onWebSocketClose: () => {
+        console.log("WebSocket connection closed");
+      },
+      onWebSocketError: (event) => {
+        console.error("WebSocket Error:", event);
+      }
     });
 
     client.activate();
     stompClient.current = client;
 
     return () => {
+      console.log("Deactivating WebSocket client");
       client.deactivate();
     };
-  }, [session]);
+  }, [session, queryClient]);
 
   const addNotification = (booking: any) => {
     const isStaff = session?.role === "STAFF" || session?.role === "OWNER";
@@ -106,6 +147,40 @@ export function NotificationCenter() {
     setNotifications(prev => [newNotif, ...prev].slice(0, 10));
   };
 
+  const addAdminNotification = (payload: any) => {
+    let newNotif: BookingNotification;
+    
+    if (payload.type === "SUPPORT_MESSAGE") {
+      newNotif = {
+        id: Math.random().toString(),
+        customerName: payload.username,
+        serviceName: "Support Chat",
+        scheduledStart: new Date().toISOString(),
+        price: 0,
+        status: "SUPPORT",
+        timestamp: Date.now(),
+        read: false,
+      };
+      (newNotif as any).displayTitle = `New support message from ${payload.username}`;
+      (newNotif as any).type = "SUPPORT_MESSAGE";
+    } else {
+      newNotif = {
+        id: payload.id,
+        customerName: payload.ownerName,
+        serviceName: `Shop: ${payload.shopName}`,
+        scheduledStart: new Date().toISOString(),
+        price: 0,
+        status: "PENDING",
+        timestamp: Date.now(),
+        read: false,
+      };
+      (newNotif as any).displayTitle = `New shop registration: ${payload.shopName}`;
+      (newNotif as any).type = "SHOP_REGISTRATION";
+    }
+
+    setNotifications(prev => [newNotif, ...prev].slice(0, 10));
+  };
+
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
@@ -114,10 +189,17 @@ export function NotificationCenter() {
     setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
     setIsOpen(false);
     
+    if ((notif as any).type === "SHOP_REGISTRATION") {
+      router.push("/admin/shops");
+      return;
+    }
+
     if (session?.role === "OWNER") {
       router.push("/owner/bookings");
     } else if (session?.role === "STAFF") {
       router.push("/staff");
+    } else if (session?.role === "ADMIN") {
+      router.push("/admin");
     } else {
       router.push("/app/appointments");
     }
@@ -127,7 +209,9 @@ export function NotificationCenter() {
     ? "/owner/bookings" 
     : session?.role === "STAFF" 
       ? "/staff" 
-      : "/app/appointments";
+      : session?.role === "ADMIN"
+        ? "/admin/shops"
+        : "/app/appointments";
 
   return (
     <div className="relative">
@@ -209,12 +293,18 @@ export function NotificationCenter() {
                         
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                           notif.status === 'REJECTED' ? 'bg-red-500/10 text-red-500' : 
-                          notif.status === 'RESCHEDULE_REQUESTED' ? 'bg-orange-500/10 text-orange-500' : 
+                          notif.status === 'RESCHEDULE_REQUESTED' || notif.status === 'PENDING' ? 'bg-orange-500/10 text-orange-500' : 
                           'bg-green-500/10 text-green-500'
                         }`}>
                           {notif.status === 'REJECTED' ? <XCircle className="w-5 h-5" /> : 
                            notif.status === 'RESCHEDULE_REQUESTED' ? <Calendar className="w-5 h-5" /> : 
-                           <CheckCircle2 className="w-5 h-5" />}
+                           (notif as any).type === "SHOP_REGISTRATION" ? (
+                            <Scissors className="w-4 h-4 text-orange-400" />
+                          ) : (notif as any).type === "SUPPORT_MESSAGE" ? (
+                            <MessageCircle className="w-4 h-4 text-blue-400" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                          )}
                         </div>
                         
                         <div className="flex-1 min-w-0 space-y-1">

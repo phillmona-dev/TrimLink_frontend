@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2, User as UserIcon } from "lucide-react";
 import { ImageUpload } from "@/components/common/image-upload";
 import { uploadService } from "@/api/uploadService";
+import { useAuth } from "@/hooks/use-auth";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -27,9 +28,11 @@ export function ProfilePage() {
   const queryClient = useQueryClient();
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const { session } = useAuth();
   const { data: user, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: userService.me,
+    enabled: !!session
   });
 
   const devicesQuery = useQuery({

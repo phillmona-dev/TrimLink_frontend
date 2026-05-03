@@ -74,6 +74,7 @@ export type StaffProfile = {
   averageRating: number;
   totalReviews: number;
   available: boolean;
+  status: "IDLE" | "BUSY";
   user: {
     id: string;
     firstName: string;
@@ -83,8 +84,13 @@ export type StaffProfile = {
   };
   serviceAssignments?: {
     id: string;
-    service: Service;
+    serviceId: string;
+    serviceName: string;
+    serviceDescription?: string;
+    durationMinutes: number;
+    basePrice: number;
     customPrice?: number;
+    effectivePrice: number;
     active: boolean;
   }[];
 };
@@ -99,6 +105,12 @@ export type Shop = {
   latitude?: number;
   longitude?: number;
   logoUrl?: string;
+  bankAccounts?: {
+    id: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolder?: string;
+  }[];
   active?: boolean;
 };
 
@@ -114,10 +126,12 @@ export type Appointment = {
   serviceName?: string;
   scheduledStart: string;
   scheduledEnd: string;
-  status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED" | "NO_SHOW";
+  status: "PENDING" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW" | "REJECTED" | "RESCHEDULE_REQUESTED";
   priceCharged: number;
   notes?: string;
   cancellationReason?: string;
+  receiptImageUrl?: string;
+  reviewed: boolean;
   createdAt?: string;
 };
 
@@ -154,13 +168,15 @@ export type Payment = {
 
 export type Review = {
   id: string;
-  staffProfileId: string;
+  reviewId: string;
   appointmentId: string;
+  staffId: string;
+  staffName: string;
   reviewerId: string;
+  reviewerName: string;
   rating: number;
   comment?: string;
   createdAt: string;
-  reviewerName?: string;
 };
 
 export type DashboardMetric = {

@@ -5,22 +5,20 @@ import { useQuery } from "@tanstack/react-query";
 import { shopService } from "@/api/shopService";
 import Link from "next/link";
 import Image from "next/image";
-import { useDebounce } from "@/hooks/use-debounce";
 import { motion } from "framer-motion";
 import {
   Bell,
   CalendarDays,
   Clock,
   Heart,
-  HelpCircle,
   Home,
   MapPin,
   MoreHorizontal,
   Search,
-  Scissors,
-  Star,
   User,
+  Scissors,
   X,
+  Star,
   ExternalLink,
   LogOut
 } from "lucide-react";
@@ -29,20 +27,36 @@ import { AnimatedIcon } from "@/components/common/animated-icon";
 import { AnimatePresence } from "framer-motion";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
+import { useChat } from "@/context/ChatContext";
 
 export function LandingPage() {
   const { isAuthenticated, role, logout } = useAuth();
+  const { openChat } = useChat();
+  const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
-  const activeQuery = useDebounce(query, 300);
+  const [activeQuery, setActiveQuery] = useState("");
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
 
-  const { data: searchResults, isLoading: isSearchLoading, isError: isSearchError } = useQuery({
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Debounced search logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveQuery(query);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const { data: searchResults, isLoading: isSearchLoading } = useQuery({
     queryKey: ["search-shops", activeQuery],
     queryFn: () => shopService.search(activeQuery),
     enabled: !!activeQuery,
   });
 
-  const { data: nearbyShops, isLoading: isNearbyLoading, isError: isNearbyError } = useQuery({
+  const { data: nearbyShops, isLoading: isNearbyLoading } = useQuery({
     queryKey: ["nearby-shops"],
     queryFn: () => shopService.list(0, 4),
   });
@@ -84,7 +98,7 @@ export function LandingPage() {
           </div>
 
           <div className="group relative">
-            <button aria-label="Focus Search" onClick={() => document.getElementById('search-input')?.focus()} className="p-3 text-white/50 hover:text-white/90 transition">
+            <button onClick={() => document.getElementById('search-input')?.focus()} className="p-3 text-white/50 hover:text-white/90 transition">
               <AnimatedIcon icon={Search} size={20} />
             </button>
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
@@ -94,7 +108,7 @@ export function LandingPage() {
           </div>
 
           <div className="group relative">
-            <Link href={isAuthenticated ? "/app" : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
+            <Link href={(mounted && isAuthenticated) ? "/app" : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
               <AnimatedIcon icon={CalendarDays} size={20} />
             </Link>
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
@@ -104,7 +118,7 @@ export function LandingPage() {
           </div>
 
           <div className="group relative">
-            <Link href={isAuthenticated ? "/app" : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
+            <Link href={(mounted && isAuthenticated) ? "/app" : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
               <AnimatedIcon icon={Heart} size={20} animate="wiggle" />
             </Link>
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
@@ -114,28 +128,18 @@ export function LandingPage() {
           </div>
 
           <div className="group relative">
-            <Link href={isAuthenticated ? (role === 'CUSTOMER' ? '/app' : '/owner') : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
+            <Link href={(mounted && isAuthenticated) ? (role === 'CUSTOMER' ? '/app' : '/owner') : "/auth/login"} className="p-3 text-white/50 hover:text-white/90 transition">
               <AnimatedIcon icon={User} size={20} />
             </Link>
             <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
-              {isAuthenticated ? "Profile" : "Login"}
+              {(mounted && isAuthenticated) ? "Profile" : "Login"}
               <div className="absolute top-1/2 -left-1 -translate-y-1/2 border-4 border-transparent border-r-black/80" />
             </div>
           </div>
 
-          <div className="group relative">
-            <Link href="/help" className="p-3 text-white/50 hover:text-white/90 transition">
-              <HelpCircle size={20} />
-            </Link>
-            <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
-              Help
-              <div className="absolute top-1/2 -left-1 -translate-y-1/2 border-4 border-transparent border-r-black/80" />
-            </div>
-          </div>
-
-          {isAuthenticated && (
+          {(mounted && isAuthenticated) && (
             <div className="mt-auto group relative">
-              <button aria-label="Logout" onClick={logout} className="p-3 text-white/30 hover:text-red-400 transition">
+              <button onClick={logout} className="p-3 text-white/30 hover:text-red-400 transition">
                 <AnimatedIcon icon={LogOut} size={20} />
               </button>
               <div className="absolute left-full top-1/2 -translate-y-1/2 ml-4 px-3 py-1.5 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl text-xs font-bold text-white whitespace-nowrap opacity-0 scale-90 -translate-x-2 group-hover:opacity-100 group-hover:scale-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none z-50 shadow-2xl">
@@ -162,6 +166,7 @@ export function LandingPage() {
                 className="flex items-center gap-2 md:gap-4 border-b border-white/10 pb-6 w-full"
                 onSubmit={(e) => {
                   e.preventDefault();
+                  setActiveQuery(query);
                 }}
               >
                 <div className="hidden sm:flex h-10 w-10 rounded-full bg-gradient-to-tr from-orange-600 to-orange-400 items-center justify-center text-white font-bold shrink-0">
@@ -173,6 +178,9 @@ export function LandingPage() {
                   value={query}
                   onChange={(e) => {
                     setQuery(e.target.value);
+                    if (e.target.value === "") {
+                      setActiveQuery("");
+                    }
                   }}
                   placeholder="Search for a staff or shop..."
                   className="flex-1 min-w-0 h-12 bg-black/40 border border-white/5 rounded-full px-4 md:px-5 flex items-center text-white/90 text-sm focus:outline-none focus:border-orange-500/50 transition"
@@ -187,7 +195,7 @@ export function LandingPage() {
                 <div className="flex flex-col gap-6">
                   <div className="flex justify-between items-center mb-2">
                     <span className="font-semibold text-white/90">Search Results for "{activeQuery}"</span>
-                    <Button variant="ghost" size="sm" onClick={() => { setQuery(""); }} className="text-white/40 hover:text-white/90">
+                    <Button variant="ghost" size="sm" onClick={() => { setQuery(""); setActiveQuery(""); }} className="text-white/40 hover:text-white/90">
                       Clear
                     </Button>
                   </div>
@@ -197,10 +205,6 @@ export function LandingPage() {
                       {[1, 2, 3].map(i => (
                         <div key={i} className="h-24 bg-white/5 animate-pulse rounded-2xl" />
                       ))}
-                    </div>
-                  ) : isSearchError ? (
-                    <div className="text-center py-12 rounded-3xl border border-red-500/20 bg-red-500/5 text-red-400/80">
-                      An error occurred while searching.
                     </div>
                   ) : searchResults?.content && searchResults.content.length > 0 ? (
                     searchResults.content.map(shop => (
@@ -219,7 +223,7 @@ export function LandingPage() {
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-1">
                             <span className="font-bold text-lg text-white/90">{shop.name}</span>
-                            <Link href="/auth/login">
+                            <Link href={(mounted && isAuthenticated) ? "/app" : "/auth/login"}>
                               <Button size="sm" className="bg-orange-500 text-black hover:bg-orange-600 rounded-full text-xs font-semibold h-8 px-4">
                                 Book
                               </Button>
@@ -302,7 +306,7 @@ export function LandingPage() {
                           <p className="text-white/80 text-sm mb-4">
                             Discover top-rated staffs in your area.
                           </p>
-                          <Link href="/shops">
+                          <Link href={(mounted && isAuthenticated) ? "/app" : "/auth/login"}>
                             <Button className="w-fit bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 text-sm font-semibold">
                               Explore Shops
                             </Button>
@@ -321,9 +325,7 @@ export function LandingPage() {
                   {/* Feed Item 2: Testimonial */}
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="relative h-10 w-10 rounded-full shrink-0 overflow-hidden">
-                        <Image src="https://i.pravatar.cc/150?img=33" alt="User Avatar" fill className="object-cover" />
-                      </div>
+                      <div className="h-10 w-10 rounded-full bg-[url('https://i.pravatar.cc/150?img=33')] bg-cover shrink-0"></div>
                     </div>
                     <div className="flex-1 pb-6">
                       <div className="flex justify-between items-center mb-2">
@@ -432,15 +434,10 @@ export function LandingPage() {
                         <div key={i} className="h-10 bg-white/5 animate-pulse rounded-xl" />
                       ))}
                     </div>
-                  ) : isNearbyError ? (
-                    <div className="text-xs text-red-400/80 bg-red-400/10 rounded-xl p-3 text-center border border-red-400/20">
-                      Unable to load nearby shops.
-                    </div>
                   ) : nearbyShops?.content && nearbyShops.content.length > 0 ? (
                     nearbyShops.content.map((shop) => (
                       <div key={shop.id} className="flex items-center justify-between gap-3 group">
                         <button 
-                          aria-label="View shop on map"
                           onClick={() => handleOpenMap(shop)}
                           className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/5 hover:bg-orange-500/20 hover:border-orange-500/30 transition group"
                         >
@@ -522,11 +519,11 @@ export function LandingPage() {
 
               {/* Footer Links */}
               <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 px-2">
-                <Link href="/shops" className="text-[11px] text-white/30 hover:text-white/60 transition">Explore Shops</Link>
-                <Link href="/help" className="text-[11px] text-white/30 hover:text-white/60 transition">Help</Link>
-                <Link href="/help" className="text-[11px] text-white/30 hover:text-white/60 transition">Contact</Link>
-                <Link href="#" className="text-[11px] text-white/30 hover:text-white/60 transition">Privacy</Link>
-                <Link href="#" className="text-[11px] text-white/30 hover:text-white/60 transition">Terms</Link>
+                {["About", "Privacy", "Terms", "Pricing", "Contact"].map((item) => (
+                  <Link key={item} href="#" className="text-[11px] text-white/30 hover:text-white/60 transition">
+                    {item}
+                  </Link>
+                ))}
                 <span className="text-[11px] text-white/30 w-full mt-2">© 2026 TrimLink.</span>
               </div>
 
@@ -536,15 +533,15 @@ export function LandingPage() {
         </main>
 
         {/* Mobile Bottom Navigation */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-black/90 backdrop-blur-3xl border-t border-white/10 z-[60] flex items-center justify-around px-1">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-black/90 backdrop-blur-3xl border-t border-white/10 z-[60] flex items-center justify-around px-2">
           <Link href="/" className="flex flex-col items-center gap-1 text-orange-400 p-2">
             <Home size={20} />
             <span className="text-[10px] font-medium">Home</span>
           </Link>
-          <Link href="/shops" className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
-            <Scissors size={20} />
-            <span className="text-[10px] font-medium">Shops</span>
-          </Link>
+          <button onClick={() => document.getElementById('search-input')?.focus()} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
+            <Search size={20} />
+            <span className="text-[10px] font-medium">Search</span>
+          </button>
           <Link href={isAuthenticated ? "/app" : "/auth/login"} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
             <CalendarDays size={20} />
             <span className="text-[10px] font-medium">Book</span>
@@ -552,10 +549,6 @@ export function LandingPage() {
           <Link href={isAuthenticated ? (role === 'CUSTOMER' ? '/app' : '/owner') : "/auth/login"} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
             <User size={20} />
             <span className="text-[10px] font-medium">Profile</span>
-          </Link>
-          <Link href="/help" className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
-            <HelpCircle size={20} />
-            <span className="text-[10px] font-medium">Help</span>
           </Link>
         </nav>
       </div>
@@ -655,6 +648,14 @@ export function LandingPage() {
                                   <span className="text-[10px] text-white/30 font-bold tracking-tighter">{staff.averageRating.toFixed(1)} Rating</span>
                                 </div>
                               </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => openChat(staff.user.id, `${staff.user.firstName} ${staff.user.lastName}`)}
+                                className="opacity-0 group-hover:opacity-100 transition-opacity border-white/10 hover:bg-white/10 text-[10px] h-8 rounded-full"
+                              >
+                                Chat
+                              </Button>
                             </motion.div>
                           ))
                         ) : (
@@ -687,7 +688,7 @@ export function LandingPage() {
                         <p className="text-white/40 text-xs mb-8 max-w-xs mx-auto leading-relaxed">
                           Join the digital queue at <span className="text-orange-400 font-bold">{shopDetail?.name}</span> and skip the wait.
                         </p>
-                        {isAuthenticated ? (
+                        {(mounted && isAuthenticated) ? (
                           <Link href={role === 'CUSTOMER' ? '/app' : '/owner'} className="block">
                             <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-14 rounded-2xl shadow-xl text-base transition-all hover:scale-[1.02]">
                               {role === 'CUSTOMER' ? 'Book Now' : 'Go to Dashboard'}
@@ -711,7 +712,22 @@ export function LandingPage() {
         )}
       </AnimatePresence>
 
-
+      {/* Global styling for custom scrollbar within the glass pane */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `}} />
     </div>
   );
 }

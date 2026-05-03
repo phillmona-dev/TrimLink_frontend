@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell, CalendarDays, Clock, Home, LayoutDashboard, LogOut, Scissors, Settings, Users } from "lucide-react";
+import { Bell, CalendarDays, Clock, Home, LayoutDashboard, LogOut, Scissors, Settings, Users, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimatedIcon } from "@/components/common/animated-icon";
 
@@ -46,6 +46,7 @@ export function Sidebar() {
               { to: "/admin", label: "Overview", icon: LayoutDashboard },
               { to: "/admin/users", label: "Users", icon: Users },
               { to: "/admin/shops", label: "Shops", icon: Home },
+              { to: "/admin/support", label: "Support", icon: MessageCircle },
               { to: "/admin/settings", label: "Settings", icon: Settings }
             ]
           : [

@@ -73,5 +73,11 @@ export const ownerService = {
     unwrap<any[]>(http.get("/shops/my-shop/hours")),
 
   updateShopHours: (hours: any[]) =>
-    unwrap<any[]>(http.put("/shops/my-shop/hours", hours))
+    unwrap<any[]>(http.put("/shops/my-shop/hours", hours)),
+  
+  getShopDetails: () =>
+    unwrap<any>(http.get("/shops/my-shop")),
+    
+  updateShopDetails: (details: any) =>
+    unwrap<any>(http.put("/shops/my-shop", details))
 };
