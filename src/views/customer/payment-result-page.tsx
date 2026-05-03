@@ -1,11 +1,11 @@
+"use client";
+
 import { CheckCircle2, XCircle } from "lucide-react";
 import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
-"use client";
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
 export function PaymentResultPage() {
   const params = useSearchParams();
   const status = params.get("status") ?? "success";

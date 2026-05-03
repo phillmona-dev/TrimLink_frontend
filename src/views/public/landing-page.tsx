@@ -73,9 +73,9 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-8 lg:p-12 relative overflow-hidden">
+    <div className="min-h-[100dvh] md:min-h-screen w-full flex items-center justify-center p-0 md:p-8 lg:p-12 relative overflow-hidden">
       <AnimatedBackground />
-      <div className="flex w-full max-w-7xl h-[85vh] gap-6 items-center relative z-10">
+      <div className="flex w-full max-w-7xl h-[100dvh] md:h-[85vh] md:gap-6 items-center relative z-10">
         
         {/* Detached Floating Sidebar */}
         <aside className="relative z-50 hidden md:flex flex-col items-center gap-8 bg-white/5 backdrop-blur-2xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.4)] rounded-full py-8 px-4 w-16 shrink-0 h-fit">
@@ -143,25 +143,25 @@ export function LandingPage() {
         </aside>
 
         {/* Main Glass Container */}
-        <main className="flex-1 h-full bg-white/5 backdrop-blur-3xl border border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6)] rounded-[2.5rem] overflow-hidden flex flex-col relative">
+        <main className="flex-1 h-full bg-black md:bg-white/5 md:backdrop-blur-3xl border-0 md:border md:border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6)] rounded-none md:rounded-[2.5rem] overflow-hidden flex flex-col relative pb-16 md:pb-0">
           
           {/* Subtle inner glass highlight */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.08] to-transparent pointer-events-none rounded-[2.5rem]"></div>
+          <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-white/[0.08] to-transparent pointer-events-none rounded-[2.5rem]"></div>
 
-          <div className="flex-1 overflow-y-auto p-6 md:p-10 flex flex-col lg:flex-row gap-10 relative z-10 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto p-4 md:p-10 flex flex-col lg:flex-row gap-8 md:gap-10 relative z-10 custom-scrollbar">
             
             {/* Left Column (Feed) */}
             <div className="flex-1 flex flex-col gap-8 max-w-2xl">
               
               {/* Search Form */}
               <form 
-                className="flex items-center gap-4 border-b border-white/10 pb-6"
+                className="flex items-center gap-2 md:gap-4 border-b border-white/10 pb-6 w-full"
                 onSubmit={(e) => {
                   e.preventDefault();
                   setActiveQuery(query);
                 }}
               >
-                <div className="h-10 w-10 rounded-full bg-gradient-to-tr from-orange-600 to-orange-400 flex items-center justify-center text-white font-bold shrink-0">
+                <div className="hidden sm:flex h-10 w-10 rounded-full bg-gradient-to-tr from-orange-600 to-orange-400 items-center justify-center text-white font-bold shrink-0">
                   <AnimatedIcon icon={User} size={20} animate="rotate" />
                 </div>
                 <input
@@ -175,9 +175,9 @@ export function LandingPage() {
                     }
                   }}
                   placeholder="Search for a barber or shop..."
-                  className="flex-1 h-12 bg-black/40 border border-white/5 rounded-full px-5 flex items-center text-white/90 text-sm focus:outline-none focus:border-orange-500/50 transition"
+                  className="flex-1 min-w-0 h-12 bg-black/40 border border-white/5 rounded-full px-4 md:px-5 flex items-center text-white/90 text-sm focus:outline-none focus:border-orange-500/50 transition"
                 />
-                <Button type="submit" variant="outline" className="rounded-full border-white/10 bg-white/5 hover:bg-white/10 h-10 px-6 text-sm">
+                <Button type="submit" variant="outline" className="shrink-0 rounded-full border-white/10 bg-white/5 hover:bg-white/10 h-10 px-4 md:px-6 text-sm">
                   Search
                 </Button>
               </form>
@@ -511,6 +511,26 @@ export function LandingPage() {
 
           </div>
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-black/90 backdrop-blur-3xl border-t border-white/10 z-[60] flex items-center justify-around px-2">
+          <Link href="/" className="flex flex-col items-center gap-1 text-orange-400 p-2">
+            <Home size={20} />
+            <span className="text-[10px] font-medium">Home</span>
+          </Link>
+          <button onClick={() => document.getElementById('search-input')?.focus()} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
+            <Search size={20} />
+            <span className="text-[10px] font-medium">Search</span>
+          </button>
+          <Link href={isAuthenticated ? "/app" : "/auth/login"} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
+            <CalendarDays size={20} />
+            <span className="text-[10px] font-medium">Book</span>
+          </Link>
+          <Link href={isAuthenticated ? (role === 'CUSTOMER' ? '/app' : '/owner') : "/auth/login"} className="flex flex-col items-center gap-1 text-white/50 hover:text-white/90 p-2">
+            <User size={20} />
+            <span className="text-[10px] font-medium">Profile</span>
+          </Link>
+        </nav>
       </div>
 
       {/* Shop Detail Modal */}
@@ -528,15 +548,17 @@ export function LandingPage() {
               initial={{ opacity: 0, scale: 0.98, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 30 }}
-              className="relative w-full max-w-4xl bg-white/5 border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.9)] h-[85vh] flex flex-col"
+              className="relative w-full max-w-4xl bg-black md:bg-white/5 border-0 md:border md:border-white/10 rounded-none md:rounded-[3rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.9)] h-[100dvh] md:h-[85vh] flex flex-col"
             >
               {/* Crystal Clear High-Definition Background - SYSTEM ANIMATED BACKGROUND */}
               <div className="absolute inset-0 z-0 overflow-hidden">
                  <div className="absolute inset-0 bg-black/40 z-10" />
-                 <AnimatedBackground />
+                 <div className="hidden md:block">
+                   <AnimatedBackground />
+                 </div>
               </div>
 
-              <div className="relative z-10 flex-1 flex flex-col p-8 md:p-10 overflow-hidden">
+              <div className="relative z-10 flex-1 flex flex-col p-6 md:p-10 overflow-hidden">
                 {/* Header - Compact */}
                 <div className="flex justify-between items-center mb-8">
                   <div className="flex items-center gap-5">
@@ -560,7 +582,7 @@ export function LandingPage() {
                 </div>
 
                 {/* Content Area - Two Columns for efficiency */}
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-0 overflow-hidden">
+                <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 min-h-0 overflow-y-auto md:overflow-hidden">
                   
                   {/* Left Side: About & Barbers */}
                   <div className="flex flex-col gap-8 min-h-0">
@@ -587,7 +609,7 @@ export function LandingPage() {
                         </div>
                       </div>
                       
-                      <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                      <div className="flex-1 md:overflow-y-auto custom-scrollbar space-y-3 pr-2">
                         {isBarbersLoading ? (
                           [1, 2].map(i => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-[1.5rem]" />)
                         ) : shopBarbers && shopBarbers.length > 0 ? (

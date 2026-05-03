@@ -59,15 +59,15 @@ export function ShopDetailsPage() {
                 </div>
                 <div className="mt-4 grid gap-3">
                   {barber.serviceAssignments?.map((assignment) => (
-                    <div className="flex items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 group/service" key={assignment.assignmentId}>
+                    <div className="flex items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 group/service" key={assignment.id}>
                       <div className="flex-1">
-                        <div className="font-semibold text-white/90">{assignment.serviceName}</div>
-                        <div className="text-xs text-white/40">{assignment.durationMinutes} min</div>
+                        <div className="font-semibold text-white/90">{assignment.service.name}</div>
+                        <div className="text-xs text-white/40">{assignment.service.durationMinutes} min</div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="font-black text-orange-400">{formatCurrency(assignment.effectivePrice)}</div>
+                        <div className="font-black text-orange-400">{formatCurrency(assignment.customPrice ?? assignment.service.basePrice)}</div>
                         <Link 
-                          href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.serviceId}`}
+                          href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.service.id}`}
                         >
                           <Button size="sm" className="bg-orange-500 hover:bg-orange-400 text-black font-bold h-9 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
                             Book

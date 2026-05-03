@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminService, type PlatformUser } from "@/api/adminService";
+import { adminService } from "@/api/adminService";
+import type { PlatformUser } from "@/types";
 import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
 import { featuredShops } from "@/assets/mock-data"; // Fallback for active shops
