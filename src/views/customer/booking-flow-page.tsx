@@ -107,8 +107,26 @@ export function BookingFlowPage() {
       shopId,
       serviceId,
       scheduledStart: selectedSlot,
-      notes: ""
+      notes: "",
+      receiptImageUrl: receiptImageUrl
     });
+  };
+
+  const [receiptImageUrl, setReceiptImageUrl] = useState("");
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    // Mock upload delay
+    setTimeout(() => {
+      // In a real app, this would be an actual upload to S3/Cloudinary
+      setReceiptImageUrl("https://images.unsplash.com/photo-1554224155-1696413565d3?q=80&w=2000&auto=format&fit=crop");
+      setIsUploading(false);
+    }, 1500);
   };
 
   if (isSuccess) {
@@ -180,6 +198,86 @@ export function BookingFlowPage() {
           <p className="text-xs leading-relaxed text-orange-200/60">
             Select a time slot on the right. If you don't see a preferred time, try changing the date.
           </p>
+        </div>
+
+        {/* Payment Details */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest px-2">Payment Verification</h3>
+          <Card className="bg-white/5 border-white/10 p-6 space-y-6">
+             {shop?.bankAccounts && shop.bankAccounts.length > 0 ? (
+               <>
+                 <div className="space-y-4">
+                   <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 px-1">Select Payment Method</p>
+                   <div className="grid grid-cols-1 gap-3">
+                     {shop.bankAccounts.map((acc: any) => (
+                       <button
+                         key={acc.id}
+                         onClick={() => setSelectedAccount(acc)}
+                         className={`p-4 rounded-2xl border text-left transition-all ${
+                           selectedAccount?.id === acc.id 
+                             ? "bg-orange-500/10 border-orange-500 shadow-lg shadow-orange-500/10" 
+                             : "bg-black/40 border-white/5 hover:border-white/20"
+                         }`}
+                       >
+                         <div className="flex justify-between items-center">
+                           <span className="font-bold text-white">{acc.bankName}</span>
+                           {selectedAccount?.id === acc.id && <CheckCircle2 className="w-4 h-4 text-orange-500" />}
+                         </div>
+                         <p className="text-xs text-white/40 mt-1">{acc.accountNumber}</p>
+                         {acc.accountHolder && <p className="text-[10px] text-white/20 uppercase mt-1">{acc.accountHolder}</p>}
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+
+                 {selectedAccount && (
+                   <div className="space-y-4 pt-4 border-t border-white/5">
+                     <p className="text-xs text-white/50 leading-relaxed">
+                       Please make a reservation payment of <b>{service && formatCurrency(service.basePrice)}</b> to the selected account and upload the receipt below.
+                     </p>
+                     
+                     <div className="relative">
+                       <input 
+                         type="file" 
+                         accept="image/*"
+                         onChange={handleFileUpload}
+                         className="hidden" 
+                         id="receipt-upload"
+                       />
+                       <label 
+                         htmlFor="receipt-upload"
+                         className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2rem] transition-all cursor-pointer ${
+                           receiptImageUrl 
+                             ? "border-green-500/50 bg-green-500/5" 
+                             : "border-white/10 bg-white/5 hover:border-orange-500/50 hover:bg-orange-500/5"
+                         }`}
+                       >
+                         {isUploading ? (
+                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                         ) : receiptImageUrl ? (
+                           <>
+                             <CheckCircle2 className="w-8 h-8 text-green-500 mb-2" />
+                             <span className="text-xs font-bold text-green-500">Receipt Uploaded</span>
+                           </>
+                         ) : (
+                           <>
+                             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                               <Store className="w-5 h-5 text-white/40" />
+                             </div>
+                             <span className="text-xs font-bold text-white/60 text-center px-4">Click to upload receipt image</span>
+                           </>
+                         )}
+                       </label>
+                     </div>
+                   </div>
+                 )}
+               </>
+             ) : (
+               <div className="text-center py-4">
+                 <p className="text-xs text-white/20">This shop hasn't configured bank details yet. You can pay after the service.</p>
+               </div>
+             )}
+          </Card>
         </div>
       </div>
 

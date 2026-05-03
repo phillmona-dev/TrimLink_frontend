@@ -11,9 +11,16 @@ export const bookingService = {
     notes?: string;
   }) => unwrap<Appointment>(http.post("/bookings", payload)),
 
-  getMine: (page = 0) =>
+  getMine: (page = 0, query = "", since = "") => {
+    const params: any = { page, size: 10 };
+    if (query) params.query = query;
+    if (since) params.since = since;
+    return unwrap<PageResponse<Appointment>>(http.get("/bookings/me", { params }));
+  },
+
+  getBarberAppointments: (status: string, page = 0) =>
     unwrap<PageResponse<Appointment>>(
-      http.get("/bookings/me", { params: { page, size: 10 } })
+      http.get("/bookings/barber", { params: { status, page, size: 50 } })
     ),
 
   cancelAppointment: (id: string, reason: string) =>
@@ -25,5 +32,24 @@ export const bookingService = {
     unwrap<Review>(http.post(`/bookings/${appointmentId}/review`, payload)),
 
   getSlots: (params: { barberId: string; serviceId: string; date: string }) =>
-    unwrap<any[]>(http.get("/bookings/slots", { params }))
+    unwrap<any[]>(http.get("/bookings/slots", { params })),
+
+  confirmAppointment: (id: string) =>
+    unwrap<Appointment>(http.patch(`/bookings/${id}/confirm`)),
+
+  startAppointment: (id: string) =>
+    unwrap<Appointment>(http.patch(`/bookings/${id}/start`)),
+
+  completeAppointment: (id: string) =>
+    unwrap<Appointment>(http.patch(`/bookings/${id}/complete`)),
+
+  getBarberReviews: (barberId: string, page = 0) =>
+    unwrap<PageResponse<Review>>(
+      http.get(`/barbers/${barberId}/reviews`, { params: { page, size: 10 } })
+    ),
+
+  getShopReviews: (shopId: string, page = 0) =>
+    unwrap<PageResponse<Review>>(
+      http.get(`/shops/${shopId}/reviews`, { params: { page, size: 10 } })
+    )
 };

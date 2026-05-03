@@ -11,8 +11,9 @@ import { Input } from "@/components/common/input";
 import { Button } from "@/components/common/button";
 import { authService } from "@/api/authService";
 import { useAuthStore } from "@/store/auth-store";
-import { LogIn } from "lucide-react";
+import { LogIn, MessageCircle } from "lucide-react";
 import { AnimatedIcon } from "@/components/common/animated-icon";
+import { SupportChatModal } from "@/components/widgets/support-chat-modal";
 
 const schema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -32,6 +33,8 @@ export function LoginPage() {
     }
   });
 
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
+  const [currentUsername, setCurrentUsername] = useState("");
   const { setSession } = useAuthStore();
 
   const onSubmit = async (values: FormValues) => {
@@ -55,6 +58,7 @@ export function LoginPage() {
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Failed to login";
       setServerMessage({ text: message, type: 'error' });
+      setCurrentUsername(values.username);
     }
   };
 
@@ -74,15 +78,25 @@ export function LoginPage() {
           {errors.password ? <p className="mt-2 text-sm text-orange-400">{errors.password.message}</p> : null}
         </div>
         {serverMessage ? (
-          <p className={`rounded-2xl p-4 text-sm border backdrop-blur-md ${
+          <div className={`rounded-2xl p-4 text-sm border backdrop-blur-md space-y-3 ${
             serverMessage.type === 'success' 
               ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
               : serverMessage.type === 'error'
               ? "bg-red-500/10 text-red-400 border-red-500/20"
               : "bg-amber-500/10 text-amber-400 border-amber-500/20"
           }`}>
-            {serverMessage.text}
-          </p>
+            <p>{serverMessage.text}</p>
+            {serverMessage.text.includes("shop has been deactivated") && (
+              <Button 
+                type="button"
+                onClick={() => setIsSupportOpen(true)}
+                className="w-full bg-white/10 hover:bg-white/20 text-white border-white/10 h-10 rounded-xl flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Contact System Admin
+              </Button>
+            )}
+          </div>
         ) : null}
         <Button className="w-full h-12 rounded-full bg-orange-500 text-black hover:bg-orange-600 font-bold flex items-center justify-center gap-2" disabled={isSubmitting} type="submit">
           {isSubmitting ? (
@@ -103,6 +117,11 @@ export function LoginPage() {
           New here? Create account
         </Link>
       </div>
+      <SupportChatModal 
+        isOpen={isSupportOpen} 
+        onClose={() => setIsSupportOpen(false)} 
+        username={currentUsername} 
+      />
     </Card>
   );
 }

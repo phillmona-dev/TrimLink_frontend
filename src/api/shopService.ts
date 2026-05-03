@@ -33,4 +33,16 @@ export const shopService = {
 
   /** Get barbers for a shop */
   getBarbers: (id: string) => unwrap<any[]>(http.get(`/shops/${id}/barbers`)),
+
+  /** List all shops including inactive ones (Admin only) */
+  listAll: (page = 0, size = 50) =>
+    unwrap<PageResponse<Shop>>(http.get(`/shops/admin/all?page=${page}&size=${size}`)),
+
+  /** Deactivate a shop (Admin only) */
+  deactivate: (id: string) =>
+    unwrap<void>(http.delete(`/shops/${id}`)),
+
+  /** Activate a shop (Admin only) */
+  activate: (id: string) =>
+    unwrap<void>(http.patch(`/shops/${id}/activate`)),
 };

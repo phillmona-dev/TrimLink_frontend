@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -25,9 +26,11 @@ export function ProfilePage() {
   const queryClient = useQueryClient();
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
+  const { session } = useAuth();
   const { data: user, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: userService.me,
+    enabled: !!session
   });
 
   const devicesQuery = useQuery({

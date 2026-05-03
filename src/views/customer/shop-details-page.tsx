@@ -3,7 +3,8 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { barberService } from "@/api/barberService";
-import { featuredBarbers, featuredShops, mockReviews } from "@/assets/mock-data";
+import { bookingService } from "@/api/bookingService";
+import { featuredBarbers, featuredShops } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 import { Badge } from "@/components/common/badge";
 import { Button } from "@/components/common/button";
@@ -23,6 +24,12 @@ export function ShopDetailsPage() {
     queryKey: ["shop-barbers", shopId],
     queryFn: () => barberService.getShopBarbers(shopId),
     placeholderData: featuredBarbers
+  });
+
+  const reviewsQuery = useQuery({
+    queryKey: ["shop-reviews", shopId],
+    queryFn: () => bookingService.getShopReviews(shopId),
+    enabled: !!shopId
   });
 
   const shop = shopQuery.data;
@@ -55,24 +62,33 @@ export function ShopDetailsPage() {
                     <h3 className="text-xl font-bold">{barber.user.firstName} {barber.user.lastName}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{barber.bio}</p>
                   </div>
-                  <Badge>{barber.available ? "Available" : "Busy"}</Badge>
+                  <div className="flex flex-col items-end gap-2">
+                    <Badge className={barber.available ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}>
+                      {barber.available ? "Available" : "Away"}
+                    </Badge>
+                    <Badge className={barber.status === "BUSY" ? "bg-orange-500/10 text-orange-500 border-orange-500/20" : "bg-blue-500/10 text-blue-500 border-blue-500/20"}>
+                      {barber.status === "BUSY" ? "On Work" : "Idle"}
+                    </Badge>
+                  </div>
                 </div>
                 <div className="mt-4 grid gap-3">
                   {barber.serviceAssignments?.map((assignment) => (
                     <div className="flex items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 group/service" key={assignment.id}>
                       <div className="flex-1">
-                        <div className="font-semibold text-white/90">{assignment.service.name}</div>
-                        <div className="text-xs text-white/40">{assignment.service.durationMinutes} min</div>
+                        <div className="font-semibold text-white/90">{assignment.serviceName || "Unknown Service"}</div>
+                        <div className="text-xs text-white/40">{assignment.durationMinutes || 0} min</div>
                       </div>
                       <div className="flex items-center gap-4">
-                        <div className="font-black text-orange-400">{formatCurrency(assignment.customPrice ?? assignment.service.basePrice)}</div>
-                        <Link 
-                          href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.service.id}`}
-                        >
-                          <Button size="sm" className="bg-orange-500 hover:bg-orange-400 text-black font-bold h-9 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
-                            Book
-                          </Button>
-                        </Link>
+                        <div className="font-black text-orange-400">{formatCurrency(assignment.effectivePrice ?? 0)}</div>
+                        {assignment.serviceId && (
+                          <Link 
+                            href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.serviceId}`}
+                          >
+                            <Button size="sm" className="bg-orange-500 hover:bg-orange-400 text-black font-bold h-9 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
+                              Book
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -84,15 +100,26 @@ export function ShopDetailsPage() {
         <Card>
           <h2 className="text-2xl font-black">Reviews</h2>
           <div className="mt-5 space-y-4">
-            {mockReviews.map((review) => (
-              <div className="rounded-3xl border border-border p-5" key={review.id}>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold">{review.reviewerName}</h3>
-                  <Badge>{review.rating}/5</Badge>
+            {reviewsQuery.data?.content.map((review) => (
+              <div className="rounded-[2rem] bg-white/5 border border-white/5 p-6 hover:bg-white/10 transition-all" key={review.id}>
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-black text-white/90">{review.reviewerName}</h3>
+                    <p className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Reviewed {review.barberName}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20">
+                    <span className="text-sm font-black text-orange-400">{review.rating}</span>
+                    <span className="text-[10px] text-orange-400/50">/ 5</span>
+                  </div>
                 </div>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{review.comment}</p>
+                <p className="text-sm leading-relaxed text-white/50">{review.comment}</p>
               </div>
             ))}
+            {(!reviewsQuery.data?.content || reviewsQuery.data.content.length === 0) && (
+              <div className="text-center py-10 text-white/20 border border-dashed border-white/10 rounded-3xl">
+                No reviews yet for this shop.
+              </div>
+            )}
           </div>
         </Card>
       </div>

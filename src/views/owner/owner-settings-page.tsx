@@ -50,11 +50,62 @@ export function OwnerSettingsPage() {
     }
   }, [hours]);
 
+  // Fetch Shop Details
+  const { data: shop, isLoading: isLoadingShop } = useQuery({
+    queryKey: ["shop-details"],
+    queryFn: ownerService.getShopDetails
+  });
+  
+  const [localShop, setLocalShop] = useState<any>({
+    name: "",
+    phone: "",
+    address: "",
+    city: "",
+    description: "",
+    bankAccounts: []
+  });
+
+  useEffect(() => {
+    if (shop) {
+      setLocalShop({
+        name: shop.name || "",
+        phone: shop.phone || "",
+        address: shop.address || "",
+        city: shop.city || "",
+        description: shop.description || "",
+        bankAccounts: shop.bankAccounts || []
+      });
+    }
+  }, [shop]);
+
+  const handleAddAccount = () => {
+    setLocalShop({
+      ...localShop,
+      bankAccounts: [...localShop.bankAccounts, { bankName: "", accountNumber: "", accountHolder: "" }]
+    });
+  };
+
+  const handleRemoveAccount = (index: number) => {
+    const newAccounts = [...localShop.bankAccounts];
+    newAccounts.splice(index, 1);
+    setLocalShop({ ...localShop, bankAccounts: newAccounts });
+  };
+
+  const handleAccountChange = (index: number, field: string, value: string) => {
+    const newAccounts = [...localShop.bankAccounts];
+    newAccounts[index] = { ...newAccounts[index], [field]: value };
+    setLocalShop({ ...localShop, bankAccounts: newAccounts });
+  };
+
   const mutation = useMutation({
-    mutationFn: ownerService.updateShopHours,
+    mutationFn: async () => {
+      await ownerService.updateShopHours(localHours);
+      await ownerService.updateShopDetails(localShop);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shop-hours"] });
-      setSuccessMessage("Schedule updated successfully!");
+      queryClient.invalidateQueries({ queryKey: ["shop-details"] });
+      setSuccessMessage("Settings updated successfully!");
       setTimeout(() => setSuccessMessage(null), 3000);
     }
   });
@@ -74,8 +125,14 @@ export function OwnerSettingsPage() {
   };
 
   const handleSave = () => {
-    mutation.mutate(localHours);
+    mutation.mutate();
   };
+
+  if (isLoadingHours || isLoadingShop) return (
+    <div className="flex items-center justify-center h-96">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+    </div>
+  );
 
   return (
     <div className="space-y-8 pb-20">
@@ -168,7 +225,7 @@ export function OwnerSettingsPage() {
           </Card>
         </div>
 
-        {/* Shop Info Section */}
+        {/* Shop Info & Payment Section */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="bg-white/5 border-white/10 p-6 space-y-6">
             <div className="flex items-center gap-3">
@@ -177,29 +234,108 @@ export function OwnerSettingsPage() {
               </div>
               <h2 className="text-xl font-bold text-white">Basic Info</h2>
             </div>
-
+ 
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Shop Name</label>
                 <div className="relative">
                   <Store className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                  <Input defaultValue="Summit Barber Shop" className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" />
+                  <Input 
+                    value={localShop.name} 
+                    onChange={(e) => setLocalShop({...localShop, name: e.target.value})}
+                    className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Phone Number</label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                  <Input defaultValue="+251911222333" className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" />
+                  <Input 
+                    value={localShop.phone} 
+                    onChange={(e) => setLocalShop({...localShop, phone: e.target.value})}
+                    className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Address</label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                  <Input defaultValue="Summit, Addis Ababa" className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" />
+                  <Input 
+                    value={localShop.address} 
+                    onChange={(e) => setLocalShop({...localShop, address: e.target.value})}
+                    className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" 
+                  />
                 </div>
               </div>
+            </div>
+          </Card>
+
+          <Card className="bg-white/5 border-white/10 p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
+                  <Save className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-bold text-white">Payment Settings</h2>
+              </div>
+              <Button 
+                onClick={handleAddAccount}
+                className="h-9 px-4 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded-xl border border-white/10 transition-all"
+              >
+                + Add Account
+              </Button>
+            </div>
+            
+            <p className="text-white/40 text-xs leading-relaxed">
+              Customers will see these bank details to make a manual reservation payment and upload a receipt.
+            </p>
+
+            <div className="space-y-6">
+              {localShop.bankAccounts.map((acc: any, idx: number) => (
+                <div key={idx} className="space-y-4 p-4 rounded-2xl bg-black/20 border border-white/5 relative group">
+                  <button 
+                    onClick={() => handleRemoveAccount(idx)}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-all shadow-lg"
+                  >
+                    ×
+                  </button>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Bank Name</label>
+                    <Input 
+                      placeholder="e.g. CBE, Telebirr"
+                      value={acc.bankName} 
+                      onChange={(e) => handleAccountChange(idx, "bankName", e.target.value)}
+                      className="bg-black/40 border-white/5 h-10 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Account Number</label>
+                    <Input 
+                      placeholder="Enter Account Number"
+                      value={acc.accountNumber} 
+                      onChange={(e) => handleAccountChange(idx, "accountNumber", e.target.value)}
+                      className="bg-black/40 border-white/5 h-10 rounded-xl text-sm" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Account Holder (Optional)</label>
+                    <Input 
+                      placeholder="Enter Holder Name"
+                      value={acc.accountHolder} 
+                      onChange={(e) => handleAccountChange(idx, "accountHolder", e.target.value)}
+                      className="bg-black/40 border-white/5 h-10 rounded-xl text-sm" 
+                    />
+                  </div>
+                </div>
+              ))}
+              
+              {localShop.bankAccounts.length === 0 && (
+                <div className="text-center py-6 border border-dashed border-white/10 rounded-2xl text-white/20 text-xs">
+                  No bank accounts added. Click "+ Add Account" to start.
+                </div>
+              )}
             </div>
           </Card>
 

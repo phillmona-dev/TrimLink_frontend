@@ -1,14 +1,27 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { adminService } from "@/api/adminService";
 import { Card } from "@/components/common/card";
+import { Button } from "@/components/common/button";
+import { MessageSquare } from "lucide-react";
+import { useChat } from "@/context/ChatContext";
 
 export function AdminUsersPage() {
+  const searchParams = useSearchParams();
+  const filterUsername = searchParams.get("username");
+  const { openChat } = useChat();
+
   const { data: usersPage, isLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: adminService.users,
   });
+
+  const allUsers = usersPage?.content || [];
+  const filteredUsers = filterUsername 
+    ? allUsers.filter(u => u.username.toLowerCase() === filterUsername.toLowerCase())
+    : allUsers;
 
   return (
     <Card className="border-white/5 bg-black/30 backdrop-blur-md">
@@ -23,6 +36,7 @@ export function AdminUsersPage() {
               <th className="px-6 py-4 font-medium tracking-wider">Username</th>
               <th className="px-6 py-4 font-medium tracking-wider">Role</th>
               <th className="px-6 py-4 font-medium tracking-wider">Status</th>
+              <th className="px-6 py-4 font-medium tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -35,8 +49,8 @@ export function AdminUsersPage() {
                   <td className="px-6 py-4"><div className="h-4 w-20 bg-white/10 animate-pulse rounded" /></td>
                 </tr>
               ))
-            ) : usersPage?.content && usersPage.content.length > 0 ? (
-              usersPage.content.map((user) => (
+            ) : filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => (
                 <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 font-medium text-white/90">
                     {user.firstName} {user.lastName}
@@ -57,6 +71,17 @@ export function AdminUsersPage() {
                     {user.approvalStatus === "REJECTED" && (
                       <span className="text-red-400 font-medium">Rejected</span>
                     )}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => openChat(user.id, `${user.firstName} ${user.lastName}`)}
+                      className="text-white/40 hover:text-orange-400 hover:bg-orange-500/10 rounded-xl"
+                    >
+                      <MessageSquare className="w-4 h-4 mr-2" />
+                      Message
+                    </Button>
                   </td>
                 </tr>
               ))
