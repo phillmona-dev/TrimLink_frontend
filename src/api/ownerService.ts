@@ -4,7 +4,7 @@ import type { PlatformUser } from "@/types";
 
 export type StaffPerformance = {
   user: PlatformUser;
-  barberId: string;
+  staffId: string;
   available: boolean;
   customersToday: number;
   manualLogsToday: number;
@@ -15,8 +15,8 @@ export type StaffPerformance = {
 };
 
 export type WeeklyPerformance = {
-  barberId: string;
-  barberName: string;
+  staffId: string;
+  staffName: string;
   totalCustomers: number;
   appBookings: number;
   manualEntries: number;
@@ -40,25 +40,25 @@ export const ownerService = {
   
   getStaffPerformance: () => unwrap<StaffPerformance[]>(http.get("/shops/my-shop/staff")),
   
-  getWeeklyReport: () => unwrap<WeeklyPerformance[]>(http.get("/shops/my-shop/staff/weekly-report")),
+  getWeeklyReport: () => unwrap<WeeklyPerformance[]>(http.get("/shops/my-shop/staffs/weekly-report")),
   
-  logDailyWork: (barberId: string, count: number, notes?: string) => 
-    unwrap<void>(http.post(`/shops/my-shop/staff/${barberId}/logs`, { count, notes })),
+  logDailyWork: (staffId: string, count: number, notes?: string) => 
+    unwrap<void>(http.post(`/shops/my-shop/staffs/${staffId}/logs`, { count, notes })),
   
   addStaff: (phoneNumber: string) => 
     unwrap<PlatformUser>(http.post("/shops/my-shop/staff", { phoneNumber })),
 
-  toggleStaffAvailability: (barberId: string, available: boolean) =>
-    unwrap<void>(http.patch(`/shops/my-shop/staff/${barberId}/availability`, { available })),
+  toggleStaffAvailability: (staffId: string, available: boolean) =>
+    unwrap<void>(http.patch(`/shops/my-shop/staffs/${staffId}/availability`, { available })),
 
   getPlatformServices: () => 
     unwrap<{ content: any[] }>(http.get("/services")),
 
-  getBarberServices: (barberId: string) =>
-    unwrap<any[]>(http.get(`/barber/services/${barberId}`)),
+  getStaffServices: (staffId: string) =>
+    unwrap<any[]>(http.get(`/staffs/services/${staffId}`)),
 
-  updateBarberServices: (barberId: string, assignments: { serviceId: string, customPrice: number }[]) =>
-    unwrap<any[]>(http.put(`/barber/services/${barberId}`, { assignments })),
+  updateStaffServices: (staffId: string, assignments: { serviceId: string, customPrice: number }[]) =>
+    unwrap<any[]>(http.put(`/staffs/services/${staffId}`, { assignments })),
 
   createShopService: (service: { name: string, description: string, basePrice: number, durationMinutes: number }) =>
     unwrap<any>(http.post("/services/my-shop", service)),

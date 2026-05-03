@@ -4,7 +4,7 @@ import type { PageResponse, PlatformUser } from "@/types";
 
 export type DashboardStats = {
   totalUsers: number;
-  totalBarbers: number;
+  totalStaffs: number;
   totalShops: number;
   totalAppointmentsToday: number;
   totalAppointmentsThisMonth: number;
@@ -15,11 +15,11 @@ export type DashboardStats = {
   pendingAppointments: number;
 };
 
-export type BarberPerformance = {
-  barberId: string;
+export type StaffPerformance = {
+  staffId: string;
   userId: string;
   shopId: string;
-  barberName: string;
+  staffName: string;
   averageRating: number;
   totalReviews: number;
   completedAppointmentsToday: number;
@@ -32,8 +32,8 @@ export type BarberPerformance = {
 export const adminService = {
   dashboard: () => unwrap<DashboardStats>(http.get("/admin/dashboard")),
   users: () => unwrap<PageResponse<PlatformUser>>(http.get("/admin/users")),
-  barberPerformance: () =>
-    unwrap<PageResponse<BarberPerformance>>(http.get("/admin/barbers/performance")),
+  staffPerformance: () =>
+    unwrap<PageResponse<StaffPerformance>>(http.get("/admin/staffs/performance")),
   pendingShops: () => unwrap<PlatformUser[]>(http.get("/admin/users/pending")),
   approveShop: (id: string) => unwrap<void>(http.patch(`/admin/users/${id}/approve`)),
   rejectShop: (id: string) => unwrap<void>(http.patch(`/admin/users/${id}/reject`)),

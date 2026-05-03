@@ -40,8 +40,8 @@ export function RegisterPage() {
       
       setServerMessage({ text: "Registration successful! Redirecting...", type: 'success' });
       
-      if (auth.role === "BARBER" || auth.role === "OWNER") {
-        router.push("/barber/queue");
+      if (auth.role === "STAFF" || auth.role === "OWNER") {
+        router.push("/staffs/queue");
       } else {
         router.push("/app");
       }
@@ -54,7 +54,7 @@ export function RegisterPage() {
   return (
     <Card className="mx-auto w-full max-w-md border-white/5 bg-black/30 backdrop-blur-md shadow-2xl p-8 rounded-[2rem] text-white">
       <h2 className="text-3xl font-normal tracking-tight text-white/90">Create account</h2>
-      <p className="mt-2 text-sm text-white/50">Fast setup for customers, barbers, and shop teams.</p>
+      <p className="mt-2 text-sm text-white/50">Fast setup for customers, staffs, and shop teams.</p>
       <form className="mt-8 space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -102,7 +102,7 @@ export function RegisterPage() {
         Already have an account? <Link className="text-orange-400 hover:text-orange-300 font-medium ml-1 transition" href="/auth/login">Sign in</Link>
       </p>
       <div className="mt-4 pt-4 border-t border-white/10 text-xs text-white/50 text-center">
-        Are you a Barber Shop? <Link className="text-white hover:text-orange-300 font-medium ml-1 transition" href="/auth/register/shop">Register your business</Link>
+        Are you a Staff Shop? <Link className="text-white hover:text-orange-300 font-medium ml-1 transition" href="/auth/register/shop">Register your business</Link>
       </div>
     </Card>
   );

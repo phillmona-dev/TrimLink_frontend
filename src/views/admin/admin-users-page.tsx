@@ -13,7 +13,7 @@ export function AdminUsersPage() {
   return (
     <Card className="border-white/5 bg-black/30 backdrop-blur-md">
       <h2 className="text-2xl font-black text-white/90">Users Management</h2>
-      <p className="mt-2 text-sm text-white/50 mb-6">Directory of all customers, barbers, and shop owners.</p>
+      <p className="mt-2 text-sm text-white/50 mb-6">Directory of all customers, staffs, and shop owners.</p>
       
       <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/20">
         <table className="w-full text-left text-sm text-white/70">

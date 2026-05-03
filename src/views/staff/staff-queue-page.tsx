@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { WS_BASE_URL } from "@/utils/constants";
 
-export function BarberQueuePage() {
+export function StaffQueuePage() {
   const { session } = useAuth();
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -18,7 +18,7 @@ export function BarberQueuePage() {
   const { data: initialData, refetch } = useQuery({
     queryKey: ["bookings", "pending", session?.userId],
     queryFn: async () => {
-      const { data } = await http.get("/bookings/barber?status=PENDING");
+      const { data } = await http.get("/bookings/staff?status=PENDING");
       return data.data.content;
     },
     enabled: !!session?.userId
@@ -33,7 +33,7 @@ export function BarberQueuePage() {
   // 2. Real-time Updates via WebSocket
   const { connected } = useWebSocket({
     url: WS_BASE_URL,
-    topic: `/topic/barbers/${session?.userId}/bookings`,
+    topic: `/topic/staffs/${session?.userId}/bookings`,
     onMessage: (booking) => {
       console.log("WebSocket booking received:", booking);
       setToastMsg(`New booking request from ${booking.customerName}!`);

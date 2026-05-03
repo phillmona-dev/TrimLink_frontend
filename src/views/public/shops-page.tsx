@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/common/button";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
+import Image from "next/image";
 
 function ShopCard({ shop, onSelect }: { shop: Shop; onSelect: () => void }) {
   return (
@@ -32,9 +33,15 @@ function ShopCard({ shop, onSelect }: { shop: Shop; onSelect: () => void }) {
     >
       {/* Shop Avatar & Name */}
       <div className="flex items-start gap-4">
-        <div className="h-12 w-12 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30 group-hover:border-orange-500/60 transition">
-          <Scissors className="h-6 w-6 text-orange-400" />
-        </div>
+        {shop.logoUrl ? (
+          <div className="h-12 w-12 rounded-xl shrink-0 border border-orange-500/30 group-hover:border-orange-500/60 transition relative overflow-hidden">
+            <Image src={shop.logoUrl} alt={shop.name} fill className="object-cover" />
+          </div>
+        ) : (
+          <div className="h-12 w-12 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30 group-hover:border-orange-500/60 transition">
+            <Scissors className="h-6 w-6 text-orange-400" />
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-white text-base leading-tight truncate">{shop.name}</h3>
           <div className="flex items-center gap-1.5 mt-1 text-white/40">
@@ -101,9 +108,9 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
     enabled: !!shopId,
   });
 
-  const { data: shopBarbers, isLoading: isBarbersLoading } = useQuery({
-    queryKey: ["shop-barbers", shopId],
-    queryFn: () => shopService.getBarbers(shopId),
+  const { data: shopStaffs, isLoading: isStaffsLoading } = useQuery({
+    queryKey: ["shop-staffs", shopId],
+    queryFn: () => shopService.getStaffs(shopId),
     enabled: !!shopId,
   });
 
@@ -149,9 +156,15 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
           {/* Header */}
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shadow-[0_0_20px_rgba(249,115,22,0.2)]">
-                <Scissors className="h-7 w-7 text-orange-400" />
-              </div>
+              {shopDetail?.logoUrl ? (
+                <div className="h-14 w-14 rounded-2xl shrink-0 border border-orange-500/30 shadow-[0_0_20px_rgba(249,115,22,0.2)] relative overflow-hidden">
+                  <Image src={shopDetail.logoUrl} alt={shopDetail.name} fill className="object-cover" />
+                </div>
+              ) : (
+                <div className="h-14 w-14 rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+                  <Scissors className="h-7 w-7 text-orange-400" />
+                </div>
+              )}
               <div>
                 <h2 className="text-xl font-black text-white leading-tight">
                   {isDetailLoading ? <div className="w-32 h-5 bg-white/10 animate-pulse rounded" /> : shopDetail?.name}
@@ -187,36 +200,42 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
             </button>
           )}
 
-          {/* Barbers */}
+          {/* Staffs */}
           <div>
-            <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Barbers</h3>
+            <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Staffs</h3>
             <div className="space-y-2">
-              {isBarbersLoading
+              {isStaffsLoading
                 ? [1, 2].map((i) => <div key={i} className="h-16 bg-white/5 animate-pulse rounded-2xl" />)
-                : shopBarbers && shopBarbers.length > 0
-                ? shopBarbers.map((barber: any) => (
+                : shopStaffs && shopStaffs.length > 0
+                ? shopStaffs.map((staff: any) => (
                     <div
-                      key={barber.id}
+                      key={staff.id}
                       className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center gap-4"
                     >
-                      <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
-                        <User className="h-5 w-5 text-white/20" />
-                      </div>
+                      {staff.user?.avatarUrl ? (
+                        <div className="h-10 w-10 rounded-xl shrink-0 border border-white/5 relative overflow-hidden">
+                          <Image src={staff.user.avatarUrl} alt={staff.user.firstName} fill className="object-cover" />
+                        </div>
+                      ) : (
+                        <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5 shrink-0">
+                          <User className="h-5 w-5 text-white/20" />
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <h4 className="text-sm font-bold text-white truncate">
-                          {barber.user?.firstName} {barber.user?.lastName}
+                          {staff.user?.firstName} {staff.user?.lastName}
                         </h4>
                         <div className="flex items-center gap-1 mt-0.5">
                           <Star size={10} className="text-orange-400 fill-orange-400" />
                           <span className="text-[10px] text-white/30">
-                            {barber.averageRating?.toFixed(1)} Rating
+                            {staff.averageRating?.toFixed(1)} Rating
                           </span>
                         </div>
                       </div>
                     </div>
                   ))
                 : (
-                    <div className="text-center py-6 text-white/20 text-xs">No barbers listed yet</div>
+                    <div className="text-center py-6 text-white/20 text-xs">No staffs listed yet</div>
                   )}
             </div>
           </div>
@@ -280,7 +299,7 @@ export function ShopsPage() {
           </Link>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Explore Shops</h1>
-            <p className="text-sm text-white/40 mt-0.5">Find the perfect barbershop near you</p>
+            <p className="text-sm text-white/40 mt-0.5">Find the perfect staffshop near you</p>
           </div>
         </div>
 

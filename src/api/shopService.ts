@@ -31,6 +31,6 @@ export const shopService = {
   /** Get a single shop by ID */
   getById: (id: string) => unwrap<Shop>(http.get(`/shops/${id}`)),
 
-  /** Get barbers for a shop */
-  getBarbers: (id: string) => unwrap<any[]>(http.get(`/shops/${id}/barbers`)),
+  /** Get staffs for a shop */
+  getStaffs: (id: string) => unwrap<any[]>(http.get(`/shops/${id}/staffs`)),
 };

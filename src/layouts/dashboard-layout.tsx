@@ -56,7 +56,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <div className="flex flex-1 items-center gap-3 lg:max-w-xl">
                 <div className="relative flex-1">
                   <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                  <Input className="pl-11 bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-full h-10" placeholder="Search shops, barbers, bookings..." />
+                  <Input className="pl-11 bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-full h-10" placeholder="Search shops, staffs, bookings..." />
                 </div>
                 <div className="group relative">
                   <ThemeToggle />

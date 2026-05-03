@@ -6,8 +6,8 @@ describe("LandingPage", () => {
     render(<LandingPage />);
 
     expect(
-      screen.getByText(/Your barbershop’s booking, queue, and payment flow finally feels premium/i)
+      screen.getByText(/Your staffshop’s booking, queue, and payment flow finally feels premium/i)
     ).toBeInTheDocument();
-    expect(screen.getByText(/Simple plans for solo barbers/i)).toBeInTheDocument();
+    expect(screen.getByText(/Simple plans for solo staffs/i)).toBeInTheDocument();
   });
 });

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { bookingService } from "@/api/bookingService";
-import { barberService } from "@/api/barberService";
+import { staffService } from "@/api/staffService";
 import { Button } from "@/components/common/button";
 import { Card } from "@/components/common/card";
 import { Badge } from "@/components/common/badge";
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { formatCurrency } from "@/utils/format";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export function BookingFlowPage() {
   const searchParams = useSearchParams();
@@ -30,37 +31,37 @@ export function BookingFlowPage() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const shopId = searchParams.get("shopId");
-  const barberId = searchParams.get("barberId");
+  const staffId = searchParams.get("staffId");
   const serviceId = searchParams.get("serviceId");
 
   // Fetch Details
   const { data: shop } = useQuery({
     queryKey: ["shop", shopId],
-    queryFn: () => barberService.getShop(shopId!),
+    queryFn: () => staffService.getShop(shopId!),
     enabled: !!shopId
   });
 
-  const { data: barber } = useQuery({
-    queryKey: ["barber", barberId],
-    queryFn: () => barberService.getBarber(barberId!),
-    enabled: !!barberId
+  const { data: staff } = useQuery({
+    queryKey: ["staff", staffId],
+    queryFn: () => staffService.getStaff(staffId!),
+    enabled: !!staffId
   });
 
   const { data: service } = useQuery({
     queryKey: ["service", serviceId],
-    queryFn: () => barberService.getService(serviceId!),
+    queryFn: () => staffService.getService(serviceId!),
     enabled: !!serviceId
   });
 
   // Fetch Slots
   const { data: slots, isLoading: isLoadingSlots, error: slotsError } = useQuery({
-    queryKey: ["slots", barberId, serviceId, selectedDate],
+    queryKey: ["slots", staffId, serviceId, selectedDate],
     queryFn: () => bookingService.getSlots({ 
-      barberId: barberId!, 
+      staffId: staffId!, 
       serviceId: serviceId!, 
       date: selectedDate 
     }),
-    enabled: !!barberId && !!serviceId && !!selectedDate,
+    enabled: !!staffId && !!serviceId && !!selectedDate,
     retry: false
   });
 
@@ -101,9 +102,9 @@ export function BookingFlowPage() {
   });
 
   const handleConfirm = () => {
-    if (!selectedSlot || !barberId || !shopId || !serviceId) return;
+    if (!selectedSlot || !staffId || !shopId || !serviceId) return;
     mutation.mutate({
-      barberId,
+      staffId,
       shopId,
       serviceId,
       scheduledStart: selectedSlot,
@@ -136,31 +137,49 @@ export function BookingFlowPage() {
         <h2 className="text-2xl font-black text-white">Your Selection</h2>
         <Card className="bg-white/5 border-white/10 space-y-6 p-6">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
-              <Store className="h-6 w-6" />
-            </div>
+            {shop?.logoUrl ? (
+              <div className="h-12 w-12 rounded-2xl shrink-0 border border-white/5 relative overflow-hidden">
+                <Image src={shop.logoUrl} alt={shop.name} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
+                <Store className="h-6 w-6" />
+              </div>
+            )}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Barbershop</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Staffshop</p>
               <p className="font-bold text-white">{shop?.name || "Loading..."}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
-              <User className="h-6 w-6" />
-            </div>
+            {staff?.user?.avatarUrl ? (
+              <div className="h-12 w-12 rounded-2xl shrink-0 border border-white/5 relative overflow-hidden">
+                <Image src={staff.user.avatarUrl} alt={staff.user.firstName} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
+                <User className="h-6 w-6" />
+              </div>
+            )}
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Barber</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Staff</p>
               <p className="font-bold text-white">
-                {barber?.user ? `${barber.user.firstName} ${barber.user.lastName}` : "Loading..."}
+                {staff?.user ? `${staff.user.firstName} ${staff.user.lastName}` : "Loading..."}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center text-orange-500">
-              <Scissors className="h-6 w-6" />
-            </div>
+            {service?.imageUrl ? (
+              <div className="h-12 w-12 rounded-2xl shrink-0 border border-orange-500/30 relative overflow-hidden">
+                <Image src={service.imageUrl} alt={service.name} fill className="object-cover" />
+              </div>
+            ) : (
+              <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center text-orange-500">
+                <Scissors className="h-6 w-6" />
+              </div>
+            )}
             <div>
               <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Service</p>
               <p className="font-bold text-white">{service?.name || "Loading..."}</p>
@@ -218,7 +237,7 @@ export function BookingFlowPage() {
                 <Clock className="h-8 w-8" />
               </div>
               <h3 className="text-xl font-bold text-white/40">No slots available</h3>
-              <p className="text-white/20 text-sm max-w-xs">This barber is fully booked or unavailable for the selected date.</p>
+              <p className="text-white/20 text-sm max-w-xs">This staff is fully booked or unavailable for the selected date.</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 p-2">

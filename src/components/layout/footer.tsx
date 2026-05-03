@@ -7,7 +7,7 @@ export function Footer() {
         <div>
           <h3 className="text-2xl font-black tracking-tight">TrimLink</h3>
           <p className="mt-4 max-w-xl text-base leading-8 text-muted-foreground">
-            A calmer way to discover barbershops, reserve a time, join a queue, and pay digitally
+            A calmer way to discover staffshops, reserve a time, join a queue, and pay digitally
             across Ethiopia.
           </p>
         </div>

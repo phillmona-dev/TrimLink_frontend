@@ -2,7 +2,7 @@ import { Card } from "@/components/common/card";
 import { Input } from "@/components/common/input";
 import { Button } from "@/components/common/button";
 
-export function BarberSettingsPage() {
+export function StaffSettingsPage() {
   return (
     <Card>
       <h2 className="text-2xl font-black">Availability settings</h2>

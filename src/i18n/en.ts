@@ -17,8 +17,8 @@ export const en = {
     retry: "Retry"
   },
   marketing: {
-    heroTitle: "Barbershop booking, live queues, and payments built for Ethiopia.",
+    heroTitle: "Staffshop booking, live queues, and payments built for Ethiopia.",
     heroBody:
-      "TrimLink helps customers skip uncertainty while helping barbershops run faster, earn more, and serve every customer with confidence."
+      "TrimLink helps customers skip uncertainty while helping staffshops run faster, earn more, and serve every customer with confidence."
   }
 };

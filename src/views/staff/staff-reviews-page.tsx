@@ -1,7 +1,7 @@
 import { mockReviews } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 
-export function BarberReviewsPage() {
+export function StaffReviewsPage() {
   return (
     <Card>
       <h2 className="text-2xl font-black">Reviews received</h2>

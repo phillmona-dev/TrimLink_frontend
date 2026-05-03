@@ -13,7 +13,7 @@ type RegisterPayload = {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
-  role?: "CUSTOMER" | "BARBER" | "OWNER";
+  role?: "CUSTOMER" | "STAFF" | "OWNER";
 };
 
 type ShopRegistrationPayload = {

@@ -33,7 +33,7 @@ export function AppointmentsPage() {
             <div>
               <h3 className="text-xl font-bold">{appointment.serviceName}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {appointment.shopName} · {appointment.barberName}
+                {appointment.shopName} · {appointment.staffName}
               </p>
               <p className="mt-3 text-sm">{formatDateTime(appointment.scheduledStart)}</p>
             </div>
@@ -42,7 +42,7 @@ export function AppointmentsPage() {
               <div className="font-black text-primary">{formatCurrency(appointment.priceCharged)}</div>
               <Button 
                 variant="outline"
-                onClick={() => router.push(`/app/booking?shopId=${appointment.shopId}&barberId=${appointment.barberId}&serviceId=${appointment.serviceId}`)}
+                onClick={() => router.push(`/app/booking?shopId=${appointment.shopId}&staffId=${appointment.staffId}&serviceId=${appointment.serviceId}`)}
               >
                 Rebook
               </Button>

@@ -25,7 +25,7 @@ export function QueuePage() {
         <div className="mt-6 space-y-4">
           {[
             "Queue joined successfully",
-            "Barber called the next customer",
+            "Staff called the next customer",
             "Service started",
             "Queue completed or cancelled"
           ].map((event) => (

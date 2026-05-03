@@ -2,8 +2,8 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { barberService } from "@/api/barberService";
-import { featuredBarbers, featuredShops, mockReviews } from "@/assets/mock-data";
+import { staffService } from "@/api/staffService";
+import { featuredStaffs, featuredShops, mockReviews } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 import { Badge } from "@/components/common/badge";
 import { Button } from "@/components/common/button";
@@ -15,14 +15,14 @@ export function ShopDetailsPage() {
   const shopId = params?.shopId ?? "shop-1";
   const shopQuery = useQuery({
     queryKey: ["shop", shopId],
-    queryFn: () => barberService.getShop(shopId),
+    queryFn: () => staffService.getShop(shopId),
     placeholderData: featuredShops[0]
   });
 
-  const barbersQuery = useQuery({
-    queryKey: ["shop-barbers", shopId],
-    queryFn: () => barberService.getShopBarbers(shopId),
-    placeholderData: featuredBarbers
+  const staffsQuery = useQuery({
+    queryKey: ["shop-staffs", shopId],
+    queryFn: () => staffService.getShopStaffs(shopId),
+    placeholderData: featuredStaffs
   });
 
   const shop = shopQuery.data;
@@ -46,19 +46,19 @@ export function ShopDetailsPage() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
         <Card>
-          <h2 className="text-2xl font-black">Barbers</h2>
+          <h2 className="text-2xl font-black">Staffs</h2>
           <div className="mt-5 space-y-4">
-            {barbersQuery.data?.map((barber) => (
-              <div className="rounded-3xl border border-border p-5" key={barber.id}>
+            {staffsQuery.data?.map((staff) => (
+              <div className="rounded-3xl border border-border p-5" key={staff.id}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-bold">{barber.user.firstName} {barber.user.lastName}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{barber.bio}</p>
+                    <h3 className="text-xl font-bold">{staff.user.firstName} {staff.user.lastName}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{staff.bio}</p>
                   </div>
-                  <Badge>{barber.available ? "Available" : "Busy"}</Badge>
+                  <Badge>{staff.available ? "Available" : "Busy"}</Badge>
                 </div>
                 <div className="mt-4 grid gap-3">
-                  {barber.serviceAssignments?.map((assignment) => (
+                  {staff.serviceAssignments?.map((assignment) => (
                     <div className="flex items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 group/service" key={assignment.id}>
                       <div className="flex-1">
                         <div className="font-semibold text-white/90">{assignment.service.name}</div>
@@ -67,7 +67,7 @@ export function ShopDetailsPage() {
                       <div className="flex items-center gap-4">
                         <div className="font-black text-orange-400">{formatCurrency(assignment.customPrice ?? assignment.service.basePrice)}</div>
                         <Link 
-                          href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.service.id}`}
+                          href={`/app/booking?shopId=${shopId}&staffId=${staff.id}&serviceId=${assignment.service.id}`}
                         >
                           <Button size="sm" className="bg-orange-500 hover:bg-orange-400 text-black font-bold h-9 px-4 rounded-xl shadow-lg shadow-orange-500/20 transition-all hover:scale-105 active:scale-95">
                             Book

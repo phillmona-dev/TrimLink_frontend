@@ -1,21 +1,21 @@
 import { http } from "@/api/http";
 import { unwrap } from "@/api/helpers";
-import type { ApiResponse, BarberProfile, PageResponse, Review, Service, Shop } from "@/types";
+import type { ApiResponse, StaffProfile, PageResponse, Review, Service, Shop } from "@/types";
 
-export const barberService = {
+export const staffService = {
   listShops: (params?: { q?: string; city?: string; page?: number; size?: number }) =>
     unwrap<PageResponse<Shop>>(http.get("/shops", { params })),
 
   getShop: (id: string) => unwrap<Shop>(http.get(`/shops/${id}`)),
 
-  getShopBarbers: (id: string) => unwrap<BarberProfile[]>(http.get(`/shops/${id}/barbers`)),
+  getShopStaffs: (id: string) => unwrap<StaffProfile[]>(http.get(`/shops/${id}/staffs`)),
 
   listServices: () => unwrap<PageResponse<Service>>(http.get("/services")),
 
-  getBarber: (id: string) => unwrap<BarberProfile>(http.get(`/barbers/${id}`)),
+  getStaff: (id: string) => unwrap<StaffProfile>(http.get(`/staffs/${id}`)),
 
   getService: (id: string) => unwrap<Service>(http.get(`/services/${id}`)),
 
-  getReviews: (barberId: string) =>
-    unwrap<PageResponse<Review>>(http.get(`/barbers/${barberId}/reviews`))
+  getReviews: (staffId: string) =>
+    unwrap<PageResponse<Review>>(http.get(`/staffs/${staffId}/reviews`))
 };

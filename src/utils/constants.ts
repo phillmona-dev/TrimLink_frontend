@@ -16,7 +16,7 @@ export const USER_KEY = "trimlink.user";
 
 export const dashboardRoleMap = {
   CUSTOMER: "/app",
-  BARBER: "/barber",
+  STAFF: "/staff",
   OWNER: "/owner",
   ADMIN: "/admin"
 } as const;

@@ -23,13 +23,13 @@ export function Sidebar() {
   }
 
   const links =
-    role === "BARBER"
+    role === "STAFF"
       ? [
-          { to: "/barber", label: "Dashboard", icon: LayoutDashboard },
-          { to: "/barber/queue", label: "Queue", icon: Clock },
-          { to: "/barber/services", label: "Services", icon: Scissors },
-          { to: "/barber/reviews", label: "Reviews", icon: Bell },
-          { to: "/barber/settings", label: "Settings", icon: Settings }
+          { to: "/staff", label: "Dashboard", icon: LayoutDashboard },
+          { to: "/staffs/queue", label: "Queue", icon: Clock },
+          { to: "/staffs/services", label: "Services", icon: Scissors },
+          { to: "/staffs/reviews", label: "Reviews", icon: Bell },
+          { to: "/staffs/settings", label: "Settings", icon: Settings }
         ]
       : role === "OWNER"
         ? [
@@ -37,7 +37,7 @@ export function Sidebar() {
             { to: "/owner/staff", label: "Staff", icon: Users },
             { to: "/owner/catalog", label: "Catalog", icon: Scissors },
             { to: "/owner/services", label: "Staff Services", icon: Users },
-            { to: "/barber/queue", label: "Queue", icon: Clock },
+            { to: "/staffs/queue", label: "Queue", icon: Clock },
             { to: "/owner/bookings", label: "Bookings", icon: CalendarDays },
             { to: "/owner/settings", label: "Settings", icon: Settings }
           ]

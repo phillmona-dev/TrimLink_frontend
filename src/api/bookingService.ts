@@ -4,7 +4,7 @@ import type { Appointment, PageResponse, Review } from "@/types";
 
 export const bookingService = {
   createAppointment: (payload: {
-    barberId: string;
+    staffId: string;
     shopId: string;
     serviceId: string;
     scheduledStart: string;
@@ -24,6 +24,6 @@ export const bookingService = {
   submitReview: (appointmentId: string, payload: { rating: number; comment?: string }) =>
     unwrap<Review>(http.post(`/bookings/${appointmentId}/review`, payload)),
 
-  getSlots: (params: { barberId: string; serviceId: string; date: string }) =>
+  getSlots: (params: { staffId: string; serviceId: string; date: string }) =>
     unwrap<any[]>(http.get("/bookings/slots", { params }))
 };

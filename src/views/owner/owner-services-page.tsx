@@ -21,10 +21,13 @@ import {
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/utils/format";
+import { ImageUpload } from "@/components/common/image-upload";
+import { uploadService } from "@/api/uploadService";
+import Image from "next/image";
 
 export function OwnerServicesPage() {
   const queryClient = useQueryClient();
-  const [selectedBarberId, setSelectedBarberId] = useState<string | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
   const [isAddingNewGlobal, setIsAddingNewGlobal] = useState(false);
   const [newServiceName, setNewServiceName] = useState("");
   const [newServiceDesc, setNewServiceDesc] = useState("");
@@ -43,11 +46,11 @@ export function OwnerServicesPage() {
     queryFn: ownerService.getPlatformServices,
   });
 
-  // Fetch selected barber's services
-  const { data: barberServices, isLoading: isLoadingServices } = useQuery({
-    queryKey: ["barber-services", selectedBarberId],
-    queryFn: () => ownerService.getBarberServices(selectedBarberId!),
-    enabled: !!selectedBarberId,
+  // Fetch selected staff's services
+  const { data: staffServices, isLoading: isLoadingServices } = useQuery({
+    queryKey: ["staff-services", selectedStaffId],
+    queryFn: () => ownerService.getStaffServices(selectedStaffId!),
+    enabled: !!selectedStaffId,
   });
 
   const createMutation = useMutation({
@@ -72,25 +75,25 @@ export function OwnerServicesPage() {
   };
 
   const updateMutation = useMutation({
-    mutationFn: (vars: { barberId: string; assignments: any[] }) => 
-      ownerService.updateBarberServices(vars.barberId, vars.assignments),
+    mutationFn: (vars: { staffId: string; assignments: any[] }) => 
+      ownerService.updateStaffServices(vars.staffId, vars.assignments),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["barber-services", selectedBarberId] });
+      queryClient.invalidateQueries({ queryKey: ["staff-services", selectedStaffId] });
     }
   });
 
   const handlePriceChange = (serviceId: string, newPrice: string) => {
-    if (!selectedBarberId || !barberServices) return;
+    if (!selectedStaffId || !staffServices) return;
     
     const price = parseFloat(newPrice);
     if (isNaN(price)) return;
 
-    const updatedServices = barberServices.map((s: any) => 
+    const updatedServices = staffServices.map((s: any) => 
       s.serviceId === serviceId ? { ...s, customPrice: price } : s
     );
 
     updateMutation.mutate({
-      barberId: selectedBarberId,
+      staffId: selectedStaffId,
       assignments: updatedServices.map((s: any) => ({
         serviceId: s.serviceId,
         customPrice: s.customPrice
@@ -99,16 +102,16 @@ export function OwnerServicesPage() {
   };
 
   const handleAddService = (serviceId: string) => {
-    if (!selectedBarberId || !barberServices) return;
+    if (!selectedStaffId || !staffServices) return;
     
     // Check if already exists
-    if (barberServices.find((s: any) => s.serviceId === serviceId)) return;
+    if (staffServices.find((s: any) => s.serviceId === serviceId)) return;
 
     const platformSvc = platformServices?.content.find((s: any) => s.id === serviceId);
     if (!platformSvc) return;
 
     const updatedServices = [
-      ...barberServices,
+      ...staffServices,
       { 
         serviceId: platformSvc.id, 
         serviceName: platformSvc.name, 
@@ -118,7 +121,7 @@ export function OwnerServicesPage() {
     ];
 
     updateMutation.mutate({
-      barberId: selectedBarberId,
+      staffId: selectedStaffId,
       assignments: updatedServices.map((s: any) => ({
         serviceId: s.serviceId,
         customPrice: s.customPrice
@@ -147,15 +150,15 @@ export function OwnerServicesPage() {
         <div className="lg:col-span-1 space-y-4">
           <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest px-2">Select Staff</h3>
           <div className="space-y-2">
-            {staff?.map((barber) => (
+            {staff?.map((staff) => (
               <div
-                key={barber.barberId}
+                key={staff.staffId}
                 role="button"
                 tabIndex={0}
-                onClick={() => setSelectedBarberId(barber.barberId)}
-                onKeyDown={(e) => e.key === 'Enter' && setSelectedBarberId(barber.barberId)}
+                onClick={() => setSelectedStaffId(staff.staffId)}
+                onKeyDown={(e) => e.key === 'Enter' && setSelectedStaffId(staff.staffId)}
                 className={`w-full flex items-center gap-4 p-4 rounded-[2rem] border transition-all cursor-pointer select-none ${
-                  selectedBarberId === barber.barberId
+                  selectedStaffId === staff.staffId
                     ? "bg-orange-500/10 border-orange-500/30 text-orange-400"
                     : "bg-white/5 border-white/5 text-white/60 hover:bg-white/10"
                 }`}
@@ -164,10 +167,10 @@ export function OwnerServicesPage() {
                   <User className="w-5 h-5" />
                 </div>
                 <div className="text-left overflow-hidden">
-                  <span className="block font-bold truncate">{barber.user.firstName} {barber.user.lastName}</span>
-                  <span className="block text-[10px] uppercase tracking-wider opacity-50">Barber</span>
+                  <span className="block font-bold truncate">{staff.user.firstName} {staff.user.lastName}</span>
+                  <span className="block text-[10px] uppercase tracking-wider opacity-50">Staff</span>
                 </div>
-                <ChevronRight className={`ml-auto w-4 h-4 transition-transform ${selectedBarberId === barber.barberId ? "rotate-90" : ""}`} />
+                <ChevronRight className={`ml-auto w-4 h-4 transition-transform ${selectedStaffId === staff.staffId ? "rotate-90" : ""}`} />
               </div>
             ))}
           </div>
@@ -175,7 +178,7 @@ export function OwnerServicesPage() {
 
         {/* Services List */}
         <div className="lg:col-span-3 space-y-6">
-          {!selectedBarberId ? (
+          {!selectedStaffId ? (
             <Card className="h-64 flex flex-col items-center justify-center text-center p-10 border-dashed border-white/10 bg-transparent">
               <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center text-white/20 mb-4">
                 <Scissors className="w-8 h-8" />
@@ -190,7 +193,7 @@ export function OwnerServicesPage() {
                 <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest px-2">Assigned Services</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <AnimatePresence mode="popLayout">
-                    {barberServices?.map((assignment: any) => (
+                    {staffServices?.map((assignment: any) => (
                       <motion.div
                         layout
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -240,7 +243,7 @@ export function OwnerServicesPage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {platformServices?.content
-                    .filter((ps: any) => !barberServices?.find((bs: any) => bs.serviceId === ps.id))
+                    .filter((ps: any) => !staffServices?.find((bs: any) => bs.serviceId === ps.id))
                     .map((ps: any) => (
                       <div
                         key={ps.id}
@@ -251,13 +254,33 @@ export function OwnerServicesPage() {
                         className="group p-5 rounded-[2rem] bg-white/[0.03] border border-white/5 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all text-left cursor-pointer select-none"
                       >
                         <div className="flex items-center justify-between mb-4">
-                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20 group-hover:bg-orange-500/20 group-hover:text-orange-500 transition-colors">
-                            <Plus className="w-5 h-5" />
-                          </div>
+                          {ps.imageUrl ? (
+                            <div className="w-10 h-10 rounded-xl relative overflow-hidden">
+                              <Image src={ps.imageUrl} alt={ps.name} fill className="object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-white/20 group-hover:bg-orange-500/20 group-hover:text-orange-500 transition-colors">
+                              <Plus className="w-5 h-5" />
+                            </div>
+                          )}
                           <span className="text-xs font-bold text-white/40 group-hover:text-white/80">{formatCurrency(ps.basePrice)}</span>
                         </div>
                         <span className="block font-bold text-white/80 group-hover:text-white transition-colors">{ps.name}</span>
-                        <span className="block text-[10px] text-white/30 mt-1 uppercase tracking-widest">{ps.durationMinutes} min</span>
+                        <div className="flex items-center justify-between mt-1">
+                          <span className="block text-[10px] text-white/30 uppercase tracking-widest">{ps.durationMinutes} min</span>
+                          <div onClick={(e) => e.stopPropagation()} className="w-20">
+                            <ImageUpload 
+                              currentImageUrl={ps.imageUrl}
+                              label=""
+                              shape="square"
+                              className="h-8"
+                              onUpload={async (file) => {
+                                await uploadService.uploadServiceImage(ps.id, file);
+                                queryClient.invalidateQueries({ queryKey: ["platform-services"] });
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     ))}
                 </div>

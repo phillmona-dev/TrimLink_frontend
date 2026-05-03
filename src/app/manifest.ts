@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "TrimLink",
     short_name: "TrimLink",
     description:
-      "Premium barbershop booking, queue, and payment platform for Ethiopia.",
+      "Premium staffshop booking, queue, and payment platform for Ethiopia.",
     start_url: "/",
     display: "standalone",
     background_color: "#04191c",

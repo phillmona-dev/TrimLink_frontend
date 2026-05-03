@@ -46,7 +46,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
                     Appointments, live queues, and Ethiopian payments in one premium experience.
                   </h1>
                   <p className="mt-6 max-w-lg text-sm leading-8 text-white/60">
-                    Customers move faster, barbers stay in control, and owners finally get a clean
+                    Customers move faster, staffs stay in control, and owners finally get a clean
                     operational view of the business.
                   </p>
                 </div>

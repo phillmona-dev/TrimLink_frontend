@@ -2,7 +2,7 @@ import { featuredServices } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 import { formatCurrency } from "@/utils/format";
 
-export function BarberServicesPage() {
+export function StaffServicesPage() {
   return (
     <Card>
       <h2 className="text-2xl font-black">Service management</h2>

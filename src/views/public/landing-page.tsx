@@ -53,9 +53,9 @@ export function LandingPage() {
     enabled: !!selectedShopId,
   });
 
-  const { data: shopBarbers, isLoading: isBarbersLoading } = useQuery({
-    queryKey: ["shop-barbers", selectedShopId],
-    queryFn: () => shopService.getBarbers(selectedShopId!),
+  const { data: shopStaffs, isLoading: isStaffsLoading } = useQuery({
+    queryKey: ["shop-staffs", selectedShopId],
+    queryFn: () => shopService.getStaffs(selectedShopId!),
     enabled: !!selectedShopId,
   });
 
@@ -174,7 +174,7 @@ export function LandingPage() {
                   onChange={(e) => {
                     setQuery(e.target.value);
                   }}
-                  placeholder="Search for a barber or shop..."
+                  placeholder="Search for a staff or shop..."
                   className="flex-1 min-w-0 h-12 bg-black/40 border border-white/5 rounded-full px-4 md:px-5 flex items-center text-white/90 text-sm focus:outline-none focus:border-orange-500/50 transition"
                 />
                 <Button type="submit" variant="outline" className="shrink-0 rounded-full border-white/10 bg-white/5 hover:bg-white/10 h-10 px-4 md:px-6 text-sm">
@@ -206,9 +206,15 @@ export function LandingPage() {
                     searchResults.content.map(shop => (
                       <motion.div key={shop.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-4 p-4 rounded-2xl bg-black/20 border border-white/5 hover:bg-white/5 transition">
                         <div className="flex flex-col items-center">
-                          <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30">
-                            <Scissors className="h-6 w-6 text-orange-400" />
-                          </div>
+                          {shop.logoUrl ? (
+                            <div className="h-12 w-12 rounded-full shrink-0 border border-orange-500/30 relative overflow-hidden">
+                              <Image src={shop.logoUrl} alt={shop.name} fill className="object-cover" />
+                            </div>
+                          ) : (
+                            <div className="h-12 w-12 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30">
+                              <Scissors className="h-6 w-6 text-orange-400" />
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1">
                           <div className="flex justify-between items-start mb-1">
@@ -273,7 +279,7 @@ export function LandingPage() {
                         </div>
                       </div>
                       <p className="text-sm text-white/70 leading-relaxed mb-4">
-                        Book your trim without spending the day waiting. Find trusted barbershops, reserve a slot, and join a live queue.
+                        Book your trim without spending the day waiting. Find trusted staffshops, reserve a slot, and join a live queue.
                       </p>
                       
                       {/* Embedded Hero Banner */}
@@ -281,7 +287,7 @@ export function LandingPage() {
                         <div className="absolute inset-0 bg-gradient-to-br from-orange-600/80 to-purple-900/80 z-10 mix-blend-multiply"></div>
                         <Image 
                           src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop" 
-                          alt="Barbershop" 
+                          alt="Staffshop" 
                           fill 
                           priority
                           className="object-cover opacity-50 z-0" 
@@ -294,7 +300,7 @@ export function LandingPage() {
                             The Perfect Fade
                           </h2>
                           <p className="text-white/80 text-sm mb-4">
-                            Discover top-rated barbers in your area.
+                            Discover top-rated staffs in your area.
                           </p>
                           <Link href="/shops">
                             <Button className="w-fit bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 text-sm font-semibold">
@@ -605,7 +611,7 @@ export function LandingPage() {
                 {/* Content Area - Two Columns for efficiency */}
                 <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 min-h-0 overflow-y-auto md:overflow-hidden">
                   
-                  {/* Left Side: About & Barbers */}
+                  {/* Left Side: About & Staffs */}
                   <div className="flex flex-col gap-8 min-h-0">
                     <section className="shrink-0">
                       <h3 className="text-[10px] font-black text-orange-500/60 uppercase tracking-[0.3em] mb-3">The Experience</h3>
@@ -623,7 +629,7 @@ export function LandingPage() {
 
                     <section className="flex-1 flex flex-col min-h-0">
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">Master Barbers</h3>
+                        <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">Master Staffs</h3>
                         <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20">
                           <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
                           <span className="text-emerald-400 text-[9px] font-black uppercase tracking-widest">Active Now</span>
@@ -631,22 +637,22 @@ export function LandingPage() {
                       </div>
                       
                       <div className="flex-1 md:overflow-y-auto custom-scrollbar space-y-3 pr-2">
-                        {isBarbersLoading ? (
+                        {isStaffsLoading ? (
                           [1, 2].map(i => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-[1.5rem]" />)
-                        ) : shopBarbers && shopBarbers.length > 0 ? (
-                          shopBarbers.map((barber: any) => (
+                        ) : shopStaffs && shopStaffs.length > 0 ? (
+                          shopStaffs.map((staff: any) => (
                             <motion.div 
-                              key={barber.id} 
+                              key={staff.id} 
                               className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center gap-4 group hover:bg-white/[0.08] transition-all duration-300"
                             >
                               <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/5">
                                 <User className="h-5 w-5 text-white/20" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-bold text-white truncate">{barber.user.firstName} {barber.user.lastName}</h4>
+                                <h4 className="text-sm font-bold text-white truncate">{staff.user.firstName} {staff.user.lastName}</h4>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                   <Star size={10} className="text-orange-400 fill-orange-400" />
-                                  <span className="text-[10px] text-white/30 font-bold tracking-tighter">{barber.averageRating.toFixed(1)} Rating</span>
+                                  <span className="text-[10px] text-white/30 font-bold tracking-tighter">{staff.averageRating.toFixed(1)} Rating</span>
                                 </div>
                               </div>
                             </motion.div>

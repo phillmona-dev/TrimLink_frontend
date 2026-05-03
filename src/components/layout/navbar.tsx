@@ -30,7 +30,7 @@ export function Navbar() {
           <LogoMark />
           <div>
             <div className="text-2xl font-black tracking-tight">{t("common.appName")}</div>
-            <div className="text-base text-muted-foreground">Simple barber booking</div>
+            <div className="text-base text-muted-foreground">Simple staff booking</div>
           </div>
         </Link>
 

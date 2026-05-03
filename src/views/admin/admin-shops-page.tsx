@@ -34,7 +34,7 @@ export function AdminShopsPage() {
       {/* Pending Approvals Section */}
       <Card className="border-white/5 bg-black/30 backdrop-blur-md">
         <h2 className="text-2xl font-black text-white/90">Pending Shop Approvals</h2>
-        <p className="mt-2 text-sm text-white/50 mb-6">Review and approve new barber shop applications.</p>
+        <p className="mt-2 text-sm text-white/50 mb-6">Review and approve new staff shop applications.</p>
         
         {isLoading ? (
           <div className="space-y-4">
@@ -49,12 +49,12 @@ export function AdminShopsPage() {
                 <div>
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-semibold text-lg text-white">
-                      {user.barberProfile?.shop?.name || "Unknown Shop"}
+                      {user.staffProfile?.shop?.name || "Unknown Shop"}
                     </h3>
                     <span className="px-2 py-0.5 rounded text-xs bg-orange-500/20 text-orange-400 font-medium uppercase">Pending</span>
                   </div>
                   <div className="text-sm text-white/60 mb-2">
-                    {user.barberProfile?.shop?.address}, {user.barberProfile?.shop?.city}
+                    {user.staffProfile?.shop?.address}, {user.staffProfile?.shop?.city}
                   </div>
                   <div className="text-xs text-white/40 flex items-center gap-4">
                     <span>Owner: {user.firstName} {user.lastName} (@{user.username})</span>

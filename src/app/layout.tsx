@@ -12,7 +12,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "TrimLink",
   description:
-    "Premium barbershop booking, queue, and payment platform for Ethiopia.",
+    "Premium staffshop booking, queue, and payment platform for Ethiopia.",
   icons: {
     icon: "/favicon.svg"
   }

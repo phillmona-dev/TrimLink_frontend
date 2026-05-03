@@ -4,7 +4,7 @@ import type { QueueTicket } from "@/types";
 
 export const queueService = {
   join: (payload: {
-    barberId: string;
+    staffId: string;
     shopId: string;
     serviceId: string;
     clientTimestamp?: string;

@@ -1,4 +1,4 @@
-export type Role = "CUSTOMER" | "BARBER" | "OWNER" | "ADMIN";
+export type Role = "CUSTOMER" | "STAFF" | "OWNER" | "ADMIN";
 
 export type PlatformUser = {
   id: string;
@@ -12,7 +12,7 @@ export type PlatformUser = {
   approvalStatus: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: string;
   updatedAt?: string;
-  barberProfile?: {
+  staffProfile?: {
     id: string;
     bio?: string;
     experienceYears?: number;
@@ -67,7 +67,7 @@ export type Service = {
   active?: boolean;
 };
 
-export type BarberProfile = {
+export type StaffProfile = {
   id: string;
   bio?: string;
   experienceYears?: number;
@@ -106,8 +106,8 @@ export type Appointment = {
   id: string;
   customerId: string;
   customerName?: string;
-  barberId: string;
-  barberName?: string;
+  staffId: string;
+  staffName?: string;
   shopId: string;
   shopName?: string;
   serviceId: string;
@@ -124,8 +124,8 @@ export type Appointment = {
 export type QueueTicket = {
   entryId: string;
   customerId: string;
-  barberId: string;
-  barberName?: string;
+  staffId: string;
+  staffName?: string;
   shopId: string;
   shopName?: string;
   serviceId: string;
@@ -154,7 +154,7 @@ export type Payment = {
 
 export type Review = {
   id: string;
-  barberProfileId: string;
+  staffProfileId: string;
   appointmentId: string;
   reviewerId: string;
   rating: number;

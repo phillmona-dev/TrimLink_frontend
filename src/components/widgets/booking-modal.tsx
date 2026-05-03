@@ -12,7 +12,7 @@ export function BookingModal() {
         <div className="flex-1">
           <h3 className="text-lg font-bold">Quick booking</h3>
           <p className="mt-2 text-sm text-muted-foreground">
-            Reusable surface for embedded booking on shop or barber detail pages.
+            Reusable surface for embedded booking on shop or staff detail pages.
           </p>
           <Button className="mt-4">Open booking flow</Button>
         </div>

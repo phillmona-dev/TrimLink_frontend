@@ -21,11 +21,11 @@ import { AnimatedBackground } from "@/components/common/animated-background";
 const FAQ_ITEMS = [
   {
     q: "How do I book an appointment?",
-    a: "After logging in, search for a barbershop or browse nearby shops. Select a shop, choose a barber and a time slot that works for you, then confirm your booking. You'll receive a confirmation immediately.",
+    a: "After logging in, search for a staffshop or browse nearby shops. Select a shop, choose a staff and a time slot that works for you, then confirm your booking. You'll receive a confirmation immediately.",
   },
   {
     q: "How does the Live Queue work?",
-    a: "When you join a queue at a barbershop, TrimLink gives you a virtual ticket number. You can track your position in real time from anywhere. The app notifies you when it's almost your turn, so you don't have to wait at the shop.",
+    a: "When you join a queue at a staffshop, TrimLink gives you a virtual ticket number. You can track your position in real time from anywhere. The app notifies you when it's almost your turn, so you don't have to wait at the shop.",
   },
   {
     q: "What payment methods are supported?",
@@ -36,19 +36,19 @@ const FAQ_ITEMS = [
     a: "Yes, you can cancel or reschedule a booking from your profile page. Please note that cancellations less than 1 hour before the appointment may be subject to the shop's cancellation policy.",
   },
   {
-    q: "How do I register my barbershop on TrimLink?",
-    a: "Create an account and select 'Shop Owner' as your role. After verification, you'll be able to set up your shop profile, add barbers, define services, and start accepting bookings.",
+    q: "How do I register my staffshop on TrimLink?",
+    a: "Create an account and select 'Shop Owner' as your role. After verification, you'll be able to set up your shop profile, add staffs, define services, and start accepting bookings.",
   },
   {
     q: "Is TrimLink available outside Addis Ababa?",
     a: "TrimLink is currently expanding across Ethiopia. While most shops are currently in Addis Ababa, we are onboarding shops in other cities every week. Stay tuned!",
   },
   {
-    q: "What if my barber is running late?",
-    a: "The live queue updates in real time. If a barber is running behind, the estimated wait time in the app will reflect that automatically, keeping you informed without any calls needed.",
+    q: "What if my staff is running late?",
+    a: "The live queue updates in real time. If a staff is running behind, the estimated wait time in the app will reflect that automatically, keeping you informed without any calls needed.",
   },
   {
-    q: "How do I contact a barbershop directly?",
+    q: "How do I contact a staffshop directly?",
     a: "On each shop's detail page, you can find the shop's phone number and address. You can call them directly or navigate to their location using Google Maps.",
   },
 ];

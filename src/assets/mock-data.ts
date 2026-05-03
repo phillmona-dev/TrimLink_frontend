@@ -1,4 +1,4 @@
-import type { Appointment, BarberProfile, Payment, QueueTicket, Review, Service, Shop } from "@/types";
+import type { Appointment, StaffProfile, Payment, QueueTicket, Review, Service, Shop } from "@/types";
 
 export const featuredServices: Service[] = [
   { id: "svc-1", name: "Signature Fade", description: "Sharp modern fade and beard line-up.", basePrice: 220, durationMinutes: 45 },
@@ -33,16 +33,16 @@ export const featuredShops: Shop[] = [
   }
 ];
 
-export const featuredBarbers: BarberProfile[] = [
+export const featuredStaffs: StaffProfile[] = [
   {
-    id: "barber-1",
+    id: "staff-1",
     averageRating: 4.9,
     totalReviews: 182,
     available: true,
     experienceYears: 7,
     bio: "Skin fades and camera-ready detailing.",
     user: {
-      id: "user-barber-1",
+      id: "user-staff-1",
       firstName: "Henok",
       lastName: "Alem",
       phoneNumber: "+251911111111"
@@ -53,14 +53,14 @@ export const featuredBarbers: BarberProfile[] = [
     ]
   },
   {
-    id: "barber-2",
+    id: "staff-2",
     averageRating: 4.7,
     totalReviews: 96,
     available: true,
     experienceYears: 5,
     bio: "Fast walk-ins, classic cuts, and tight beard shaping.",
     user: {
-      id: "user-barber-2",
+      id: "user-staff-2",
       firstName: "Dawit",
       lastName: "Mekonnen",
       phoneNumber: "+251922222222"
@@ -73,8 +73,8 @@ export const mockAppointments: Appointment[] = [
   {
     id: "apt-1",
     customerId: "user-1",
-    barberId: "barber-1",
-    barberName: "Henok Alem",
+    staffId: "staff-1",
+    staffName: "Henok Alem",
     shopId: "shop-1",
     shopName: "Bole Trim House",
     serviceId: "svc-1",
@@ -88,8 +88,8 @@ export const mockAppointments: Appointment[] = [
   {
     id: "apt-2",
     customerId: "user-1",
-    barberId: "barber-2",
-    barberName: "Dawit Mekonnen",
+    staffId: "staff-2",
+    staffName: "Dawit Mekonnen",
     shopId: "shop-2",
     shopName: "Kazanchis Studio",
     serviceId: "svc-2",
@@ -104,8 +104,8 @@ export const mockAppointments: Appointment[] = [
 export const mockQueueTicket: QueueTicket = {
   entryId: "queue-1",
   customerId: "user-1",
-  barberId: "barber-1",
-  barberName: "Henok Alem",
+  staffId: "staff-1",
+  staffName: "Henok Alem",
   shopId: "shop-1",
   shopName: "Bole Trim House",
   serviceId: "svc-1",
@@ -135,7 +135,7 @@ export const mockPayments: Payment[] = [
 export const mockReviews: Review[] = [
   {
     id: "rev-1",
-    barberProfileId: "barber-1",
+    staffProfileId: "staff-1",
     appointmentId: "apt-2",
     reviewerId: "user-1",
     rating: 5,

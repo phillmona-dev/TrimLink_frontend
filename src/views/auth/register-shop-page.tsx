@@ -91,7 +91,7 @@ export function RegisterShopPage() {
   return (
     <Card className="mx-auto w-full max-w-lg border-white/5 bg-black/30 backdrop-blur-md shadow-2xl p-8 rounded-[2rem] text-white">
       <h2 className="text-3xl font-normal tracking-tight text-white/90">Register Shop</h2>
-      <p className="mt-2 text-sm text-white/50">Submit your barber shop details for admin approval.</p>
+      <p className="mt-2 text-sm text-white/50">Submit your staff shop details for admin approval.</p>
       
       <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
         {/* Personal Details Section */}

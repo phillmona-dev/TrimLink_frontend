@@ -7,6 +7,8 @@ import { Card } from "@/components/common/card";
 import { Input } from "@/components/common/input";
 import { Button } from "@/components/common/button";
 import { Badge } from "@/components/common/badge";
+import { ImageUpload } from "@/components/common/image-upload";
+import { uploadService } from "@/api/uploadService";
 import { 
   Settings, 
   Clock, 
@@ -179,11 +181,18 @@ export function OwnerSettingsPage() {
             </div>
 
             <div className="space-y-4">
+              <ImageUpload
+                label="Shop Logo"
+                onUpload={async (file) => {
+                  await uploadService.uploadShopLogo(file);
+                  // Optional: invalidate queries to refresh
+                }}
+              />
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Shop Name</label>
                 <div className="relative">
                   <Store className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                  <Input defaultValue="Summit Barber Shop" className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" />
+                  <Input defaultValue="Summit Staff Shop" className="pl-11 bg-black/40 border-white/5 h-12 rounded-2xl" />
                 </div>
               </div>
               <div className="space-y-2">

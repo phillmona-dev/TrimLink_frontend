@@ -9,7 +9,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useState } from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, User as UserIcon } from "lucide-react";
+import { ImageUpload } from "@/components/common/image-upload";
+import { uploadService } from "@/api/uploadService";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -81,9 +83,21 @@ export function ProfilePage() {
       <Card className="p-8">
         <h2 className="text-2xl font-black">Profile settings</h2>
         <p className="text-sm text-white/50 mt-1">Manage your identity and security credentials.</p>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
-          <div className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-8">
+          <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="shrink-0">
+              <ImageUpload
+                currentImageUrl={user?.avatarUrl}
+                label="Profile Picture"
+                shape="circle"
+                onUpload={async (file) => {
+                  await uploadService.uploadAvatar(file);
+                  queryClient.invalidateQueries({ queryKey: ["me"] });
+                }}
+              />
+            </div>
+            
+            <div className="space-y-4 flex-1 w-full">
             <h3 className="text-sm font-semibold text-orange-400 uppercase tracking-wider border-b border-white/10 pb-2">Personal Information</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-1.5">
@@ -113,10 +127,11 @@ export function ProfilePage() {
                 error={errors.email?.message}
                 className="bg-white/5 border-white/10"
               />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4 pt-4">
+          <div className="space-y-4 pt-4 border-t border-white/5">
             <h3 className="text-sm font-semibold text-orange-400 uppercase tracking-wider border-b border-white/10 pb-2">Security Credentials</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-1.5">

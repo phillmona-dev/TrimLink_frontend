@@ -29,7 +29,7 @@ export function AnimatedBackground() {
         >
           {[...backgroundImages, ...backgroundImages].map((src, i) => (
             <div key={i} className="w-64 h-64 shrink-0 rounded-3xl overflow-hidden shadow-2xl">
-              <img src={src} alt="Barber style" className="w-full h-full object-cover mix-blend-luminosity" />
+              <img src={src} alt="Staff style" className="w-full h-full object-cover mix-blend-luminosity" />
             </div>
           ))}
         </motion.div>
@@ -42,7 +42,7 @@ export function AnimatedBackground() {
         >
           {[...backgroundImages, ...backgroundImages].reverse().map((src, i) => (
             <div key={i} className="w-80 h-80 shrink-0 rounded-3xl overflow-hidden shadow-2xl">
-              <img src={src} alt="Barber style" className="w-full h-full object-cover mix-blend-luminosity" />
+              <img src={src} alt="Staff style" className="w-full h-full object-cover mix-blend-luminosity" />
             </div>
           ))}
         </motion.div>
@@ -55,7 +55,7 @@ export function AnimatedBackground() {
         >
           {[...backgroundImages, ...backgroundImages].map((src, i) => (
             <div key={i} className="w-64 h-64 shrink-0 rounded-3xl overflow-hidden shadow-2xl">
-              <img src={src} alt="Barber style" className="w-full h-full object-cover mix-blend-luminosity" />
+              <img src={src} alt="Staff style" className="w-full h-full object-cover mix-blend-luminosity" />
             </div>
           ))}
         </motion.div>

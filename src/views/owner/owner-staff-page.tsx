@@ -21,7 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export function OwnerStaffPage() {
   const queryClient = useQueryClient();
-  const [selectedBarber, setSelectedBarber] = useState<StaffPerformance | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<StaffPerformance | null>(null);
   const [logCount, setLogCount] = useState(1);
   const [isLogging, setIsLogging] = useState(false);
   const [isAddingStaff, setIsAddingStaff] = useState(false);
@@ -41,13 +41,13 @@ export function OwnerStaffPage() {
   });
 
   const logMutation = useMutation({
-    mutationFn: (vars: { barberId: string; count: number }) => 
-      ownerService.logDailyWork(vars.barberId, vars.count),
+    mutationFn: (vars: { staffId: string; count: number }) => 
+      ownerService.logDailyWork(vars.staffId, vars.count),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["owner-staff-performance"] });
       queryClient.invalidateQueries({ queryKey: ["owner-weekly-report"] });
       setIsLogging(false);
-      setSelectedBarber(null);
+      setSelectedStaff(null);
       setLogCount(1);
     }
   });
@@ -66,24 +66,24 @@ export function OwnerStaffPage() {
   });
 
   const toggleAvailabilityMutation = useMutation({
-    mutationFn: (vars: { barberId: string; available: boolean }) => 
-      ownerService.toggleStaffAvailability(vars.barberId, vars.available),
+    mutationFn: (vars: { staffId: string; available: boolean }) => 
+      ownerService.toggleStaffAvailability(vars.staffId, vars.available),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["owner-staff-performance"] });
     }
   });
 
   const handleLogSubmit = () => {
-    if (selectedBarber) {
+    if (selectedStaff) {
       logMutation.mutate({ 
-        barberId: selectedBarber.barberId, 
+        staffId: selectedStaff.staffId, 
         count: logCount 
       });
     }
   };
 
-  const handleToggleAvailability = (barberId: string, currentStatus: boolean) => {
-    toggleAvailabilityMutation.mutate({ barberId, available: !currentStatus });
+  const handleToggleAvailability = (staffId: string, currentStatus: boolean) => {
+    toggleAvailabilityMutation.mutate({ staffId, available: !currentStatus });
   };
 
   const handleAddStaff = () => {
@@ -102,7 +102,7 @@ export function OwnerStaffPage() {
             <Users className="w-8 h-8 text-orange-500" />
             Staff Management
           </h1>
-          <p className="text-white/50 mt-1">Track performance and manage your team of barbers.</p>
+          <p className="text-white/50 mt-1">Track performance and manage your team of staffs.</p>
         </div>
         <div className="flex items-center gap-3">
           <Button 
@@ -138,7 +138,7 @@ export function OwnerStaffPage() {
           </div>
           <h2 className="text-2xl font-black text-white text-center">No staff members yet</h2>
           <p className="text-white/40 text-center mt-2 max-w-sm">
-            Add your barbers using their phone number to start tracking their performance.
+            Add your staffs using their phone number to start tracking their performance.
           </p>
           <Button 
             onClick={() => {
@@ -156,12 +156,12 @@ export function OwnerStaffPage() {
             [1, 2, 3].map((i) => (
               <div key={i} className="h-64 bg-white/5 animate-pulse rounded-3xl" />
             ))
-          ) : staff?.map((barber, index) => (
+          ) : staff?.map((staff, index) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              key={barber.user.id}
+              key={staff.user.id}
             >
               <Card className="group relative overflow-hidden border-white/5 bg-black/40 backdrop-blur-xl p-0 hover:border-orange-500/30 transition-all duration-300">
                 {/* Background Glow */}
@@ -172,34 +172,34 @@ export function OwnerStaffPage() {
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center text-white text-xl font-bold border-2 border-white/10">
-                           {barber.user.firstName[0]}{barber.user.lastName[0]}
+                           {staff.user.firstName[0]}{staff.user.lastName[0]}
                         </div>
-                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-black rounded-full transition-colors ${barber.available ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                        <div className={`absolute -bottom-1 -right-1 w-4 h-4 border-2 border-black rounded-full transition-colors ${staff.available ? 'bg-emerald-500' : 'bg-red-500'}`} />
                       </div>
                       <div>
                         <h3 className="font-bold text-white text-lg leading-tight flex items-center gap-2">
-                          {barber.user.firstName} {barber.user.lastName}
+                          {staff.user.firstName} {staff.user.lastName}
                           {/* Premium On/Off Toggle */}
                           <div 
-                            onClick={() => handleToggleAvailability(barber.barberId, barber.available)}
+                            onClick={() => handleToggleAvailability(staff.staffId, staff.available)}
                             className={`relative w-12 h-6 rounded-full cursor-pointer p-1 transition-colors duration-300 ${
-                              barber.available ? 'bg-emerald-500' : 'bg-white/10'
+                              staff.available ? 'bg-emerald-500' : 'bg-white/10'
                             }`}
                           >
                             <motion.div 
-                              animate={{ x: barber.available ? 24 : 0 }}
+                              animate={{ x: staff.available ? 24 : 0 }}
                               transition={{ type: "spring", stiffness: 500, damping: 30 }}
                               className="w-4 h-4 bg-white rounded-full shadow-sm"
                             />
                             {/* Subtle Status Text next to toggle */}
                             <span className={`absolute left-14 text-[10px] font-black uppercase tracking-widest ${
-                              barber.available ? 'text-emerald-400' : 'text-white/20'
+                              staff.available ? 'text-emerald-400' : 'text-white/20'
                             }`}>
-                              {barber.available ? 'On' : 'Off'}
+                              {staff.available ? 'On' : 'Off'}
                             </span>
                           </div>
                         </h3>
-                        <p className="text-white/40 text-sm">@{barber.user.username}</p>
+                        <p className="text-white/40 text-sm">@{staff.user.username}</p>
                       </div>
                     </div>
                     <button className="p-2 text-white/30 hover:text-white transition">
@@ -212,14 +212,14 @@ export function OwnerStaffPage() {
                     <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
                       <p className="text-xs text-white/40 font-medium uppercase tracking-wider mb-1">Today's Work</p>
                       <div className="flex items-end justify-between">
-                        <span className="text-2xl font-black text-white">{barber.customersToday}</span>
+                        <span className="text-2xl font-black text-white">{staff.customersToday}</span>
                         <TrendingUp className="w-4 h-4 text-emerald-400 mb-1" />
                       </div>
                     </div>
                     <div className="bg-white/5 rounded-2xl p-4 border border-white/5">
                       <p className="text-xs text-white/40 font-medium uppercase tracking-wider mb-1">Rating</p>
                       <div className="flex items-end justify-between">
-                        <span className="text-2xl font-black text-white">{barber.averageRating.toFixed(1)}</span>
+                        <span className="text-2xl font-black text-white">{staff.averageRating.toFixed(1)}</span>
                         <Star className="w-4 h-4 text-amber-400 mb-1 fill-amber-400" />
                       </div>
                     </div>
@@ -228,17 +228,17 @@ export function OwnerStaffPage() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/40">App Bookings</span>
-                      <span className="text-white/80 font-medium">{barber.appBookingsToday}</span>
+                      <span className="text-white/80 font-medium">{staff.appBookingsToday}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-white/40">Manual Entries</span>
-                      <span className="text-white/80 font-medium">{barber.manualLogsToday}</span>
+                      <span className="text-white/80 font-medium">{staff.manualLogsToday}</span>
                     </div>
                   </div>
 
                   <Button 
                     onClick={() => {
-                      setSelectedBarber(barber);
+                      setSelectedStaff(staff);
                       setIsLogging(true);
                     }}
                     className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold rounded-2xl py-6 group-hover:bg-orange-500 group-hover:text-white group-hover:border-transparent transition-all"
@@ -277,7 +277,7 @@ export function OwnerStaffPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-black text-white">Add Staff</h2>
-                    <p className="text-white/40">Invite a barber by their phone number</p>
+                    <p className="text-white/40">Invite a staff by their phone number</p>
                   </div>
                 </div>
 
@@ -317,7 +317,7 @@ export function OwnerStaffPage() {
                       disabled={addStaffMutation.isPending || !newStaffPhone}
                       className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl"
                     >
-                      {addStaffMutation.isPending ? "Adding..." : "Add Barber"}
+                      {addStaffMutation.isPending ? "Adding..." : "Add Staff"}
                     </Button>
                     <button 
                       onClick={() => setIsAddingStaff(false)}
@@ -379,7 +379,7 @@ export function OwnerStaffPage() {
                     <table className="w-full text-left border-collapse">
                       <thead>
                         <tr className="border-b border-white/5">
-                          <th className="pb-4 text-xs font-black text-white/30 uppercase tracking-widest">Barber</th>
+                          <th className="pb-4 text-xs font-black text-white/30 uppercase tracking-widest">Staff</th>
                           <th className="pb-4 text-xs font-black text-white/30 uppercase tracking-widest text-center">Total Served</th>
                           <th className="pb-4 text-xs font-black text-white/30 uppercase tracking-widest text-center">App Bookings</th>
                           <th className="pb-4 text-xs font-black text-white/30 uppercase tracking-widest text-center">Manual</th>
@@ -388,9 +388,9 @@ export function OwnerStaffPage() {
                       </thead>
                       <tbody className="divide-y divide-white/5">
                         {weeklyReport?.map((row) => (
-                          <tr key={row.barberId} className="group hover:bg-white/[0.02] transition">
+                          <tr key={row.staffId} className="group hover:bg-white/[0.02] transition">
                             <td className="py-6 pr-4">
-                              <span className="text-white font-bold text-lg">{row.barberName}</span>
+                              <span className="text-white font-bold text-lg">{row.staffName}</span>
                             </td>
                             <td className="py-6 px-4 text-center">
                               <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 font-black text-lg">
@@ -432,7 +432,7 @@ export function OwnerStaffPage() {
 
       {/* Log Modal */}
       <AnimatePresence>
-        {isLogging && selectedBarber && (
+        {isLogging && selectedStaff && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
@@ -454,7 +454,7 @@ export function OwnerStaffPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-black text-white">Log Daily Work</h2>
-                    <p className="text-white/40 italic">for {selectedBarber.user.firstName}</p>
+                    <p className="text-white/40 italic">for {selectedStaff.user.firstName}</p>
                   </div>
                 </div>
 

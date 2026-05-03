@@ -2,7 +2,7 @@ import { chartSeries } from "@/assets/mock-data";
 import { RevenueChart } from "@/components/charts/revenue-chart";
 import { StatCard } from "@/components/widgets/stat-card";
 
-export function BarberDashboardPage() {
+export function StaffDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-4">

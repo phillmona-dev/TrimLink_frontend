@@ -47,8 +47,8 @@ export function LoginPage() {
       setServerMessage({ text: "Login successful! Redirecting...", type: 'success' });
       
       // Redirect based on role
-      if (auth.role === "BARBER" || auth.role === "OWNER") {
-        router.push("/barber/queue");
+      if (auth.role === "STAFF" || auth.role === "OWNER") {
+        router.push("/staffs/queue");
       } else {
         router.push("/app");
       }

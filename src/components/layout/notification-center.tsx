@@ -39,9 +39,9 @@ export function NotificationCenter() {
       onConnect: () => {
         console.log("Connected to WebSocket");
         
-        // Subscribe to barber notifications
-        if (session.role === "BARBER" || session.role === "OWNER") {
-          client.subscribe(`/topic/barbers/${session.userId}/bookings`, (message) => {
+        // Subscribe to staff notifications
+        if (session.role === "STAFF" || session.role === "OWNER") {
+          client.subscribe(`/topic/staffs/${session.userId}/bookings`, (message) => {
             const booking = JSON.parse(message.body);
             addNotification(booking);
           });
@@ -69,22 +69,22 @@ export function NotificationCenter() {
   }, [session]);
 
   const addNotification = (booking: any) => {
-    const isBarber = session?.role === "BARBER" || session?.role === "OWNER";
+    const isStaff = session?.role === "STAFF" || session?.role === "OWNER";
     
-    let title = isBarber 
+    let title = isStaff 
       ? `New booking from ${booking.customerName}`
       : `Booking Update: ${booking.serviceName}`;
       
     let icon = CheckCircle2;
     
     if (booking.status === "REJECTED") {
-      title = isBarber ? `You rejected ${booking.customerName}` : `Booking rejected by ${booking.barberName}`;
+      title = isStaff ? `You rejected ${booking.customerName}` : `Booking rejected by ${booking.staffName}`;
       icon = XCircle;
     } else if (booking.status === "CONFIRMED") {
-      title = isBarber ? `Booking confirmed` : `Booking confirmed by ${booking.barberName}`;
+      title = isStaff ? `Booking confirmed` : `Booking confirmed by ${booking.staffName}`;
       icon = CheckCircle2;
     } else if (booking.status === "RESCHEDULE_REQUESTED") {
-      title = isBarber ? `Reschedule requested` : `${booking.barberName} requested a reschedule`;
+      title = isStaff ? `Reschedule requested` : `${booking.staffName} requested a reschedule`;
       icon = Calendar;
     }
 
@@ -116,8 +116,8 @@ export function NotificationCenter() {
     
     if (session?.role === "OWNER") {
       router.push("/owner/bookings");
-    } else if (session?.role === "BARBER") {
-      router.push("/barber");
+    } else if (session?.role === "STAFF") {
+      router.push("/staff");
     } else {
       router.push("/app/appointments");
     }
@@ -125,8 +125,8 @@ export function NotificationCenter() {
 
   const viewAllPath = session?.role === "OWNER" 
     ? "/owner/bookings" 
-    : session?.role === "BARBER" 
-      ? "/barber" 
+    : session?.role === "STAFF" 
+      ? "/staff" 
       : "/app/appointments";
 
   return (
