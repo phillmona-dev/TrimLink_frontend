@@ -45,8 +45,14 @@ export const ownerService = {
   logDailyWork: (staffId: string, count: number, notes?: string) => 
     unwrap<void>(http.post(`/shops/my-shop/staffs/${staffId}/logs`, { count, notes })),
   
-  addStaff: (phoneNumber: string) => 
-    unwrap<PlatformUser>(http.post("/shops/my-shop/staff", { phoneNumber })),
+  addStaff: (payload: { 
+    firstName: string, 
+    lastName: string, 
+    phoneNumber: string, 
+    username: string, 
+    password?: string 
+  }) => 
+    unwrap<PlatformUser>(http.post("/shops/my-shop/staff", payload)),
 
   toggleStaffAvailability: (staffId: string, available: boolean) =>
     unwrap<void>(http.patch(`/shops/my-shop/staffs/${staffId}/availability`, { available })),

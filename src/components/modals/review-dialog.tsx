@@ -19,10 +19,10 @@ interface ReviewDialogProps {
   isOpen: boolean;
   onClose: () => void;
   appointmentId: string;
-  barberName: string;
+  staffName: string;
 }
 
-export function ReviewDialog({ isOpen, onClose, appointmentId, barberName }: ReviewDialogProps) {
+export function ReviewDialog({ isOpen, onClose, appointmentId, staffName }: ReviewDialogProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const queryClient = useQueryClient();
@@ -44,7 +44,7 @@ export function ReviewDialog({ isOpen, onClose, appointmentId, barberName }: Rev
         <DialogHeader>
           <DialogTitle className="text-2xl font-black text-white">Rate your session</DialogTitle>
           <DialogDescription className="text-white/40">
-            How was your experience with {barberName}? Your feedback helps others choose the best barbers.
+            How was your experience with {staffName}? Your feedback helps others choose the best staffs.
           </DialogDescription>
         </DialogHeader>
 

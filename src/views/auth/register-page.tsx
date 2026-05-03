@@ -41,7 +41,7 @@ export function RegisterPage() {
       setServerMessage({ text: "Registration successful! Redirecting...", type: 'success' });
       
       if (auth.role === "STAFF" || auth.role === "OWNER") {
-        router.push("/staffs/queue");
+        router.push("/staff/queue");
       } else {
         router.push("/app");
       }

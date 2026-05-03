@@ -51,7 +51,7 @@ export function LoginPage() {
       
       // Redirect based on role
       if (auth.role === "STAFF" || auth.role === "OWNER") {
-        router.push("/staffs/queue");
+        router.push("/staff/queue");
       } else {
         router.push("/app");
       }

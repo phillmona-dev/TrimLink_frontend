@@ -1,4 +1,4 @@
-import { StaffDashboardPage } from "@/views/staffs/staff-dashboard-page";
+import { StaffDashboardPage } from "@/views/staff/staff-dashboard-page";
 
 export default function StaffDashboardRoutePage() {
   return <StaffDashboardPage />;

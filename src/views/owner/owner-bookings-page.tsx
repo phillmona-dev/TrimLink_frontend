@@ -12,33 +12,33 @@ export function OwnerBookingsPage() {
   const queryClient = useQueryClient();
   
   const { data: bookingsPage, isLoading } = useQuery({
-    queryKey: ["barber-bookings", "PENDING"],
-    queryFn: () => bookingService.getBarberAppointments("PENDING")
+    queryKey: ["staff-bookings", "PENDING"],
+    queryFn: () => bookingService.getStaffAppointments("PENDING")
   });
 
   const { data: activeBookings } = useQuery({
-    queryKey: ["barber-bookings", "CONFIRMED"],
-    queryFn: () => bookingService.getBarberAppointments("CONFIRMED")
+    queryKey: ["staff-bookings", "CONFIRMED"],
+    queryFn: () => bookingService.getStaffAppointments("CONFIRMED")
   });
 
   const { data: inProgressBookings } = useQuery({
-    queryKey: ["barber-bookings", "IN_PROGRESS"],
-    queryFn: () => bookingService.getBarberAppointments("IN_PROGRESS")
+    queryKey: ["staff-bookings", "IN_PROGRESS"],
+    queryFn: () => bookingService.getStaffAppointments("IN_PROGRESS")
   });
 
   const confirmMutation = useMutation({
     mutationFn: bookingService.confirmAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["staff-bookings"] })
   });
 
   const startMutation = useMutation({
     mutationFn: bookingService.startAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["staff-bookings"] })
   });
 
   const completeMutation = useMutation({
     mutationFn: bookingService.completeAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["staff-bookings"] })
   });
 
   const bookings = [

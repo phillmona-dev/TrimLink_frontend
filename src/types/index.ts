@@ -126,6 +126,8 @@ export type Appointment = {
   serviceName?: string;
   scheduledStart: string;
   scheduledEnd: string;
+  actualStart?: string;
+  actualEnd?: string;
   status: "PENDING" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW" | "REJECTED" | "RESCHEDULE_REQUESTED";
   priceCharged: number;
   notes?: string;

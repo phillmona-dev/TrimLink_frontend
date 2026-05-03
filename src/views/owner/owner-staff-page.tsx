@@ -26,7 +26,13 @@ export function OwnerStaffPage() {
   const [isLogging, setIsLogging] = useState(false);
   const [isAddingStaff, setIsAddingStaff] = useState(false);
   const [isViewingWeeklyReport, setIsViewingWeeklyReport] = useState(false);
-  const [newStaffPhone, setNewStaffPhone] = useState("");
+  const [newStaff, setNewStaff] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    username: "",
+    password: ""
+  });
   const [addError, setAddError] = useState<string | null>(null);
 
   const { data: staff, isLoading } = useQuery({
@@ -53,11 +59,17 @@ export function OwnerStaffPage() {
   });
 
   const addStaffMutation = useMutation({
-    mutationFn: (phone: string) => ownerService.addStaff(phone),
+    mutationFn: () => ownerService.addStaff(newStaff),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["owner-staff-performance"] });
       setIsAddingStaff(false);
-      setNewStaffPhone("");
+      setNewStaff({
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        username: "",
+        password: ""
+      });
       setAddError(null);
     },
     onError: (error: any) => {
@@ -88,8 +100,8 @@ export function OwnerStaffPage() {
 
   const handleAddStaff = () => {
     setAddError(null);
-    if (newStaffPhone.trim()) {
-      addStaffMutation.mutate(newStaffPhone);
+    if (newStaff.phoneNumber.trim() && newStaff.username.trim()) {
+      addStaffMutation.mutate();
     }
   };
 
@@ -277,7 +289,7 @@ export function OwnerStaffPage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-black text-white">Add Staff</h2>
-                    <p className="text-white/40">Invite a staff by their phone number</p>
+                    <p className="text-white/40">Create a new staff account</p>
                   </div>
                 </div>
 
@@ -295,26 +307,68 @@ export function OwnerStaffPage() {
                     </motion.div>
                   )}
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/30 uppercase tracking-widest px-1">First Name</label>
+                      <input 
+                        value={newStaff.firstName}
+                        onChange={(e) => setNewStaff({...newStaff, firstName: e.target.value})}
+                        placeholder="John"
+                        className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:outline-none focus:border-orange-500 transition"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-white/30 uppercase tracking-widest px-1">Last Name</label>
+                      <input 
+                        value={newStaff.lastName}
+                        onChange={(e) => setNewStaff({...newStaff, lastName: e.target.value})}
+                        placeholder="Doe"
+                        className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:outline-none focus:border-orange-500 transition"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
                     <label className="text-xs font-bold text-white/30 uppercase tracking-widest px-1">
                       Phone Number
                     </label>
                     <input 
                       type="tel"
-                      value={newStaffPhone}
+                      value={newStaff.phoneNumber}
                       onChange={(e) => {
-                        setNewStaffPhone(e.target.value);
+                        setNewStaff({...newStaff, phoneNumber: e.target.value});
                         if (addError) setAddError(null);
                       }}
                       placeholder="+251..."
-                      className={`w-full h-14 bg-white/5 border ${addError ? 'border-red-500/30' : 'border-white/10'} rounded-2xl px-6 text-white text-lg focus:outline-none focus:border-orange-500 transition`}
+                      className={`w-full h-12 bg-white/5 border ${addError ? 'border-red-500/30' : 'border-white/10'} rounded-2xl px-4 text-white focus:outline-none focus:border-orange-500 transition`}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white/30 uppercase tracking-widest px-1">Username</label>
+                    <input 
+                      value={newStaff.username}
+                      onChange={(e) => setNewStaff({...newStaff, username: e.target.value})}
+                      placeholder="john.doe"
+                      className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:outline-none focus:border-orange-500 transition"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold text-white/30 uppercase tracking-widest px-1">Password</label>
+                    <input 
+                      type="password"
+                      value={newStaff.password}
+                      onChange={(e) => setNewStaff({...newStaff, password: e.target.value})}
+                      placeholder="••••••••"
+                      className="w-full h-12 bg-white/5 border border-white/10 rounded-2xl px-4 text-white focus:outline-none focus:border-orange-500 transition"
                     />
                   </div>
 
                   <div className="flex flex-col gap-3">
                     <Button 
                       onClick={handleAddStaff}
-                      disabled={addStaffMutation.isPending || !newStaffPhone}
+                      disabled={addStaffMutation.isPending || !newStaff.phoneNumber || !newStaff.username || !newStaff.password}
                       className="w-full h-14 bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-2xl"
                     >
                       {addStaffMutation.isPending ? "Adding..." : "Add Staff"}

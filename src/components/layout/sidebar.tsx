@@ -26,10 +26,10 @@ export function Sidebar() {
     role === "STAFF"
       ? [
           { to: "/staff", label: "Dashboard", icon: LayoutDashboard },
-          { to: "/staffs/queue", label: "Queue", icon: Clock },
-          { to: "/staffs/services", label: "Services", icon: Scissors },
-          { to: "/staffs/reviews", label: "Reviews", icon: Bell },
-          { to: "/staffs/settings", label: "Settings", icon: Settings }
+          { to: "/staff/queue", label: "Queue", icon: Clock },
+          { to: "/staff/services", label: "Services", icon: Scissors },
+          { to: "/staff/reviews", label: "Reviews", icon: Bell },
+          { to: "/staff/settings", label: "Settings", icon: Settings }
         ]
       : role === "OWNER"
         ? [
@@ -37,7 +37,7 @@ export function Sidebar() {
             { to: "/owner/staff", label: "Staff", icon: Users },
             { to: "/owner/catalog", label: "Catalog", icon: Scissors },
             { to: "/owner/services", label: "Staff Services", icon: Users },
-            { to: "/staffs/queue", label: "Queue", icon: Clock },
+            { to: "/staff/queue", label: "Queue", icon: Clock },
             { to: "/owner/bookings", label: "Bookings", icon: CalendarDays },
             { to: "/owner/settings", label: "Settings", icon: Settings }
           ]

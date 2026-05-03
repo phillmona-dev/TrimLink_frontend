@@ -1,4 +1,4 @@
-import { StaffQueuePage } from "@/views/staffs/staff-queue-page";
+import { StaffQueuePage } from "@/views/staff/staff-queue-page";
 
 export default function StaffQueueRoutePage() {
   return <StaffQueuePage />;

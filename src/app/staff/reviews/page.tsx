@@ -1,4 +1,4 @@
-import { StaffReviewsPage } from "@/views/staffs/staff-reviews-page";
+import { StaffReviewsPage } from "@/views/staff/staff-reviews-page";
 
 export default function StaffReviewsRoutePage() {
   return <StaffReviewsPage />;
