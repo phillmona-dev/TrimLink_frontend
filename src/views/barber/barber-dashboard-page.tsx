@@ -9,12 +9,13 @@ import { StatCard } from "@/components/widgets/stat-card";
 import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
 import { formatDateTime } from "@/utils/format";
-import { Play, CheckCircle, Clock, User } from "lucide-react";
+import { Play, CheckCircle, Clock, User, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/common/badge";
 
 export function BarberDashboardPage() {
   const queryClient = useQueryClient();
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const { data: stats } = useQuery({
     queryKey: ["shop-stats"],
@@ -37,35 +38,76 @@ export function BarberDashboardPage() {
   });
 
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 5000);
+  };
+
   const startMutation = useMutation({
     mutationFn: bookingService.startAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => {
+      showToast("Service started!");
+      queryClient.invalidateQueries({ queryKey: ["barber-bookings"] });
+    },
+    onError: (err: any) => showToast(err?.response?.data?.message || "Failed to start service")
   });
 
   const completeMutation = useMutation({
     mutationFn: bookingService.completeAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => {
+      showToast("Service completed!");
+      queryClient.invalidateQueries({ queryKey: ["barber-bookings"] });
+    },
+    onError: (err: any) => showToast(err?.response?.data?.message || "Failed to complete service")
   });
 
   const confirmMutation = useMutation({
     mutationFn: bookingService.confirmAppointment,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => {
+      showToast("Booking approved!");
+      queryClient.invalidateQueries({ queryKey: ["barber-bookings"] });
+    },
+    onError: (err: any) => showToast(err?.response?.data?.message || "Failed to approve booking")
   });
 
   const rejectMutation = useMutation({
     mutationFn: (id: string) => bookingService.rejectAppointment(id, "Payment verification failed or slot unavailable"),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => {
+      showToast("Booking rejected!");
+      queryClient.invalidateQueries({ queryKey: ["barber-bookings"] });
+    },
+    onError: (err: any) => showToast(err?.response?.data?.message || "Failed to reject booking")
   });
   
   const paymentMutation = useMutation({
     mutationFn: ({ id, status }: { id: string, status: string }) => bookingService.updatePaymentStatus(id, status),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+    onSuccess: () => {
+      showToast("Payment status updated!");
+      queryClient.invalidateQueries({ queryKey: ["barber-bookings"] });
+    },
+    onError: (err: any) => showToast(err?.response?.data?.message || "Failed to update payment status")
   });
 
   const activeAppt = inProgress?.content?.[0];
 
   return (
     <div className="space-y-8">
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-4 right-4 bg-orange-500 text-black px-4 py-3 rounded-xl font-bold shadow-lg z-50 flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5" />
+            {toastMsg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="grid gap-6 md:grid-cols-4">
         <StatCard label="Today’s bookings" value={upcoming?.totalElements || 0} helper="Confirmed sessions" />
         <StatCard label="Queue Traffic" value={stats?.queueTraffic || 0} helper={stats?.queueHelper || "Steady pace"} />

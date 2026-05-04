@@ -75,12 +75,20 @@ export function BarberQueuePage() {
       
       await http.patch(url);
       setPendingBookings((prev) => prev.filter(b => b.id !== appointmentId));
+      
+      const actionDisplay = action === "confirm" ? "Approved" : action === "reject" ? "Rejected" : "Rescheduled";
+      setToastMsg(`Booking successfully ${actionDisplay.toLowerCase()}!`);
+      setTimeout(() => setToastMsg(null), 5000);
+
       if (action === "reject") {
         setRejectingAppt(null);
         setRejectReason("");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Failed to ${action} booking`, err);
+      const errorMsg = err?.response?.data?.message || `Failed to ${action} booking. Please try again.`;
+      setToastMsg(errorMsg);
+      setTimeout(() => setToastMsg(null), 5000);
     }
   };
 
