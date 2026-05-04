@@ -6,6 +6,7 @@ type ChatContextType = {
   isOpen: boolean;
   selectedUser: { id: string; name: string } | null;
   openChat: (userId: string, userName: string) => void;
+  clearSelectedUser: () => void;
   closeChat: () => void;
   toggleWidget: () => void;
 };
@@ -30,8 +31,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     setIsOpen(prev => !prev);
   };
 
+  const clearSelectedUser = () => {
+    setSelectedUser(null);
+  };
+
   return (
-    <ChatContext.Provider value={{ isOpen, selectedUser, openChat, closeChat, toggleWidget }}>
+    <ChatContext.Provider value={{ isOpen, selectedUser, openChat, clearSelectedUser, closeChat, toggleWidget }}>
       {children}
     </ChatContext.Provider>
   );

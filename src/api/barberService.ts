@@ -12,6 +12,9 @@ export const barberService = {
 
   listServices: () => unwrap<PageResponse<Service>>(http.get("/services")),
 
+  listBarbers: (params?: { q?: string; page?: number; size?: number }) =>
+    unwrap<PageResponse<BarberProfile>>(http.get("/barbers", { params })),
+
   getBarber: (id: string) => unwrap<BarberProfile>(http.get(`/barbers/${id}`)),
 
   getService: (id: string) => unwrap<Service>(http.get(`/services/${id}`)),

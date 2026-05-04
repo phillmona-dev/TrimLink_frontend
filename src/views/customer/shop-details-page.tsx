@@ -45,8 +45,8 @@ export function ShopDetailsPage() {
           </div>
           <div className="rounded-[1.75rem] border border-white/10 bg-white/8 p-5">
             <div className="text-sm text-white/60">Queue status</div>
-            <div className="mt-2 text-3xl font-black">12 active</div>
-            <div className="mt-2 text-sm text-glow-400">Average wait 18 min</div>
+            <div className="mt-2 text-3xl font-black">{shop?.activeQueueCount ?? 0} active</div>
+            <div className="mt-2 text-sm text-glow-400">Average wait {shop?.averageWaitMinutes ?? 0} min</div>
           </div>
         </div>
       </Card>
@@ -57,12 +57,12 @@ export function ShopDetailsPage() {
           <div className="mt-5 space-y-4">
             {barbersQuery.data?.map((barber) => (
               <div className="rounded-3xl border border-border p-5" key={barber.id}>
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                   <div>
                     <h3 className="text-xl font-bold">{barber.user.firstName} {barber.user.lastName}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">{barber.bio}</p>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-row sm:flex-col items-end gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                     <Badge className={barber.available ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20"}>
                       {barber.available ? "Available" : "Away"}
                     </Badge>
@@ -73,12 +73,12 @@ export function ShopDetailsPage() {
                 </div>
                 <div className="mt-4 grid gap-3">
                   {barber.serviceAssignments?.map((assignment) => (
-                    <div className="flex items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 group/service" key={assignment.id}>
-                      <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between rounded-2xl bg-secondary/60 px-4 py-3 gap-3 group/service" key={assignment.id}>
+                      <div className="flex-1 w-full">
                         <div className="font-semibold text-white/90">{assignment.serviceName || "Unknown Service"}</div>
                         <div className="text-xs text-white/40">{assignment.durationMinutes || 0} min</div>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto border-t border-white/5 sm:border-0 pt-2 sm:pt-0">
                         <div className="font-black text-orange-400">{formatCurrency(assignment.effectivePrice ?? 0)}</div>
                         {assignment.serviceId && (
                           <Link 

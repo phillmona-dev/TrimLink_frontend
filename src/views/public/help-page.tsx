@@ -131,21 +131,20 @@ export function HelpPage() {
 
         {/* Contact Info Card */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-5 mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <a
-            href="tel:+251911000000"
-            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition group"
-          >
-            <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shrink-0 group-hover:border-orange-500/60 transition">
-              <Phone className="h-5 w-5 text-orange-400" />
+          <div className="flex flex-col gap-3 p-3 rounded-xl bg-white/5 group">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shrink-0 group-hover:border-orange-500/60 transition">
+                <Phone className="h-5 w-5 text-orange-400" />
+              </div>
+              <div>
+                <div className="text-[10px] text-white/30 uppercase tracking-wider font-bold">Phone</div>
+                <div className="text-sm font-semibold text-white/90">0962608563 / 0948560005</div>
+              </div>
             </div>
-            <div>
-              <div className="text-[10px] text-white/30 uppercase tracking-wider font-bold">Phone</div>
-              <div className="text-sm font-semibold text-white/90">+251 911 000 000</div>
-            </div>
-          </a>
+          </div>
 
           <a
-            href="mailto:support@trimlink.et"
+            href="mailto:phillipos1212@gmail.com"
             className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition group"
           >
             <div className="h-10 w-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-500/30 shrink-0 group-hover:border-blue-500/60 transition">
@@ -153,7 +152,7 @@ export function HelpPage() {
             </div>
             <div>
               <div className="text-[10px] text-white/30 uppercase tracking-wider font-bold">Email</div>
-              <div className="text-sm font-semibold text-white/90">support@trimlink.et</div>
+              <div className="text-sm font-semibold text-white/90">phillipos1212@gmail.com</div>
             </div>
           </a>
 

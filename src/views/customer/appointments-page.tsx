@@ -24,8 +24,8 @@ export function AppointmentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
           <Input 
             placeholder="Search bookings, shops, barbers..." 
@@ -34,10 +34,21 @@ export function AppointmentsPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="outline" className="rounded-2xl h-12 border-white/5 bg-white/5 px-6 text-xs font-bold text-white/40">
-          <Filter className="w-4 h-4 mr-2" />
-          Last 30 Days
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="rounded-2xl h-12 border-white/5 bg-white/5 px-6 text-xs font-bold text-white/40"
+          >
+            <Filter className="w-4 h-4 mr-2" />
+            Last 30 Days
+          </Button>
+          <Button 
+            onClick={() => router.push("/app")}
+            className="rounded-2xl h-12 bg-orange-500 hover:bg-orange-400 text-black px-6 text-xs font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95"
+          >
+            New Appointment
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">

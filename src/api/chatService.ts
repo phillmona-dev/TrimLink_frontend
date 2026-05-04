@@ -15,6 +15,7 @@ export type UserSummary = {
   fullName: string;
   username: string;
   role: string;
+  unreadCount?: number;
 };
 
 export const chatService = {
@@ -29,4 +30,12 @@ export const chatService = {
   /** List active conversations */
   getConversations: () =>
     unwrap<UserSummary[]>(http.get("/chat/conversations")),
+
+  /** Search for users to start a new conversation */
+  searchUsers: (query: string) =>
+    unwrap<UserSummary[]>(http.get(`/chat/search?q=${encodeURIComponent(query)}`)),
+
+  /** Get total unread message count */
+  getUnreadCount: () =>
+    unwrap<number>(http.get("/chat/unread-count")),
 };

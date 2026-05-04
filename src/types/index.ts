@@ -127,6 +127,7 @@ export type Appointment = {
   scheduledStart: string;
   scheduledEnd: string;
   status: "PENDING" | "CONFIRMED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "NO_SHOW" | "REJECTED" | "RESCHEDULE_REQUESTED";
+  paymentStatus: "UNPAID" | "PARTIALLY_PAID" | "PAID" | "PENDING" | "SUCCESS" | "FAILED" | "CANCELLED" | "REFUNDED";
   priceCharged: number;
   notes?: string;
   cancellationReason?: string;

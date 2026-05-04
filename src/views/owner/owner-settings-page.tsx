@@ -73,7 +73,12 @@ export function OwnerSettingsPage() {
         address: shop.address || "",
         city: shop.city || "",
         description: shop.description || "",
-        bankAccounts: shop.bankAccounts || []
+        // Normalize null fields to empty strings to prevent React controlled input warnings
+        bankAccounts: (shop.bankAccounts || []).map((acc: any) => ({
+          bankName: acc.bankName || "",
+          accountNumber: acc.accountNumber || "",
+          accountHolder: acc.accountHolder || ""
+        }))
       });
     }
   }, [shop]);
@@ -98,9 +103,9 @@ export function OwnerSettingsPage() {
   };
 
   const mutation = useMutation({
-    mutationFn: async () => {
-      await ownerService.updateShopHours(localHours);
-      await ownerService.updateShopDetails(localShop);
+    mutationFn: async (payload: { hours: any[], shop: any }) => {
+      await ownerService.updateShopHours(payload.hours);
+      await ownerService.updateShopDetails(payload.shop);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["shop-hours"] });
@@ -125,7 +130,7 @@ export function OwnerSettingsPage() {
   };
 
   const handleSave = () => {
-    mutation.mutate();
+    mutation.mutate({ hours: localHours, shop: localShop });
   };
 
   if (isLoadingHours || isLoadingShop) return (
@@ -320,9 +325,9 @@ export function OwnerSettingsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Account Holder (Optional)</label>
+                    <label className="text-[10px] font-bold text-white/30 uppercase tracking-widest px-1">Account Holder</label>
                     <Input 
-                      placeholder="Enter Holder Name"
+                      placeholder="Enter Holder Name (required)"
                       value={acc.accountHolder} 
                       onChange={(e) => handleAccountChange(idx, "accountHolder", e.target.value)}
                       className="bg-black/40 border-white/5 h-10 rounded-xl text-sm" 
@@ -336,6 +341,14 @@ export function OwnerSettingsPage() {
                   No bank accounts added. Click "+ Add Account" to start.
                 </div>
               )}
+
+              <Button 
+                onClick={handleSave}
+                disabled={mutation.isPending}
+                className="w-full bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 h-12 rounded-xl font-bold transition-all mt-4"
+              >
+                {mutation.isPending ? "Saving..." : "Save Payment Settings"}
+              </Button>
             </div>
           </Card>
 

@@ -54,6 +54,11 @@ export function BarberDashboardPage() {
     mutationFn: (id: string) => bookingService.rejectAppointment(id, "Payment verification failed or slot unavailable"),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
   });
+  
+  const paymentMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string, status: string }) => bookingService.updatePaymentStatus(id, status),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["barber-bookings"] })
+  });
 
   const activeAppt = inProgress?.content?.[0];
 
@@ -77,8 +82,8 @@ export function BarberDashboardPage() {
             <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest mb-6">Current Active Session</h3>
             
             {activeAppt ? (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                <div className="flex items-center gap-6 w-full sm:w-auto">
                   <div className="w-20 h-20 rounded-3xl bg-orange-500 flex items-center justify-center text-black">
                     <User className="w-10 h-10" />
                   </div>
@@ -93,7 +98,7 @@ export function BarberDashboardPage() {
                 </div>
                 <Button 
                   onClick={() => completeMutation.mutate(activeAppt.id)}
-                  className="bg-white hover:bg-white/90 text-black h-16 px-8 rounded-2xl font-black text-lg shadow-2xl shadow-white/10 transition-all active:scale-95"
+                  className="w-full sm:w-auto bg-white hover:bg-white/90 text-black h-16 px-8 rounded-2xl font-black text-lg shadow-2xl shadow-white/10 transition-all active:scale-95"
                 >
                   <CheckCircle className="w-6 h-6 mr-2" />
                   Finish Cut
@@ -148,6 +153,21 @@ export function BarberDashboardPage() {
                     </div>
                   )}
 
+                  <div className="mt-4 flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5">
+                    <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Payment Status</span>
+                    <select 
+                      value={appt.paymentStatus} 
+                      onChange={(e) => paymentMutation.mutate({ id: appt.id, status: e.target.value })}
+                      className="bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold text-white outline-none focus:border-orange-500 transition-all"
+                    >
+                      <option value="UNPAID" className="bg-ink-950">Unpaid</option>
+                      <option value="PARTIALLY_PAID" className="bg-ink-950">Partially Paid</option>
+                      <option value="PAID" className="bg-ink-950">Paid</option>
+                      <option value="PENDING" className="bg-ink-950">Pending</option>
+                      <option value="SUCCESS" className="bg-ink-950">Success</option>
+                    </select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3 mt-6">
                     <Button 
                       onClick={() => rejectMutation.mutate(appt.id)}
@@ -183,6 +203,22 @@ export function BarberDashboardPage() {
                 </div>
                 <h4 className="font-bold text-white group-hover:text-orange-400 transition-colors">{appt.customerName}</h4>
                 <p className="text-xs text-white/40 mt-1">{appt.serviceName}</p>
+
+                <div className="mt-4 flex items-center justify-between p-3 rounded-2xl bg-black/20 border border-white/5">
+                  <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Payment Status</span>
+                  <select 
+                    value={appt.paymentStatus} 
+                    onChange={(e) => paymentMutation.mutate({ id: appt.id, status: e.target.value })}
+                    className="bg-black/40 border border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold text-white outline-none focus:border-orange-500 transition-all"
+                  >
+                    <option value="UNPAID" className="bg-ink-950">Unpaid</option>
+                    <option value="PARTIALLY_PAID" className="bg-ink-950">Partially Paid</option>
+                    <option value="PAID" className="bg-ink-950">Paid</option>
+                    <option value="PENDING" className="bg-ink-950">Pending</option>
+                    <option value="SUCCESS" className="bg-ink-950">Success</option>
+                  </select>
+                </div>
+
                 <Button 
                   onClick={() => startMutation.mutate(appt.id)}
                   className="w-full mt-6 bg-white/5 hover:bg-orange-500 hover:text-black border border-white/10 hover:border-transparent rounded-2xl h-12 font-bold transition-all"

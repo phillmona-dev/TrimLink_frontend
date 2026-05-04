@@ -40,6 +40,20 @@ export function CustomerHomePage() {
     }
   });
 
+  const barbersQuery = useQuery({
+    queryKey: ["barbers", activeQuery],
+    queryFn: () => barberService.listBarbers({ q: activeQuery, size: 6 }),
+    placeholderData: {
+      content: featuredBarbers,
+      page: 0,
+      size: 6,
+      totalElements: featuredBarbers.length,
+      totalPages: 1,
+      first: true,
+      last: true
+    }
+  });
+
   return (
     <div className="space-y-6">
       <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
@@ -76,7 +90,7 @@ export function CustomerHomePage() {
 
       <section className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Shops near you" value={shopsQuery.data?.content.length ?? 0} helper="Based on your selected city" />
-        <StatCard label="Barbers available now" value={featuredBarbers.filter((item) => item.available).length} helper="Ready for bookings and walk-ins" />
+        <StatCard label="Barbers available now" value={barbersQuery.data?.content.length ?? 0} helper="Ready for bookings and walk-ins" />
         <StatCard label="Flash promos" value="3 live" helper="Haircut + beard bundles this week" />
       </section>
 
@@ -126,11 +140,11 @@ export function CustomerHomePage() {
           </div>
         </div>
         <div className="grid gap-5 md:grid-cols-2">
-          {featuredBarbers.map((barber) => (
+          {barbersQuery.data?.content.map((barber) => (
             <Card key={barber.id} className="rounded-[1.75rem]">
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-glow-400 to-glow-600 font-black text-ink-950">
-                  {barber.user.firstName[0]}
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-glow-400 to-glow-600 font-black text-ink-950 uppercase">
+                  {barber.user.firstName ? barber.user.firstName[0] : 'B'}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -143,11 +157,18 @@ export function CustomerHomePage() {
                       </div>
                     </div>
                   </div>
-                  <p className="mt-1 text-sm text-muted-foreground">{barber.bio}</p>
+                  <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                    {barber.bio || "Premium grooming specialist ready to deliver exceptional service."}
+                  </p>
                 </div>
               </div>
             </Card>
           ))}
+          {(!barbersQuery.data?.content || barbersQuery.data.content.length === 0) && (
+            <div className="col-span-2 text-center py-10 text-white/40 border border-dashed border-white/5 rounded-3xl">
+              No barbers found matching your search.
+            </div>
+          )}
         </div>
       </section>
     </div>

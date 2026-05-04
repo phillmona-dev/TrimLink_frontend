@@ -293,7 +293,7 @@ export function LandingPage() {
                           <p className="text-white/80 text-sm mb-4">
                             Discover top-rated barbers in your area.
                           </p>
-                          <Link href={(mounted && isAuthenticated) ? "/app" : "/auth/login"}>
+                          <Link href="/shops">
                             <Button className="w-fit bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 text-sm font-semibold">
                               Explore Shops
                             </Button>
@@ -506,9 +506,17 @@ export function LandingPage() {
 
               {/* Footer Links */}
               <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 px-2">
-                {["About", "Privacy", "Terms", "Pricing", "Contact"].map((item) => (
-                  <Link key={item} href="#" className="text-[11px] text-white/30 hover:text-white/60 transition">
-                    {item}
+                {[
+                  { name: "About", path: "/about" },
+                  { name: "Privacy", path: "/privacy" },
+                  { name: "Terms", path: "/terms" },
+                  { name: "Pricing", path: "/pricing" },
+                  { name: "Contact", path: "/contact" },
+                  { name: "FAQ", path: "/faq" },
+                  { name: "Help", path: "/help" }
+                ].map((item) => (
+                  <Link key={item.name} href={item.path} className="text-[11px] text-white/30 hover:text-white/60 transition">
+                    {item.name}
                   </Link>
                 ))}
                 <span className="text-[11px] text-white/30 w-full mt-2">© 2026 TrimLink.</span>

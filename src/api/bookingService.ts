@@ -18,10 +18,13 @@ export const bookingService = {
     return unwrap<PageResponse<Appointment>>(http.get("/bookings/me", { params }));
   },
 
-  getBarberAppointments: (status: string, page = 0) =>
-    unwrap<PageResponse<Appointment>>(
-      http.get("/bookings/barber", { params: { status, page, size: 50 } })
-    ),
+  getBarberAppointments: (status: string, page = 0, search = "", date = "") => {
+    const params: any = { page, size: 50 };
+    if (search && search.trim() !== "") params.search = search;
+    if (date && date.trim() !== "") params.date = date;
+    if (status && status !== "ALL") params.status = status;
+    return unwrap<PageResponse<Appointment>>(http.get("/bookings/barber", { params }));
+  },
 
   cancelAppointment: (id: string, reason: string) =>
     unwrap<Appointment>(
@@ -42,6 +45,9 @@ export const bookingService = {
 
   completeAppointment: (id: string) =>
     unwrap<Appointment>(http.patch(`/bookings/${id}/complete`)),
+
+  updatePaymentStatus: (id: string, status: string) =>
+    unwrap<Appointment>(http.patch(`/bookings/${id}/payment-status`, null, { params: { status } })),
 
   getBarberReviews: (barberId: string, page = 0) =>
     unwrap<PageResponse<Review>>(

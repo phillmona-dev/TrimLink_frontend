@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { shopService, type Shop } from "@/api/shopService";
 import Link from "next/link";
@@ -19,6 +19,7 @@ import {
   User,
 } from "lucide-react";
 import { Button } from "@/components/common/button";
+import { Badge } from "@/components/common/badge";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -259,6 +260,16 @@ export function ShopsPage() {
     staleTime: 30_000,
   });
 
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveQuery(query);
+      setPage(0);
+    }, 500); // 500ms delay for search
+
+    return () => clearTimeout(timer);
+  }, [query]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setActiveQuery(query);
@@ -307,10 +318,16 @@ export function ShopsPage() {
 
         {/* Results Count */}
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-white/40">
-            {isLoading ? "Loading…" : shops ? `${shops.totalElements ?? (shops.content?.length ?? 0)} shops found` : ""}
-            {activeQuery && <span className="text-white/60"> for "<strong>{activeQuery}</strong>"</span>}
-          </p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm text-white/40">
+              {isLoading ? "Searching…" : shops ? `${shops.totalElements ?? 0} shops found` : ""}
+            </p>
+            {activeQuery && (
+              <Badge variant="outline" className="bg-orange-500/10 text-orange-400 border-orange-500/20 text-[10px] py-0 px-2 h-5">
+                "{activeQuery}"
+              </Badge>
+            )}
+          </div>
           {activeQuery && (
             <button
               onClick={() => { setQuery(""); setActiveQuery(""); setPage(0); }}
