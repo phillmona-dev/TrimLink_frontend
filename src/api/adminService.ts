@@ -36,6 +36,7 @@ export type AdminAppointmentStats = {
   totalRevenue: number;
   revenueToday: number;
   adminShare: number;
+  adminSharePercent: number;
   shopRevenues: Array<{ shopId: string; shopName: string; revenue: number }>;
   barberRevenues: Array<{ barberId: string; barberName: string; revenue: number }>;
 };

@@ -13,7 +13,8 @@ import {
   MoreVertical,
   Download,
   AlertCircle,
-  BarChart3
+  BarChart3,
+  Eye
 } from "lucide-react";
 import { adminService, type AdminAppointmentStats } from "@/api/adminService";
 import { shopService, type Shop } from "@/api/shopService";
@@ -113,43 +114,38 @@ export const AdminAppointmentsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Stats Grid - Minimized */}
+      <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
         <StatCard 
-          title="Total Approved" 
+          title="Approved" 
           value={stats?.totalApproved || 0} 
-          icon={<CheckCircle2 className="w-6 h-6 text-green-500" />}
-          subtitle="Confirmed & Completed"
+          icon={<CheckCircle2 className="w-5 h-5 text-green-500" />}
         />
         <StatCard 
-          title="Total Pending" 
+          title="Pending" 
           value={stats?.totalPending || 0} 
-          icon={<Clock className="w-6 h-6 text-yellow-500" />}
-          subtitle="Awaiting action"
+          icon={<Clock className="w-5 h-5 text-yellow-500" />}
         />
         <StatCard 
-          title="Total Rejected" 
+          title="Rejected" 
           value={stats?.totalRejected || 0} 
-          icon={<XCircle className="w-6 h-6 text-red-500" />}
-          subtitle="Declined by barbers"
+          icon={<XCircle className="w-5 h-5 text-red-500" />}
         />
         <StatCard 
-          title="Revenue (Today)" 
+          title="Revenue (Day)" 
           value={stats?.revenueToday ? `ETB ${stats.revenueToday.toLocaleString()}` : "ETB 0"} 
-          icon={<TrendingUp className="w-6 h-6 text-emerald-500" />}
-          subtitle="Collected today"
+          icon={<TrendingUp className="w-5 h-5 text-emerald-500" />}
         />
         <StatCard 
-          title="Total Platform Revenue" 
+          title="Total Gross" 
           value={stats?.totalRevenue ? `ETB ${stats.totalRevenue.toLocaleString()}` : "ETB 0"} 
-          icon={<TrendingUp className="w-6 h-6 text-orange-500" />}
-          subtitle="Gross till date"
+          icon={<TrendingUp className="w-5 h-5 text-orange-500" />}
         />
         <StatCard 
-          title="Admin Share (10%)" 
+          title="Commission" 
           value={stats?.adminShare ? `ETB ${stats.adminShare.toLocaleString()}` : "ETB 0"} 
-          icon={<BarChart3 className="w-6 h-6 text-blue-500" />}
-          subtitle="Your commission"
+          icon={<BarChart3 className="w-5 h-5 text-blue-500" />}
+          subtitle={`${stats?.adminSharePercent || 10}%`}
         />
       </div>
 
@@ -259,15 +255,15 @@ export const AdminAppointmentsPage: React.FC = () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-white/5 text-white/50 text-sm uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-4 font-semibold">Customer</th>
-                <th className="px-6 py-4 font-semibold">Shop / Barber</th>
-                <th className="px-6 py-4 font-semibold">Service / Price</th>
-                <th className="px-6 py-4 font-semibold">Date & Time</th>
-                <th className="px-6 py-4 font-semibold">Status</th>
-                <th className="px-6 py-4 font-semibold text-right">Actions</th>
+          <table className="w-full text-left border-separate border-spacing-0">
+            <thead>
+              <tr className="bg-white/[0.02]">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Customer</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Location / Expert</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Service / Fee</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Timeline</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Status</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -320,9 +316,25 @@ export const AdminAppointmentsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <button className="p-2 hover:bg-white/10 rounded-lg transition-all text-white/40 hover:text-white">
-                        <MoreVertical className="w-5 h-5" />
-                      </button>
+                      <div className="relative inline-block text-left group/menu">
+                        <button className="p-2 hover:bg-white/10 rounded-lg transition-all text-white/40 hover:text-white">
+                          <MoreVertical className="w-5 h-5" />
+                        </button>
+                        <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-[#1a1a1a] border border-white/10 shadow-2xl opacity-0 invisible group-focus-within/menu:opacity-100 group-focus-within/menu:visible transition-all z-50 overflow-hidden">
+                          <div className="py-2">
+                            <button className="w-full px-4 py-2.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                              <Eye className="w-4 h-4" /> View Details
+                            </button>
+                            <button className="w-full px-4 py-2.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-2">
+                              <CalendarCheck className="w-4 h-4 text-orange-500" /> Manage Booking
+                            </button>
+                            <div className="h-px bg-white/5 my-1" />
+                            <button className="w-full px-4 py-2.5 text-left text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2">
+                              <XCircle className="w-4 h-4" /> Cancel/Reject
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -362,16 +374,17 @@ export const AdminAppointmentsPage: React.FC = () => {
   );
 };
 
-const StatCard = ({ title, value, icon, subtitle }: { title: string, value: string | number, icon: React.ReactNode, subtitle: string }) => (
-  <div className="bg-white/5 border border-white/10 p-6 rounded-[2rem] backdrop-blur-md hover:bg-white/10 transition-all group">
-    <div className="flex items-center justify-between mb-4">
-      <div className="p-3 bg-white/5 rounded-2xl group-hover:scale-110 transition-transform">
+const StatCard = ({ title, value, icon, subtitle }: { title: string, value: string | number, icon: React.ReactNode, subtitle?: string }) => (
+  <div className="bg-white/5 border border-white/10 p-4 rounded-[1.5rem] backdrop-blur-md hover:bg-white/10 transition-all group flex flex-col justify-between">
+    <div className="flex items-center justify-between mb-2">
+      <div className="p-2 bg-white/5 rounded-xl group-hover:scale-110 transition-transform">
         {icon}
       </div>
-      <BarChart3 className="w-4 h-4 text-white/20" />
+      {subtitle && <span className="text-[10px] font-black text-orange-500/40">{subtitle}</span>}
     </div>
-    <p className="text-white/50 text-sm">{title}</p>
-    <h3 className="text-2xl font-bold text-white mt-1">{value}</h3>
-    <p className="text-white/20 text-xs mt-2">{subtitle}</p>
+    <div>
+      <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest">{title}</p>
+      <h3 className="text-lg font-black text-white mt-1 leading-none">{value}</h3>
+    </div>
   </div>
 );
