@@ -27,7 +27,7 @@ export function BarberSchedulePage() {
         serviceId: "00000000-0000-0000-0000-000000000000", // Dummy/Generic for schedule view
         date: selectedDate
       });
-      setSlots(data);
+      setSlots(data || []);
     } catch (err) {
       console.error("Failed to fetch slots", err);
     } finally {
