@@ -9,7 +9,7 @@ import { StatCard } from "@/components/widgets/stat-card";
 import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
 import { formatDateTime } from "@/utils/format";
-import { Play, CheckCircle, Clock, User, AlertCircle } from "lucide-react";
+import { Play, CheckCircle, Clock, User, AlertCircle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/common/badge";
 
@@ -293,9 +293,10 @@ export function BarberDashboardPage() {
             >
               <button 
                 onClick={() => setSelectedReceipt(null)}
-                className="absolute -top-4 -right-4 w-10 h-10 bg-white/10 border border-white/10 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
+                className="absolute top-4 right-4 w-12 h-12 bg-orange-500 text-black rounded-full flex items-center justify-center hover:bg-orange-400 transition-all shadow-2xl z-50"
+                aria-label="Close"
               >
-                ×
+                <XCircle className="w-6 h-6" />
               </button>
               <img 
                 src={selectedReceipt} 

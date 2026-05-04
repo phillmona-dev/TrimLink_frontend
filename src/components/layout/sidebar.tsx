@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Bell, CalendarDays, Clock, Home, LayoutDashboard,
-  LogOut, Scissors, Settings, Users, MessageCircle
+  LogOut, Scissors, Settings, Users, MessageCircle,
+  CalendarCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimatedIcon } from "@/components/common/animated-icon";
@@ -24,6 +25,7 @@ export function Sidebar() {
       ? [
           { to: "/barber", label: "Dashboard", icon: LayoutDashboard },
           { to: "/barber/queue", label: "Queue", icon: Clock },
+          { to: "/barber/schedule", label: "Schedule", icon: CalendarDays },
           { to: "/barber/services", label: "Services", icon: Scissors },
           { to: "/barber/reviews", label: "Reviews", icon: Bell },
           { to: "/barber/settings", label: "Settings", icon: Settings }
@@ -35,7 +37,8 @@ export function Sidebar() {
             { to: "/owner/catalog", label: "Catalog", icon: Scissors },
             { to: "/owner/services", label: "Services", icon: Users },
             { to: "/barber/queue", label: "Queue", icon: Clock },
-            { to: "/owner/bookings", label: "Bookings", icon: CalendarDays },
+            { to: "/barber/schedule", label: "Schedule", icon: CalendarDays },
+            { to: "/owner/bookings", label: "Bookings", icon: CalendarCheck },
             { to: "/owner/settings", label: "Settings", icon: Settings }
           ]
         : role === "ADMIN"
@@ -48,7 +51,7 @@ export function Sidebar() {
             ]
           : [
               { to: "/app", label: "Home", icon: Home },
-              { to: "/app/appointments", label: "Appointments", icon: CalendarDays },
+              { to: "/app/appointments", label: "Appointments", icon: CalendarCheck },
               { to: "/app/queue", label: "Queue", icon: Clock },
               { to: "/app/profile", label: "Profile", icon: Settings }
             ];

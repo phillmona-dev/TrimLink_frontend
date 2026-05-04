@@ -61,5 +61,11 @@ export const bookingService = {
   getShopReviews: (shopId: string, page = 0) =>
     unwrap<PageResponse<Review>>(
       http.get(`/shops/${shopId}/reviews`, { params: { page, size: 10 } })
-    )
+    ),
+
+  blockSlot: (start: string, end: string) =>
+    unwrap<Appointment>(http.post("/bookings/block", null, { params: { start, end } })),
+
+  unblockSlot: (id: string) =>
+    unwrap<void>(http.post(`/bookings/unblock/${id}`))
 };

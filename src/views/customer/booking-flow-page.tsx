@@ -258,13 +258,13 @@ export function BookingFlowPage() {
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 p-2">
                   {slots?.map((slot: any) => {
-                    const timeStr = formatEthiopianTime(slot.start);
-                    const isSelected = selectedSlot === slot.start;
+                    const timeStr = formatEthiopianTime(slot.startTime);
+                    const isSelected = selectedSlot === slot.startTime;
                     return (
                       <button
-                        key={slot.start}
+                        key={slot.startTime}
                         disabled={!slot.available}
-                        onClick={() => setSelectedSlot(slot.start)}
+                        onClick={() => setSelectedSlot(slot.startTime)}
                         className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
                           !slot.available 
                             ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed"
@@ -441,78 +441,82 @@ export function BookingFlowPage() {
                           Please make the payment to the selected account and upload the receipt below.
                         </p>
                        
-                       <div className="relative">
-                         <input 
-                           type="file" 
-                           accept="image/png, image/jpeg, image/jpg"
-                           onChange={handleFileChange}
-                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
-                           id="receipt-upload"
-                         />
-                         
-                         {!receiptImageUrl && (
-                           <label 
-                             htmlFor="receipt-upload"
-                             className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2rem] transition-all cursor-pointer ${
-                               selectedFile 
-                                 ? "border-orange-500/50 bg-orange-500/5" 
-                                 : "border-white/10 bg-white/5 hover:border-orange-500/50 hover:bg-orange-500/5"
-                             }`}
-                           >
-                             <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-3">
-                               <Store className="w-5 h-5 text-white/40" />
-                             </div>
-                             <span className="text-xs font-bold text-white/60 text-center px-4">
-                               {selectedFile ? selectedFile.name : "Click to select receipt image"}
-                             </span>
-                           </label>
-                         )}
+                        <div className="space-y-4">
+                          <input 
+                            type="file" 
+                            accept="image/png, image/jpeg, image/jpg"
+                            onChange={handleFileChange}
+                            className="hidden" 
+                            id="receipt-upload"
+                          />
+                          
+                          {!receiptImageUrl && (
+                            <label 
+                              htmlFor="receipt-upload"
+                              className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-[2rem] transition-all cursor-pointer ${
+                                selectedFile 
+                                  ? "border-orange-500/50 bg-orange-500/5" 
+                                  : "border-white/10 bg-white/5 hover:border-orange-500/50 hover:bg-orange-500/5"
+                              }`}
+                            >
+                              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-3">
+                                <Store className="w-5 h-5 text-white/40" />
+                              </div>
+                              <span className="text-xs font-bold text-white/60 text-center px-4">
+                                {selectedFile ? selectedFile.name : "Click to select receipt image"}
+                              </span>
+                            </label>
+                          )}
 
-                         {selectedFile && !isUploading && (
-                           <Button 
-                             onClick={handleUpload}
-                             className="w-full mt-4 bg-orange-500 text-black font-bold h-12 rounded-2xl shadow-lg shadow-orange-500/20"
-                           >
-                             Upload Receipt
-                           </Button>
-                         )}
+                          {selectedFile && !isUploading && (
+                            <Button 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleUpload();
+                              }}
+                              className="w-full bg-orange-500 text-black font-black h-14 rounded-2xl shadow-xl shadow-orange-500/20 transition-all active:scale-95"
+                            >
+                              Confirm & Upload Receipt
+                            </Button>
+                          )}
 
-                         {isUploading && (
-                           <div className="flex flex-col items-center gap-3 p-8 border-2 border-dashed border-orange-500/30 rounded-[2rem] bg-orange-500/5">
-                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-                             <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Uploading...</span>
-                           </div>
-                         )}
+                          {isUploading && (
+                            <div className="flex flex-col items-center gap-3 p-8 border-2 border-dashed border-orange-500/30 rounded-[2rem] bg-orange-500/5">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+                              <span className="text-xs font-bold text-orange-400 uppercase tracking-widest">Uploading...</span>
+                            </div>
+                          )}
 
-                         {receiptImageUrl && uploadSuccess && (
-                           <div className="space-y-4">
-                             <div className="relative group w-full">
-                               <img 
-                                 src={receiptImageUrl} 
-                                 alt="Receipt Preview" 
-                                 className="w-full h-48 object-cover rounded-[2rem] border-2 border-green-500/30 shadow-2xl shadow-green-500/10"
-                               />
-                               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-[2rem] gap-2">
-                                 <Button 
-                                   size="sm"
-                                   variant="outline"
-                                   className="border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white h-8 px-4 rounded-xl text-[10px] font-bold"
-                                   onClick={(e) => {
-                                     e.preventDefault();
-                                     setReceiptImageUrl("");
-                                     setUploadSuccess(false);
-                                   }}
-                                 >
-                                   Remove & Change
-                                 </Button>
-                               </div>
-                             </div>
-                             <div className="flex items-center gap-2 text-green-500 bg-green-500/10 p-3 rounded-xl border border-green-500/20">
-                               <CheckCircle2 className="w-4 h-4" />
-                               <span className="text-[11px] font-bold uppercase tracking-wider">Receipt uploaded successfully!</span>
-                             </div>
-                           </div>
-                         )}
+                          {receiptImageUrl && uploadSuccess && (
+                            <div className="space-y-4">
+                              <div className="relative group w-full">
+                                <img 
+                                  src={receiptImageUrl} 
+                                  alt="Receipt Preview" 
+                                  className="w-full h-48 object-cover rounded-[2rem] border-2 border-green-500/30 shadow-2xl shadow-green-500/10"
+                                />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center rounded-[2rem] gap-2">
+                                  <Button 
+                                    size="sm"
+                                    variant="outline"
+                                    className="border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white h-8 px-4 rounded-xl text-[10px] font-bold"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setReceiptImageUrl("");
+                                      setUploadSuccess(false);
+                                    }}
+                                  >
+                                    Remove & Change
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 text-green-500 bg-green-500/10 p-3 rounded-xl border border-green-500/20">
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span className="text-[11px] font-bold uppercase tracking-wider">Receipt uploaded successfully!</span>
+                              </div>
+                            </div>
+                          )}
                        </div>
                      </div>
                    )}
@@ -544,7 +548,7 @@ export function BookingFlowPage() {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                variant="outline"
+                variant="outline" 
                 className="w-full h-14 rounded-2xl border-white/10"
                 onClick={() => setCurrentStep(2)}
                 disabled={mutation.isPending}
