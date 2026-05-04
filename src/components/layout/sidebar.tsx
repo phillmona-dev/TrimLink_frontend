@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Bell, CalendarDays, Clock, Home, LayoutDashboard,
   LogOut, Scissors, Settings, Users, MessageCircle,
-  CalendarCheck
+  CalendarCheck, Wallet
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimatedIcon } from "@/components/common/animated-icon";
@@ -45,6 +45,7 @@ export function Sidebar() {
           ? [
               { to: "/admin", label: "Overview", icon: LayoutDashboard },
               { to: "/admin/appointments", label: "Bookings", icon: CalendarCheck },
+              { to: "/admin/finance", label: "Finance", icon: Wallet },
               { to: "/admin/users", label: "Users", icon: Users },
               { to: "/admin/shops", label: "Shops", icon: Home },
               { to: "/admin/support", label: "Support", icon: MessageCircle },
