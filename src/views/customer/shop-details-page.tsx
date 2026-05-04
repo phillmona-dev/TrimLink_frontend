@@ -4,7 +4,6 @@ import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { barberService } from "@/api/barberService";
 import { bookingService } from "@/api/bookingService";
-import { featuredBarbers, featuredShops } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 import { Badge } from "@/components/common/badge";
 import { Button } from "@/components/common/button";
@@ -13,17 +12,18 @@ import { formatCurrency } from "@/utils/format";
 
 export function ShopDetailsPage() {
   const params = useParams<{ shopId: string }>();
-  const shopId = params?.shopId ?? "shop-1";
+  const shopId = params?.shopId;
+  
   const shopQuery = useQuery({
     queryKey: ["shop", shopId],
-    queryFn: () => barberService.getShop(shopId),
-    placeholderData: featuredShops[0]
+    queryFn: () => barberService.getShop(shopId!),
+    enabled: !!shopId
   });
 
   const barbersQuery = useQuery({
     queryKey: ["shop-barbers", shopId],
-    queryFn: () => barberService.getShopBarbers(shopId),
-    placeholderData: featuredBarbers
+    queryFn: () => barberService.getShopBarbers(shopId!),
+    enabled: !!shopId
   });
 
   const reviewsQuery = useQuery({

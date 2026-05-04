@@ -29,29 +29,11 @@ export function CustomerHomePage() {
   const shopsQuery = useQuery({
     queryKey: ["shops", activeQuery],
     queryFn: () => barberService.listShops({ q: activeQuery, size: 6 }),
-    placeholderData: {
-      content: featuredShops,
-      page: 0,
-      size: 6,
-      totalElements: featuredShops.length,
-      totalPages: 1,
-      first: true,
-      last: true
-    }
   });
 
   const barbersQuery = useQuery({
     queryKey: ["barbers", activeQuery],
     queryFn: () => barberService.listBarbers({ q: activeQuery, size: 6 }),
-    placeholderData: {
-      content: featuredBarbers,
-      page: 0,
-      size: 6,
-      totalElements: featuredBarbers.length,
-      totalPages: 1,
-      first: true,
-      last: true
-    }
   });
 
   return (

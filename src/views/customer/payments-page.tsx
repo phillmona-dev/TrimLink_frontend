@@ -2,33 +2,48 @@
 
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { paymentService } from "@/api/paymentService";
-import { mockAppointments } from "@/assets/mock-data";
 import { Button } from "@/components/common/button";
 import { Card } from "@/components/common/card";
-import { formatCurrency } from "@/utils/format";
 
 export function PaymentsPage() {
+  const searchParams = useSearchParams();
+  const appointmentId = searchParams.get("appointmentId");
+  const amountStr = searchParams.get("amount");
+  const amount = amountStr ? parseFloat(amountStr) : 0;
+  const serviceName = searchParams.get("service") || "Grooming Service";
+  
   const [selectedProvider, setSelectedProvider] = useState<"CHAPA" | "TELEBIRR">("CHAPA");
-  const appointment = mockAppointments[0];
 
   const paymentMutation = useMutation({
     mutationFn: paymentService.initiate
   });
 
+  if (!appointmentId || !amount) {
+    return (
+      <Card className="max-w-3xl">
+        <h2 className="text-2xl font-black">No active payment request</h2>
+        <p className="mt-4 text-muted-foreground text-center py-10 border border-dashed border-white/10 rounded-3xl">
+          Please initiate a payment from your bookings or queue ticket.
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <Card className="max-w-3xl">
       <h2 className="text-2xl font-black">Complete payment</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Use the same backend payment orchestration for Chapa and Telebirr. The returned checkout URL can open in-app or in-browser.
+        Securely pay for your service using your preferred provider.
       </p>
-      <div className="mt-6 rounded-3xl bg-secondary/60 p-5">
+      <div className="mt-6 rounded-3xl bg-secondary/60 p-5 border border-white/5">
         <div className="flex items-center justify-between">
           <div>
-            <div className="font-bold">{appointment.serviceName}</div>
-            <div className="text-sm text-muted-foreground">{appointment.shopName}</div>
+            <div className="font-bold">{serviceName}</div>
+            <div className="text-xs text-muted-foreground mt-1">ID: {appointmentId}</div>
           </div>
-          <div className="text-2xl font-black text-primary">{formatCurrency(appointment.priceCharged)}</div>
+          <div className="text-2xl font-black text-glow-400">ETB {amount}</div>
         </div>
       </div>
       <div className="mt-6 flex gap-3">
@@ -40,22 +55,29 @@ export function PaymentsPage() {
         </Button>
       </div>
       <Button
-        className="mt-6"
+        className="mt-6 w-full h-14 text-lg font-bold"
+        isLoading={paymentMutation.isPending}
         onClick={() =>
           paymentMutation.mutate({
-            referenceId: appointment.id,
+            referenceId: appointmentId,
             referenceType: "APPOINTMENT",
             provider: selectedProvider,
-            amount: appointment.priceCharged
+            amount: amount
           })
         }
       >
         Start secure checkout
       </Button>
       {paymentMutation.data?.checkoutUrl ? (
-        <p className="mt-4 rounded-2xl bg-secondary p-3 text-sm">
-          Gateway ready: <span className="font-semibold">{paymentMutation.data.checkoutUrl}</span>
-        </p>
+        <div className="mt-6 p-4 rounded-2xl bg-primary/10 border border-primary/20">
+          <p className="text-sm font-medium text-primary">Redirecting to payment gateway...</p>
+          <a 
+            href={paymentMutation.data.checkoutUrl} 
+            className="mt-2 block text-xs underline break-all opacity-60"
+          >
+            {paymentMutation.data.checkoutUrl}
+          </a>
+        </div>
       ) : null}
     </Card>
   );
