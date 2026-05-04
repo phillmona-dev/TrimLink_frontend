@@ -40,7 +40,7 @@ export function SupportChatModal({ isOpen, onClose, username }: SupportChatModal
   const loadHistory = async () => {
     try {
       const history = await supportService.getHistory(username);
-      setMessages(history);
+      setMessages(history || []);
     } catch (err) {
       console.error("Failed to load support history", err);
     }
@@ -65,7 +65,9 @@ export function SupportChatModal({ isOpen, onClose, username }: SupportChatModal
     setIsLoading(true);
     try {
       const sent = await supportService.send(username, newMessage);
-      setMessages(prev => [...prev, sent]);
+      if (sent) {
+        setMessages(prev => [...prev, sent]);
+      }
       setNewMessage("");
     } catch (err) {
       console.error("Failed to send support message", err);

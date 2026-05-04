@@ -35,6 +35,11 @@ export function RegisterPage() {
     try {
       const auth = await authService.register(values);
       
+      if (!auth) {
+        setServerMessage({ text: "Registration failed: No session returned", type: 'error' });
+        return;
+      }
+
       // Save session to store (this handles localStorage correctly)
       setSession(auth);
       

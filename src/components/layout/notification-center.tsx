@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Client } from "@stomp/stompjs";
-import { Bell, Calendar, User, Scissors, CheckCircle2, XCircle } from "lucide-react";
+import { Bell, Calendar, User, Scissors, CheckCircle2, XCircle, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { WS_BASE_URL } from "@/utils/constants";
 import { Button } from "@/components/common/button";

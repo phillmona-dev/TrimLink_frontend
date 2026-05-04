@@ -5,12 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { MapPin, Search, Sparkles, Star } from "lucide-react";
 import Link from "next/link";
 import { barberService } from "@/api/barberService";
-import { featuredBarbers, featuredShops } from "@/assets/mock-data";
 import { Card } from "@/components/common/card";
 import { Input } from "@/components/common/input";
 import { QueueWidget } from "@/components/widgets/queue-widget";
 import { StatCard } from "@/components/widgets/stat-card";
-import { mockQueueTicket } from "@/assets/mock-data";
 import { AnimatedIcon } from "@/components/common/animated-icon";
 
 export function CustomerHomePage() {
@@ -67,7 +65,7 @@ export function CustomerHomePage() {
             />
           </div>
         </Card>
-        <QueueWidget ticket={mockQueueTicket} />
+        <QueueWidget ticket={null} />
       </section>
 
       <section className="grid gap-4 sm:grid-cols-3">

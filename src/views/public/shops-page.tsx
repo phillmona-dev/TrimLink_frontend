@@ -323,7 +323,7 @@ export function ShopsPage() {
               {isLoading ? "Searching…" : shops ? `${shops.totalElements ?? 0} shops found` : ""}
             </p>
             {activeQuery && (
-              <Badge variant="outline" className="bg-orange-500/10 text-orange-400 border-orange-500/20 text-[10px] py-0 px-2 h-5">
+              <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/20 text-[10px] py-0 px-2 h-5">
                 "{activeQuery}"
               </Badge>
             )}

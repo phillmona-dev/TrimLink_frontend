@@ -10,6 +10,8 @@ import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
 import { formatDateTime } from "@/utils/format";
 import { Play, CheckCircle, Clock, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/common/badge";
 
 export function BarberDashboardPage() {
   const queryClient = useQueryClient();
@@ -92,7 +94,7 @@ export function BarberDashboardPage() {
                     <p className="text-orange-400 font-bold text-lg">{activeAppt.serviceName}</p>
                     <div className="flex items-center gap-2 mt-2 text-white/40">
                       <Clock className="w-4 h-4" />
-                      <span>Started at {formatDateTime(activeAppt.actualStart || activeAppt.scheduledStart)}</span>
+                      <span>Started at {formatDateTime(activeAppt.scheduledStart)}</span>
                     </div>
                   </div>
                 </div>
@@ -115,7 +117,10 @@ export function BarberDashboardPage() {
             )}
           </Card>
 
-          <RevenueChart title="Weekly Performance" data={[]} />
+          <RevenueChart 
+            title="Weekly Performance" 
+            data={stats?.revenueTrend || []} 
+          />
         </div>
 
         {/* Right Column: Pending & Upcoming */}

@@ -89,7 +89,7 @@ export function ChatWidget() {
   const loadHistory = async (otherUserId: string) => {
     try {
       const history = await chatService.getHistory(otherUserId);
-      setMessages(history);
+      setMessages(history || []);
       queryClient.invalidateQueries({ queryKey: ["chat-unread-count"] });
     } catch (err) {
       console.error("Failed to load history", err);
@@ -128,6 +128,7 @@ export function ChatWidget() {
   const sendMutation = useMutation({
     mutationFn: () => chatService.send(selectedUser!.id, newMessage),
     onSuccess: (sentMsg) => {
+      if (!sentMsg) return;
       setNewMessage("");
       // Add the sent message only if the WebSocket hasn't already added it
       setMessages(prev => {

@@ -112,6 +112,8 @@ export type Shop = {
     accountHolder?: string;
   }[];
   active?: boolean;
+  activeQueueCount?: number;
+  averageWaitMinutes?: number;
 };
 
 export type Appointment = {

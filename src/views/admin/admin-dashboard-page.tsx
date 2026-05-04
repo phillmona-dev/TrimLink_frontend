@@ -14,7 +14,7 @@ export function AdminDashboardPage() {
 
   // Transform current stats into a basic series or leave empty
   const chartData = [
-    { name: "Current Month", data: stats ? [Number(stats.revenueThisMonth)] : [0] }
+    { label: "Revenue", value: stats ? Number(stats.revenueThisMonth) : 0 }
   ];
 
   return (

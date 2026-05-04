@@ -55,7 +55,7 @@ export function AdminSupportPage() {
   const loadHistory = async (username: string) => {
     try {
       const history = await supportService.getHistory(username);
-      setActiveChatMessages(history);
+      setActiveChatMessages(history || []);
     } catch (err) {
       console.error("Failed to load history", err);
     }

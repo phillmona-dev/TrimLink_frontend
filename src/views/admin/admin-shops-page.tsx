@@ -109,7 +109,7 @@ export function AdminShopsPage() {
                       <h3 className="font-bold text-lg text-white">
                         {user.barberProfile?.shop?.name || "Unknown Shop"}
                       </h3>
-                      <Badge variant="warning" className="bg-orange-500/10 text-orange-400 border-orange-500/20">Pending</Badge>
+                      <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/20">Pending</Badge>
                     </div>
                     <div className="text-sm text-white/60 mb-2 flex items-center gap-2">
                       <MapPin className="w-3 h-3 text-white/30" />
@@ -210,7 +210,6 @@ export function AdminShopsPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <Badge 
-                        variant={shop.active ? "success" : "danger"}
                         className={shop.active ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"}
                       >
                         {shop.active ? "Active" : "Inactive"}
@@ -282,7 +281,6 @@ export function AdminShopsPage() {
                       <h3 className="text-3xl font-black text-white">{selectedShop.name}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge 
-                          variant={selectedShop.active ? "success" : "danger"}
                           className={selectedShop.active ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}
                         >
                           {selectedShop.active ? "Active" : "Inactive"}

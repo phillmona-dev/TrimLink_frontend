@@ -9,6 +9,7 @@ export const bookingService = {
     serviceId: string;
     scheduledStart: string;
     notes?: string;
+    receiptImageUrl?: string;
   }) => unwrap<Appointment>(http.post("/bookings", payload)),
 
   getMine: (page = 0, query = "", since = "") => {
@@ -39,6 +40,9 @@ export const bookingService = {
 
   confirmAppointment: (id: string) =>
     unwrap<Appointment>(http.patch(`/bookings/${id}/confirm`)),
+
+  rejectAppointment: (id: string, reason: string) =>
+    unwrap<Appointment>(http.patch(`/bookings/${id}/reject`, null, { params: { reason } })),
 
   startAppointment: (id: string) =>
     unwrap<Appointment>(http.patch(`/bookings/${id}/start`)),

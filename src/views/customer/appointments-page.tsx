@@ -92,7 +92,7 @@ export function AppointmentsPage() {
                         ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed' 
                         : 'bg-orange-500 hover:bg-orange-400 text-black'
                       } font-black rounded-xl h-9 px-4 text-[11px] transition-all active:scale-95`}
-                      onClick={() => setSelectedAppt({ id: appointment.id, barberName: appointment.barberName })}
+                      onClick={() => setSelectedAppt({ id: appointment.id, barberName: appointment.barberName || "Barber" })}
                     >
                       <Star className={`w-3.5 h-3.5 mr-1.5 ${appointment.reviewed ? 'fill-white/10' : 'fill-current'}`} />
                       {appointment.reviewed ? "Reviewed" : "Review"}

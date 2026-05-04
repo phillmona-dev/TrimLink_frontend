@@ -56,7 +56,7 @@ export function PaymentsPage() {
       </div>
       <Button
         className="mt-6 w-full h-14 text-lg font-bold"
-        isLoading={paymentMutation.isPending}
+        disabled={paymentMutation.isPending}
         onClick={() =>
           paymentMutation.mutate({
             referenceId: appointmentId,

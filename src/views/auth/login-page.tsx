@@ -44,6 +44,11 @@ export function LoginPage() {
         password: values.password,
       });
       
+      if (!auth) {
+        setServerMessage({ text: "Invalid credentials or empty response", type: 'error' });
+        return;
+      }
+
       // Save session to store (this handles localStorage correctly)
       setSession(auth);
       

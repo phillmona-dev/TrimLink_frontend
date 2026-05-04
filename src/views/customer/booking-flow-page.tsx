@@ -414,7 +414,7 @@ export function BookingFlowPage() {
                    <div className="space-y-4">
                      <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 px-1">Select Payment Method</p>
                      <div className="grid grid-cols-1 gap-3">
-                       {shop.bankAccounts.map((acc: any) => (
+                       {shop?.bankAccounts?.map((acc: any) => (
                          <button
                            key={acc.id}
                            onClick={() => setSelectedAccount(acc)}
