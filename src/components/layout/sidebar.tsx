@@ -44,6 +44,7 @@ export function Sidebar() {
         : role === "ADMIN"
           ? [
               { to: "/admin", label: "Overview", icon: LayoutDashboard },
+              { to: "/admin/appointments", label: "Bookings", icon: CalendarCheck },
               { to: "/admin/users", label: "Users", icon: Users },
               { to: "/admin/shops", label: "Shops", icon: Home },
               { to: "/admin/support", label: "Support", icon: MessageCircle },

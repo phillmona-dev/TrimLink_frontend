@@ -29,6 +29,17 @@ export type BarberPerformance = {
   completedQueueServicesToday: number;
 };
 
+export type AdminAppointmentStats = {
+  totalApproved: number;
+  totalPending: number;
+  totalRejected: number;
+  totalRevenue: number;
+  revenueToday: number;
+  adminShare: number;
+  shopRevenues: Array<{ shopId: string; shopName: string; revenue: number }>;
+  barberRevenues: Array<{ barberId: string; barberName: string; revenue: number }>;
+};
+
 export const adminService = {
   dashboard: () => unwrap<DashboardStats>(http.get("/admin/dashboard")),
   users: () => unwrap<PageResponse<PlatformUser>>(http.get("/admin/users")),
@@ -37,4 +48,16 @@ export const adminService = {
   pendingShops: () => unwrap<PlatformUser[]>(http.get("/admin/users/pending")),
   approveShop: (id: string) => unwrap<void>(http.patch(`/admin/users/${id}/approve`)),
   rejectShop: (id: string) => unwrap<void>(http.patch(`/admin/users/${id}/reject`)),
+  getAppointments: (params?: { 
+    shopId?: string; 
+    barberId?: string; 
+    status?: string; 
+    startDate?: string; 
+    endDate?: string; 
+    query?: string;
+    page?: number; 
+    size?: number 
+  }) => 
+    unwrap<PageResponse<any>>(http.get("/admin/appointments", { params })),
+  getAppointmentStats: () => unwrap<AdminAppointmentStats>(http.get("/admin/appointments/stats")),
 };
