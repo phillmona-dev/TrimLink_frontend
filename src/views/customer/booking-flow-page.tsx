@@ -444,9 +444,9 @@ export function BookingFlowPage() {
                        <div className="relative">
                          <input 
                            type="file" 
-                           accept="image/*"
+                           accept="image/png, image/jpeg, image/jpg"
                            onChange={handleFileChange}
-                           className="hidden" 
+                           className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
                            id="receipt-upload"
                          />
                          
