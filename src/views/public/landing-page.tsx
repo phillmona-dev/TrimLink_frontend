@@ -312,11 +312,11 @@ export function LandingPage() {
                   {/* Feed Item 2: Testimonial */}
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-[url('https://i.pravatar.cc/150?img=33')] bg-cover shrink-0"></div>
+                      <div className="h-10 w-10 rounded-full bg-[url('/habesh_man_avatar_1777875648469.png')] bg-cover shrink-0"></div>
                     </div>
                     <div className="flex-1 pb-6">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-white/90">Mahi</span>
+                        <span className="font-semibold text-white/90">Amanuel</span>
                         <div className="flex items-center gap-2 text-white/40 text-xs">
                           <span>2h</span>
                           <MoreHorizontal className="h-4 w-4" />
