@@ -224,24 +224,26 @@ export const AdminAppointmentsPage: React.FC = () => {
             <select 
               value={filterShop}
               onChange={(e) => setFilterShop(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer"
+              className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white/70 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs appearance-none min-w-[150px]"
             >
-              <option value="">All Shops</option>
-              {shops.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              <option value="" className="bg-[#1a1a1a] text-white">All Shops</option>
+              {shops.map(shop => (
+                <option key={shop.id} value={shop.id} className="bg-[#1a1a1a] text-white">{shop.name}</option>
+              ))}
             </select>
 
             <select 
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer"
+              className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white/70 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs appearance-none min-w-[120px]"
             >
-              <option value="">All Statuses</option>
-              <option value="PENDING">Pending</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="REJECTED">Rejected</option>
-              <option value="CANCELLED">Cancelled</option>
-              <option value="BLOCKED">Blocked</option>
+              <option value="" className="bg-[#1a1a1a] text-white">All Status</option>
+              <option value="PENDING" className="bg-[#1a1a1a] text-white">Pending</option>
+              <option value="CONFIRMED" className="bg-[#1a1a1a] text-white">Confirmed</option>
+              <option value="COMPLETED" className="bg-[#1a1a1a] text-white">Completed</option>
+              <option value="REJECTED" className="bg-[#1a1a1a] text-white">Rejected</option>
+              <option value="CANCELLED" className="bg-[#1a1a1a] text-white">Cancelled</option>
+              <option value="BLOCKED" className="bg-[#1a1a1a] text-white">Blocked</option>
             </select>
 
             <button 
@@ -258,6 +260,7 @@ export const AdminAppointmentsPage: React.FC = () => {
           <table className="w-full text-left border-separate border-spacing-0">
             <thead>
               <tr className="bg-white/[0.02]">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5 w-16">#</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Customer</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Location / Expert</th>
                 <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-white/30 border-b border-white/5">Service / Fee</th>
@@ -270,12 +273,17 @@ export const AdminAppointmentsPage: React.FC = () => {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td colSpan={6} className="px-6 py-8 h-16 bg-white/5 rounded-lg m-2"></td>
+                    <td colSpan={7} className="px-6 py-8 h-16 bg-white/5 rounded-lg m-2"></td>
                   </tr>
                 ))
               ) : appointments.length > 0 ? (
-                appointments.map((appt) => (
-                  <tr key={appt.id} className="hover:bg-white/5 transition-colors group">
+                appointments.map((appt, idx) => (
+                  <tr key={appt.id} className="group/row hover:bg-white/[0.02] transition-colors">
+                    <td className="px-6 py-5">
+                      <span className="text-xs font-mono text-white/20 group-hover/row:text-orange-500/40 transition-colors">
+                        {(page * 20) + idx + 1}
+                      </span>
+                    </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold">
