@@ -25,6 +25,11 @@ export const AdminFinancePage: React.FC = () => {
   const [view, setView] = useState<"shops" | "transactions">("shops");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const handleShopAction = (shopName: string) => {
+    setSearchQuery(shopName);
+    setView("transactions");
+  };
+
   useEffect(() => {
     fetchFinanceData();
   }, [view]);
@@ -69,28 +74,35 @@ export const AdminFinancePage: React.FC = () => {
         </div>
       </div>
 
-      {/* High-Level Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* High-Level Stats - Minimized */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard 
-          title="Total Platform GMV" 
+          title="Platform GMV" 
           value={formatCurrency(totalRevenue)} 
           icon={TrendingUp}
           iconColor="text-emerald-500"
-          subtitle="All-time gross volume"
+          subtitle="All-time gross"
         />
         <StatCard 
-          title="Total Admin Revenue" 
+          title="Admin Revenue" 
           value={formatCurrency(totalAdminShare)} 
           icon={BarChart3}
           iconColor="text-blue-500"
-          subtitle="Net platform earnings"
+          subtitle="Net platform cut"
         />
         <StatCard 
-          title="Total Transactions" 
+          title="Transactions" 
           value={summaries.reduce((acc, curr) => acc + curr.totalTransactions, 0)} 
           icon={ArrowUpRight}
           iconColor="text-orange-500"
-          subtitle="Processed appointments"
+          subtitle="Processed bookings"
+        />
+        <StatCard 
+          title="Active Shops" 
+          value={summaries.length} 
+          icon={Building2}
+          iconColor="text-purple-500"
+          subtitle="Partner businesses"
         />
       </div>
 
@@ -185,14 +197,21 @@ export const AdminFinancePage: React.FC = () => {
                       <p className="text-white/70">{item.totalTransactions} Bookings</p>
                     </td>
                     <td className="px-8 py-6 text-right">
-                      <button className="p-3 hover:bg-white/10 rounded-2xl transition-all text-white/40 hover:text-white">
+                      <button 
+                        onClick={() => handleShopAction(item.shopName)}
+                        className="p-3 hover:bg-white/10 rounded-2xl transition-all text-white/40 hover:text-white group-hover:bg-orange-500 group-hover:text-white"
+                      >
                         <ChevronRight className="w-5 h-5" />
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
-                transactions.filter(t => t.txRef.toLowerCase().includes(searchQuery.toLowerCase())).map((tx) => (
+                transactions.filter(t => 
+                  t.txRef.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  t.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  t.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+                ).map((tx) => (
                   <tr key={tx.id} className="group hover:bg-white/[0.02] transition-colors">
                     <td className="px-8 py-6">
                       <p className="text-xs font-mono text-orange-500/60 uppercase">{tx.txRef}</p>
@@ -240,20 +259,17 @@ export const AdminFinancePage: React.FC = () => {
 };
 
 const StatCard = ({ title, value, icon: Icon, subtitle, iconColor }: { title: string, value: string | number, icon: any, subtitle: string, iconColor?: string }) => (
-  <div className="bg-[#121212] border border-white/5 p-8 rounded-[2.5rem] hover:bg-white/[0.02] transition-all group relative overflow-hidden">
-    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity translate-x-4 -translate-y-4">
-      <Icon className="w-24 h-24" />
-    </div>
-    <div className="flex items-center justify-between mb-6 relative z-10">
-      <div className="p-4 bg-white/5 rounded-[1.5rem] group-hover:scale-110 transition-transform">
-        <Icon className={`w-6 h-6 ${iconColor}`} />
+  <div className="bg-[#121212] border border-white/5 p-5 rounded-[1.5rem] hover:bg-white/[0.02] transition-all group flex flex-col justify-between h-full">
+    <div className="flex items-center justify-between mb-3">
+      <div className={`p-2.5 bg-white/5 rounded-xl group-hover:scale-110 transition-transform ${iconColor}`}>
+        <Icon className="w-5 h-5" />
       </div>
-      <ArrowUpRight className="w-5 h-5 text-white/20" />
+      <ArrowUpRight className="w-4 h-4 text-white/10 group-hover:text-white/30 transition-colors" />
     </div>
-    <div className="relative z-10">
-      <p className="text-white/40 text-xs font-black uppercase tracking-widest">{title}</p>
-      <h3 className="text-4xl font-black text-white mt-2 leading-tight">{value}</h3>
-      <p className="text-white/20 text-sm mt-2 font-medium">{subtitle}</p>
+    <div>
+      <p className="text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">{title}</p>
+      <h3 className="text-2xl font-black text-white mt-1 leading-none tracking-tight">{value}</h3>
+      <p className="text-white/10 text-[10px] mt-2 font-medium group-hover:text-white/20 transition-colors">{subtitle}</p>
     </div>
   </div>
 );
