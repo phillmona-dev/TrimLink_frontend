@@ -60,5 +60,12 @@ export const authService = {
       http.post("/auth/register/shop", payload)
     );
     return data;
+  },
+
+  completeShopRegistration: async (payload: any) => {
+    const data = await unwrap<AuthApiPayload>(
+      http.post("/auth/complete-shop-registration", payload)
+    );
+    return data;
   }
 };

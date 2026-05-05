@@ -86,7 +86,12 @@ http.interceptors.response.use(
         return http(originalRequest);
       }
 
-      useAuthStore.getState().logout();
+      const isAuthFlow = window.location.pathname.includes("/auth/callback") || 
+                        window.location.pathname.includes("/auth/register/shop/complete");
+
+      if (!isAuthFlow) {
+        useAuthStore.getState().logout();
+      }
     }
 
     return Promise.reject(error);

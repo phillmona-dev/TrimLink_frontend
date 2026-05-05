@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { Role } from "@/types";
 import { useAuth } from "@/hooks/use-auth";
@@ -17,7 +17,15 @@ export function ProtectedRoute({
   const router = useRouter();
   const { session, isAuthenticated } = useAuth();
 
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
     if (!isAuthenticated || !session) {
       router.replace(`/auth/login?next=${encodeURIComponent(pathname)}`);
       return;
@@ -26,7 +34,12 @@ export function ProtectedRoute({
     if (allowedRoles && !allowedRoles.includes(session.role)) {
       router.replace(dashboardRoleMap[session.role]);
     }
-  }, [allowedRoles, isAuthenticated, pathname, router, session]);
+  }, [allowedRoles, isAuthenticated, isMounted, pathname, router, session]);
+
+  // Wait for mounting to avoid hydration mismatch
+  if (!isMounted) {
+    return null;
+  }
 
   if (!isAuthenticated || !session) {
     return null;

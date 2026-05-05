@@ -5,6 +5,9 @@ export const API_BASE_URL =
     ? `http://${window.location.hostname}:9090/api/v1`
     : "http://localhost:9090/api/v1");
 
+export const OAUTH2_GOOGLE_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+export const OAUTH2_FACEBOOK_URL = `${API_BASE_URL}/oauth2/authorization/facebook`;
+
 export const WS_BASE_URL = 
   process.env.NEXT_PUBLIC_WS_BASE_URL ||
   (typeof window !== "undefined"
