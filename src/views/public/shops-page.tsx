@@ -22,6 +22,7 @@ import { Button } from "@/components/common/button";
 import { Badge } from "@/components/common/badge";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 function ShopCard({ shop, onSelect }: { shop: Shop; onSelect: () => void }) {
   return (
@@ -225,7 +226,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
           {/* CTA */}
           <div className="pt-2 pb-2">
             {isAuthenticated ? (
-              <Link href={role === "CUSTOMER" ? "/app" : "/owner"}>
+              <Link href={role === "CUSTOMER" ? `/app/shops/${shopId}` : "/owner"}>
                 <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-14 rounded-2xl shadow-xl text-base">
                   {role === "CUSTOMER" ? "Book Now" : "Go to Dashboard"}
                 </Button>
@@ -245,6 +246,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
 }
 
 export function ShopsPage() {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -260,12 +262,12 @@ export function ShopsPage() {
     staleTime: 30_000,
   });
 
-  // Debounce search input
+  // Debounce search input - faster for "on typing" feel
   useEffect(() => {
     const timer = setTimeout(() => {
       setActiveQuery(query);
       setPage(0);
-    }, 500); // 500ms delay for search
+    }, 200); // Reduced from 500ms
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -286,9 +288,12 @@ export function ShopsPage() {
 
         {/* Top Bar */}
         <div className="flex items-center gap-3 mb-8">
-          <Link href="/" className="p-2.5 bg-white/5 border border-white/10 rounded-full text-white/50 hover:text-white transition">
+          <button 
+            onClick={() => router.back()}
+            className="p-2.5 bg-white/5 border border-white/10 rounded-full text-white/50 hover:text-white transition active:scale-95"
+          >
             <ArrowLeft size={20} />
-          </Link>
+          </button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Explore Shops</h1>
             <p className="text-sm text-white/40 mt-0.5">Find the perfect barbershop near you</p>

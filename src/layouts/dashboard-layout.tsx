@@ -3,6 +3,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "@/api/userService";
+import { ownerService } from "@/api/ownerService";
 import { Search } from "lucide-react";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -21,17 +22,32 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: userLoading } = useQuery({
     queryKey: ["me"],
     queryFn: userService.me,
     enabled: !!session && mounted
   });
 
-  const workspaceName = !mounted
-    ? "Workspace"
-    : user?.firstName
-      ? `${user.firstName}'s Workspace`
-      : `${session?.role?.toLowerCase() ?? "Guest"} Workspace`;
+  const isStaff = session?.role === "OWNER" || session?.role === "BARBER";
+
+  const { data: shop, isLoading: shopLoading } = useQuery({
+    queryKey: ["my-shop-details"],
+    queryFn: ownerService.getShopDetails,
+    enabled: !!session && mounted && isStaff
+  });
+
+  // Handle both camelCase and snake_case for robust property access
+  const firstName = user?.firstName || (user as any)?.first_name;
+  const lastName = user?.lastName || (user as any)?.last_name;
+  const username = user?.username;
+
+  const workspaceName = !mounted || userLoading
+    ? "Loading Workspace..."
+    : firstName
+      ? `${firstName}${lastName ? ` ${lastName}` : ""}'s Workspace${(isStaff && shop?.name) ? ` | ${shop.name}` : ""}`
+      : username
+        ? `${username}'s Workspace`
+        : `${session?.role?.toLowerCase() ?? "Guest"} Workspace`;
 
   return (
     <div className="min-h-screen w-full flex items-start justify-center text-white">

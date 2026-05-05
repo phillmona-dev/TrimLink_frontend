@@ -2,13 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  CalendarCheck, Search, Filter, TrendingUp, Clock, XCircle,
-  CheckCircle2, User, ChevronRight, MoreVertical, Eye, Download,
+  CalendarCheck, Search, TrendingUp, Clock, XCircle,
+  CheckCircle2, MoreVertical, Eye, Download,
   BarChart3
 } from "lucide-react";
 import { ownerService } from "@/api/ownerService";
 import { formatEthiopianDate, formatEthiopianTime, formatCurrency } from "@/utils/format";
 import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
+import { StatusSelector } from "@/components/common/status-selector";
+import { exportToCSV, exportToPDF } from "@/utils/export";
+
+// ... (rest of imports and component)
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING:    "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -30,6 +34,33 @@ export const OwnerAppointmentsPage: React.FC = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+
+  const handleExportCSV = () => {
+    const data = appointments.map((a, i) => ({
+      "No": i + 1,
+      "Customer": a.customerName || "Walk-in",
+      "Barber": a.barberName,
+      "Service": a.serviceName,
+      "Price": a.priceCharged ? `${a.priceCharged} ETB` : "0 ETB",
+      "Date": formatEthiopianDate(a.scheduledStart),
+      "Time": formatEthiopianTime(a.scheduledStart),
+      "Status": a.status
+    }));
+    exportToCSV(data, `Appointments_${new Date().toISOString().split('T')[0]}`);
+  };
+
+  const handleExportPDF = () => {
+    const headers = ["No", "Customer", "Barber / Service", "Schedule", "Status", "Fee"];
+    const rows = appointments.map((a, i) => [
+      i + 1,
+      a.customerName || "Walk-in",
+      `${a.barberName}\n${a.serviceName}`,
+      `${formatEthiopianDate(a.scheduledStart)}\n${formatEthiopianTime(a.scheduledStart)}`,
+      a.status,
+      a.priceCharged ? `${a.priceCharged} ETB` : "0 ETB"
+    ]);
+    exportToPDF("Shop Appointments Report", headers, rows, `Appointments_${new Date().toISOString().split('T')[0]}`);
+  };
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedSearch(searchQuery), 400);
@@ -62,6 +93,10 @@ export const OwnerAppointmentsPage: React.FC = () => {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const changeDate = (days: number) => {
+    // Legacy helper if needed, but EthiopianDatePicker handles it
+  };
+
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
@@ -73,9 +108,22 @@ export const OwnerAppointmentsPage: React.FC = () => {
           </h1>
           <p className="text-white/40 mt-1">Manage and monitor all bookings for your shop.</p>
         </div>
-        <button className="px-5 py-2.5 bg-white/5 border border-white/10 text-white rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2 text-sm font-bold">
-          <Download className="w-4 h-4" /> Export
-        </button>
+        
+        <div className="relative group/export inline-block text-left">
+          <button className="px-5 py-2.5 bg-orange-500 text-black rounded-2xl hover:bg-orange-400 transition-all flex items-center gap-2 text-sm font-bold shadow-lg shadow-orange-500/20">
+            <Download className="w-4 h-4" /> Export Report
+          </button>
+          <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-2xl bg-[#1a1a1a] border border-white/10 shadow-2xl opacity-0 invisible group-hover/export:opacity-100 group-hover/export:visible transition-all z-[60] overflow-hidden">
+            <div className="py-2">
+              <button onClick={handleExportPDF} className="w-full px-4 py-3 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-3 transition-colors">
+                <Download className="w-4 h-4 text-red-500" /> Download PDF
+              </button>
+              <button onClick={handleExportCSV} className="w-full px-4 py-3 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-3 transition-colors border-t border-white/5">
+                <Download className="w-4 h-4 text-emerald-500" /> Download CSV (Excel)
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Compact Stats */}
@@ -99,19 +147,10 @@ export const OwnerAppointmentsPage: React.FC = () => {
             />
           </div>
 
-          <select
+          <StatusSelector
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/70 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs appearance-none min-w-[130px]"
-          >
-            <option value="" className="bg-[#1a1a1a] text-white">All Statuses</option>
-            <option value="PENDING" className="bg-[#1a1a1a] text-white">Pending</option>
-            <option value="CONFIRMED" className="bg-[#1a1a1a] text-white">Confirmed</option>
-            <option value="IN_PROGRESS" className="bg-[#1a1a1a] text-white">In Progress</option>
-            <option value="COMPLETED" className="bg-[#1a1a1a] text-white">Completed</option>
-            <option value="REJECTED" className="bg-[#1a1a1a] text-white">Rejected</option>
-            <option value="CANCELLED" className="bg-[#1a1a1a] text-white">Cancelled</option>
-          </select>
+            onChange={setFilterStatus}
+          />
 
           <EthiopianDatePicker
             value={startDate}

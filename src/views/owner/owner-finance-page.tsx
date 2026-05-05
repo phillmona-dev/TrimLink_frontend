@@ -2,16 +2,31 @@
 
 import React, { useState, useEffect } from "react";
 import {
-  Wallet, TrendingUp, BarChart3, ArrowUpRight, Building2,
-  Download, ChevronRight, Clock, Search
+  Wallet, TrendingUp, BarChart3, ArrowUpRight,
+  Download, Clock
 } from "lucide-react";
 import { ownerService } from "@/api/ownerService";
-import { formatCurrency, formatEthiopianDate } from "@/utils/format";
+import { formatCurrency } from "@/utils/format";
+import { exportToPDF } from "@/utils/export";
 
 export const OwnerFinancePage: React.FC = () => {
   const [finance, setFinance] = useState<any>(null);
   const [barberRevenues, setBarberRevenues] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleExportPDF = () => {
+    const headers = ["Barber", "Bookings Today", "Manual Logs", "Avg Rating", "Status"];
+    const rows = barberRevenues.map((b) => [
+      `${b.user?.firstName} ${b.user?.lastName}`,
+      b.appBookingsToday,
+      b.manualLogsToday,
+      `${b.averageRating?.toFixed(1) ?? "N/A"} ⭐`,
+      b.available ? "Available" : "Unavailable"
+    ]);
+
+    const title = `Finance Report: ${finance?.shopName || "Your Shop"}`;
+    exportToPDF(title, headers, rows, `Finance_${new Date().toISOString().split('T')[0]}`);
+  };
 
   useEffect(() => {
     const load = async () => {
@@ -45,7 +60,10 @@ export const OwnerFinancePage: React.FC = () => {
             {finance?.shopName ? `Revenue and financial overview for ${finance.shopName}` : "Loading your shop's financial data..."}
           </p>
         </div>
-        <button className="px-5 py-2.5 bg-white/5 border border-white/10 text-white rounded-2xl hover:bg-white/10 transition-all flex items-center gap-2 text-sm font-bold">
+        <button 
+          onClick={handleExportPDF}
+          className="px-5 py-2.5 bg-orange-500 text-black rounded-2xl hover:bg-orange-400 transition-all flex items-center gap-2 text-sm font-bold shadow-lg shadow-orange-500/20"
+        >
           <Download className="w-4 h-4" /> Export PDF
         </button>
       </div>

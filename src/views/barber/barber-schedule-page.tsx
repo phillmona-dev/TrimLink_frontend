@@ -5,27 +5,73 @@ import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
 import { Badge } from "@/components/common/badge";
 import { bookingService } from "@/api/bookingService";
+import { barberService } from "@/api/barberService";
 import { useAuth } from "@/hooks/use-auth";
 import { formatEthiopianDate, formatEthiopianTime } from "@/utils/format";
 import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
-import { Calendar, Clock, Lock, Unlock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { ServiceSelector } from "@/components/common/service-selector";
+import { Calendar, Clock, Lock, Unlock, AlertCircle, ChevronLeft, ChevronRight, Scissors } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { BarberProfile } from "@/types";
 
 export function BarberSchedulePage() {
   const { session } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [slots, setSlots] = useState<any[]>([]);
+  const [profile, setProfile] = useState<BarberProfile | null>(null);
+  const [shopCatalog, setShopCatalog] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Fetch barber profile to get shop info
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!session?.userId) return;
+      try {
+        const data = await barberService.getBarber(session.userId);
+        setProfile(data);
+      } catch (err: any) {
+        console.error("Failed to fetch barber profile", err);
+        if (err?.response?.status === 404) {
+          showToast("Barber profile not found. Please ensure you are registered as a barber.");
+        }
+      }
+    };
+    fetchProfile();
+  }, [session?.userId]);
+
+  // Fetch ALL shop services (catalog)
+  useEffect(() => {
+    const fetchCatalog = async () => {
+      if (!session?.userId) return;
+      try {
+        const data = await barberService.getShopCatalog();
+        setShopCatalog(data || []);
+      } catch (err) {
+        console.error("Failed to fetch shop catalog", err);
+      }
+    };
+    fetchCatalog();
+  }, [session?.userId]);
+
+  // When catalog loads, pick first service if none selected
+  useEffect(() => {
+    if (shopCatalog.length > 0 && !selectedServiceId) {
+      setSelectedServiceId(shopCatalog[0].id);
+    }
+  }, [shopCatalog, selectedServiceId]);
 
   const fetchSlots = async () => {
     if (!session?.userId) return;
     setIsLoading(true);
     try {
-      // Use a default duration of 30 mins to visualize the day
+      // Use selected service ID, fallback to dummy if none
+      const serviceId = selectedServiceId || "00000000-0000-0000-0000-000000000000";
+
       const data = await bookingService.getSlots({
         barberId: session.userId,
-        serviceId: "00000000-0000-0000-0000-000000000000", // Dummy/Generic for schedule view
+        serviceId: serviceId,
         date: selectedDate
       });
       setSlots(data || []);
@@ -37,8 +83,11 @@ export function BarberSchedulePage() {
   };
 
   useEffect(() => {
-    fetchSlots();
-  }, [selectedDate, session?.userId]);
+    // Re-fetch when date or service changes
+    if (selectedServiceId) {
+      fetchSlots();
+    }
+  }, [selectedDate, session?.userId, selectedServiceId]);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -53,8 +102,6 @@ export function BarberSchedulePage() {
         showToast("Slot closed successfully");
       } else if (slot.status === "BLOCKED") {
         // Unblock the slot
-        // Find the appointment ID from the slot (we might need to update the backend to return apptId in slot)
-        // For now, assume the backend returns 'appointmentId' in slot if it's blocked
         if (slot.appointmentId) {
           await bookingService.unblockSlot(slot.appointmentId);
           showToast("Slot opened successfully");
@@ -77,6 +124,10 @@ export function BarberSchedulePage() {
     date.setDate(date.getDate() + days);
     setSelectedDate(date.toISOString().split('T')[0]);
   };
+
+  // Calculate duration for display based on selected service from catalog
+  const selectedService = shopCatalog.find(s => s.id === selectedServiceId);
+  const displayDuration = selectedService?.durationMinutes || 30;
 
   return (
     <div className="space-y-8">
@@ -103,18 +154,28 @@ export function BarberSchedulePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-white/5 border border-white/10 p-2 rounded-2xl">
-          <Button variant="outline" size="icon" onClick={() => changeDate(-1)} className="rounded-xl border-white/5 h-10 w-10">
-            <ChevronLeft className="w-5 h-5" />
-          </Button>
-          <EthiopianDatePicker
-            value={selectedDate}
-            onChange={(iso) => iso && setSelectedDate(iso)}
-            placeholder="Select date"
+        <div className="flex flex-wrap items-center gap-3 bg-white/5 border border-white/10 p-2 rounded-2xl">
+          {/* Service Filter */}
+          <ServiceSelector
+            services={shopCatalog}
+            value={selectedServiceId}
+            onChange={setSelectedServiceId}
+            placeholder="Select Service"
           />
-          <Button variant="outline" size="icon" onClick={() => changeDate(1)} className="rounded-xl border-white/5 h-10 w-10">
-            <ChevronRight className="w-5 h-5" />
-          </Button>
+
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => changeDate(-1)} className="rounded-xl hover:bg-white/10 h-10 w-10">
+              <ChevronLeft className="w-5 h-5 text-white/60" />
+            </Button>
+            <EthiopianDatePicker
+              value={selectedDate}
+              onChange={(iso) => iso && setSelectedDate(iso)}
+              placeholder="Select date"
+            />
+            <Button variant="ghost" size="icon" onClick={() => changeDate(1)} className="rounded-xl hover:bg-white/10 h-10 w-10">
+              <ChevronRight className="w-5 h-5 text-white/60" />
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -169,7 +230,7 @@ export function BarberSchedulePage() {
                       {formatEthiopianTime(slot.startTime)}
                     </p>
                     <p className={`text-[10px] font-bold uppercase tracking-widest ${isOccupied ? "text-white/10" : "text-white/30"}`}>
-                      Slot Duration: 30m
+                      Slot Duration: {displayDuration}m
                     </p>
                   </div>
 
@@ -194,6 +255,8 @@ export function BarberSchedulePage() {
             Click on any <span className="text-emerald-400 font-bold">Open</span> slot to manually close it. 
             Closed slots will not be visible to customers. 
             Slots marked as <span className="text-white/60 font-bold">Occupied</span> are already booked by customers and cannot be changed here.
+            <br/><br/>
+            Use the <span className="text-orange-400 font-bold">Service Filter</span> in the header to see availability for different service lengths (e.g. 30m vs 60m).
           </p>
         </div>
       </div>

@@ -20,5 +20,7 @@ export const barberService = {
   getService: (id: string) => unwrap<Service>(http.get(`/services/${id}`)),
 
   getReviews: (barberId: string) =>
-    unwrap<PageResponse<Review>>(http.get(`/barbers/${barberId}/reviews`))
+    unwrap<PageResponse<Review>>(http.get(`/barbers/${barberId}/reviews`)),
+
+  getShopCatalog: () => unwrap<Service[]>(http.get("/services/my-shop"))
 };
