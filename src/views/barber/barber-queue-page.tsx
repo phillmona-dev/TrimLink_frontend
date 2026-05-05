@@ -8,6 +8,7 @@ import { Badge } from "@/components/common/badge";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { http } from "@/api/http";
 import { formatEthiopianDateTime } from "@/utils/format";
+import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
 import { 
   Dialog, 
   DialogContent, 
@@ -163,15 +164,11 @@ export function BarberQueuePage() {
               <SelectItem value="CANCELLED">Cancelled</SelectItem>
             </SelectContent>
           </Select>
-          <div className="bg-white/5 border border-white/10 rounded-2xl h-14 px-4 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-white/20" />
-            <input 
-              type="date"
-              value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
-              className="bg-transparent text-white text-xs font-bold focus:outline-none appearance-none cursor-pointer [color-scheme:dark]"
-            />
-          </div>
+          <EthiopianDatePicker
+            value={filterDate}
+            onChange={setFilterDate}
+            placeholder="All dates"
+          />
         </div>
       </div>
 

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   Bell, CalendarDays, Clock, Home, LayoutDashboard,
   LogOut, Scissors, Settings, Users, MessageCircle,
-  CalendarCheck
+  CalendarCheck, Wallet
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimatedIcon } from "@/components/common/animated-icon";
@@ -33,18 +33,20 @@ export function Sidebar() {
       : role === "OWNER"
         ? [
             { to: "/owner", label: "Overview", icon: LayoutDashboard },
+            { to: "/owner/appointments", label: "Bookings", icon: CalendarCheck },
+            { to: "/owner/finance", label: "Finance", icon: Wallet },
             { to: "/owner/staff", label: "Staff", icon: Users },
             { to: "/owner/catalog", label: "Catalog", icon: Scissors },
             { to: "/owner/services", label: "Services", icon: Users },
             { to: "/barber/queue", label: "Queue", icon: Clock },
             { to: "/barber/schedule", label: "Schedule", icon: CalendarDays },
-            { to: "/owner/bookings", label: "Bookings", icon: CalendarCheck },
             { to: "/owner/settings", label: "Settings", icon: Settings }
           ]
         : role === "ADMIN"
           ? [
               { to: "/admin", label: "Overview", icon: LayoutDashboard },
               { to: "/admin/appointments", label: "Bookings", icon: CalendarCheck },
+              { to: "/admin/finance", label: "Finance", icon: Wallet },
               { to: "/admin/users", label: "Users", icon: Users },
               { to: "/admin/shops", label: "Shops", icon: Home },
               { to: "/admin/support", label: "Support", icon: MessageCircle },

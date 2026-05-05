@@ -79,5 +79,18 @@ export const ownerService = {
     unwrap<any>(http.get("/shops/my-shop")),
     
   updateShopDetails: (details: any) =>
-    unwrap<any>(http.put("/shops/my-shop", details))
+    unwrap<any>(http.put("/shops/my-shop", details)),
+
+  getMyShopAppointments: (params?: {
+    status?: string;
+    query?: string;
+    startDate?: string;
+    endDate?: string;
+    page?: number;
+    size?: number;
+  }) =>
+    unwrap<any>(http.get("/shops/my-shop/appointments", { params })),
+
+  getMyShopFinance: () =>
+    unwrap<any>(http.get("/shops/my-shop/finance")),
 };

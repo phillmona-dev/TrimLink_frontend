@@ -75,6 +75,7 @@ export type BarberProfile = {
   totalReviews: number;
   available: boolean;
   status: "IDLE" | "BUSY";
+  shopId?: string;
   user: {
     id: string;
     firstName: string;
