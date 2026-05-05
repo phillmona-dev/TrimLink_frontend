@@ -14,6 +14,7 @@ import { useAuthStore } from "@/store/auth-store";
 import { LogIn, MessageCircle } from "lucide-react";
 import { AnimatedIcon } from "@/components/common/animated-icon";
 import { SupportChatModal } from "@/components/widgets/support-chat-modal";
+import { dashboardRoleMap } from "@/utils/constants";
 
 const schema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -51,15 +52,11 @@ export function LoginPage() {
 
       // Save session to store (this handles localStorage correctly)
       setSession(auth);
-      
       setServerMessage({ text: "Login successful! Redirecting...", type: 'success' });
-      
-      // Redirect based on role
-      if (auth.role === "BARBER" || auth.role === "OWNER") {
-        router.push("/barber/queue");
-      } else {
-        router.push("/app");
-      }
+
+      // Redirect based on role using the canonical role→path map
+      const destination = dashboardRoleMap[auth.role as keyof typeof dashboardRoleMap] ?? "/app";
+      router.push(destination);
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Failed to login";
       setServerMessage({ text: message, type: 'error' });

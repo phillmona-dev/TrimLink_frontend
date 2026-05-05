@@ -19,6 +19,7 @@ import {
 import { adminService, type AdminAppointmentStats } from "@/api/adminService";
 import { shopService, type Shop } from "@/api/shopService";
 import { formatEthiopianTime, formatEthiopianDate, formatCurrency } from "@/utils/format";
+import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
 
 export const AdminAppointmentsPage: React.FC = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -206,18 +207,16 @@ export const AdminAppointmentsPage: React.FC = () => {
             </div>
             
             <div className="flex items-center gap-2">
-              <input 
-                type="date"
+              <EthiopianDatePicker
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs"
+                onChange={setStartDate}
+                placeholder="From date"
               />
               <span className="text-white/30">to</span>
-              <input 
-                type="date"
+              <EthiopianDatePicker
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs"
+                onChange={setEndDate}
+                placeholder="To date"
               />
             </div>
             

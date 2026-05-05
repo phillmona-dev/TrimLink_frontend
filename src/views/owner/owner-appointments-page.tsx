@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { ownerService } from "@/api/ownerService";
 import { formatEthiopianDate, formatEthiopianTime, formatCurrency } from "@/utils/format";
+import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING:    "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -112,10 +113,16 @@ export const OwnerAppointmentsPage: React.FC = () => {
             <option value="CANCELLED" className="bg-[#1a1a1a] text-white">Cancelled</option>
           </select>
 
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/70 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all appearance-none [color-scheme:dark]" />
-          <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white/70 text-xs focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all appearance-none [color-scheme:dark]" />
+          <EthiopianDatePicker
+            value={startDate}
+            onChange={setStartDate}
+            placeholder="From date"
+          />
+          <EthiopianDatePicker
+            value={endDate}
+            onChange={setEndDate}
+            placeholder="To date"
+          />
 
           {(filterStatus || startDate || endDate || searchQuery) && (
             <button onClick={() => { setFilterStatus(""); setStartDate(""); setEndDate(""); setSearchQuery(""); }}

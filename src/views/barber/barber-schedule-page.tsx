@@ -7,6 +7,7 @@ import { Badge } from "@/components/common/badge";
 import { bookingService } from "@/api/bookingService";
 import { useAuth } from "@/hooks/use-auth";
 import { formatEthiopianDate, formatEthiopianTime } from "@/utils/format";
+import { EthiopianDatePicker } from "@/components/common/ethiopian-date-picker";
 import { Calendar, Clock, Lock, Unlock, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -106,15 +107,11 @@ export function BarberSchedulePage() {
           <Button variant="outline" size="icon" onClick={() => changeDate(-1)} className="rounded-xl border-white/5 h-10 w-10">
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <div className="px-4 flex items-center gap-3">
-            <Calendar className="w-4 h-4 text-orange-400" />
-            <input 
-              type="date" 
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className="bg-transparent text-white font-black text-sm focus:outline-none cursor-pointer [color-scheme:dark]"
-            />
-          </div>
+          <EthiopianDatePicker
+            value={selectedDate}
+            onChange={(iso) => iso && setSelectedDate(iso)}
+            placeholder="Select date"
+          />
           <Button variant="outline" size="icon" onClick={() => changeDate(1)} className="rounded-xl border-white/5 h-10 w-10">
             <ChevronRight className="w-5 h-5" />
           </Button>

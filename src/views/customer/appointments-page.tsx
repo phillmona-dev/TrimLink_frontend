@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { bookingService } from "@/api/bookingService";
 import { Card } from "@/components/common/card";
 import { Button } from "@/components/common/button";
-import { formatCurrency, formatDateTime } from "@/utils/format";
+import { formatCurrency, formatEthiopianDateTime } from "@/utils/format";
 import { ReviewDialog } from "@/components/modals/review-dialog";
 import { Star, Search, Filter } from "lucide-react";
 import { Input } from "@/components/common/input";
@@ -63,7 +63,7 @@ export function AppointmentsPage() {
                 }`} />
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-tighter text-white/30">{formatDateTime(appointment.scheduledStart)}</span>
+                    <span className="text-[10px] font-black uppercase tracking-tighter text-white/30">{formatEthiopianDateTime(appointment.scheduledStart)}</span>
                     <span className="text-[10px] text-white/10">•</span>
                     <span className={`text-[10px] font-bold uppercase ${
                       appointment.status === 'COMPLETED' ? 'text-emerald-500/70' : 'text-white/40'
