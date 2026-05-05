@@ -16,10 +16,7 @@ export function ProtectedRoute({
   const pathname = usePathname();
   const router = useRouter();
   const { session, isAuthenticated } = useAuth();
-  // Defer auth check until after hydration so localStorage is available
   const [mounted, setMounted] = useState(false);
-
-  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
