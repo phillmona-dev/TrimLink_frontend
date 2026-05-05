@@ -83,17 +83,19 @@ export type BarberProfile = {
     phoneNumber: string;
     avatarUrl?: string;
   };
-  serviceAssignments?: {
-    id: string;
-    serviceId: string;
-    serviceName: string;
-    serviceDescription?: string;
-    durationMinutes: number;
-    basePrice: number;
-    customPrice?: number;
-    effectivePrice: number;
-    active: boolean;
-  }[];
+  serviceAssignments?: ServiceAssignment[];
+};
+
+export type ServiceAssignment = {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  serviceDescription?: string;
+  durationMinutes: number;
+  basePrice: number;
+  customPrice?: number;
+  effectivePrice: number;
+  active: boolean;
 };
 
 export type Shop = {

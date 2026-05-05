@@ -15,7 +15,7 @@ import { Badge } from "@/components/common/badge";
 import { Button } from "@/components/common/button";
 import Link from "next/link";
 import { formatCurrency } from "@/utils/format";
-import { type Shop, type BarberProfile } from "@/types";
+import { type Shop, type BarberProfile, type ServiceAssignment } from "@/types";
 
 export function ShopDetailsPage() {
   const params = useParams<{ shopId: string }>();
@@ -261,7 +261,7 @@ function BarberDetailCard({ barber, shopId }: { barber: BarberProfile; shopId: s
         <div className="flex-1 space-y-3">
           <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-3">Services</h4>
           <div className="grid grid-cols-1 gap-2">
-            {barber.serviceAssignments?.map((assignment) => (
+            {barber.serviceAssignments?.map((assignment: ServiceAssignment) => (
               <div 
                 key={assignment.id}
                 className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-orange-500/30 hover:bg-white/10 transition-all group/service"
