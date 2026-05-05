@@ -22,19 +22,11 @@ export function ProtectedRoute({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-<<<<<<< HEAD
-    setIsMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isMounted) return;
-=======
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
->>>>>>> e6df2cfc0183823a3f969701860d8e83e5d867b1
 
     if (!isAuthenticated || !session) {
       router.replace(`/auth/login?next=${encodeURIComponent(pathname)}`);
@@ -44,16 +36,7 @@ export function ProtectedRoute({
     if (allowedRoles && !allowedRoles.includes(session.role)) {
       router.replace(dashboardRoleMap[session.role]);
     }
-<<<<<<< HEAD
-  }, [allowedRoles, isAuthenticated, isMounted, pathname, router, session]);
-
-  // Wait for mounting to avoid hydration mismatch
-  if (!isMounted) {
-    return null;
-  }
-=======
   }, [mounted, allowedRoles, isAuthenticated, pathname, router, session]);
->>>>>>> e6df2cfc0183823a3f969701860d8e83e5d867b1
 
   // Show nothing (not a redirect) until mounted — prevents flash of wrong content
   if (!mounted) {
