@@ -123,7 +123,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 pb-[76px] sm:p-4"
     >
       {/* Backdrop */}
       <motion.div
@@ -140,7 +140,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 60 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full sm:max-w-2xl bg-zinc-900 border-0 sm:border border-white/10 rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl"
+        className="relative w-full sm:max-w-2xl bg-zinc-900 border-0 sm:border border-white/10 rounded-[2rem] sm:rounded-[2rem] overflow-hidden max-h-[90dvh] sm:max-h-[85vh] flex flex-col shadow-2xl"
       >
         {/* Drag handle on mobile */}
         <div className="flex justify-center pt-3 pb-1 sm:hidden">
@@ -222,23 +222,23 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
                   )}
             </div>
           </div>
+        </div>
 
-          {/* CTA */}
-          <div className="pt-2 pb-2">
-            {isAuthenticated ? (
-              <Link href={role === "CUSTOMER" ? `/app/shops/${shopId}` : "/owner"}>
-                <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-14 rounded-2xl shadow-xl text-base">
-                  {role === "CUSTOMER" ? "Book Now" : "Go to Dashboard"}
-                </Button>
-              </Link>
-            ) : (
-              <Link href="/auth/login">
-                <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-14 rounded-2xl shadow-xl text-base">
-                  Login to Book
-                </Button>
-              </Link>
-            )}
-          </div>
+        {/* Sticky CTA — always visible, above bottom nav */}
+        <div className="shrink-0 px-5 pt-3 pb-6 bg-zinc-900 border-t border-white/5">
+          {isAuthenticated ? (
+            <Link href={role === "CUSTOMER" ? `/app/shops/${shopId}` : "/owner"}>
+              <Button className="w-full bg-orange-500 hover:bg-orange-400 active:scale-[0.98] text-black font-black h-14 rounded-2xl shadow-xl text-base transition-all">
+                {role === "CUSTOMER" ? "Book Now →" : "Go to Dashboard"}
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/auth/login">
+              <Button className="w-full bg-orange-500 hover:bg-orange-400 active:scale-[0.98] text-black font-black h-14 rounded-2xl shadow-xl text-base transition-all">
+                Login to Book
+              </Button>
+            </Link>
+          )}
         </div>
       </motion.div>
     </motion.div>

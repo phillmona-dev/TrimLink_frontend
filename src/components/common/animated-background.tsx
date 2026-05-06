@@ -15,7 +15,7 @@ const backgroundImages = [
 
 export function AnimatedBackground() {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    <div className="hidden md:block fixed inset-0 z-0 overflow-hidden pointer-events-none">
       {/* Dark gradient overlay to blend images smoothly with the theme */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a]/60 via-[#0a0a0a]/40 to-[#0a0a0a]/80 z-10" />
       

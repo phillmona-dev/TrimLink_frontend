@@ -23,13 +23,14 @@ export function AppointmentsPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-full sm:max-w-md">
+    <div className="space-y-5">
+      {/* Header controls: stacked on mobile, side-by-side on sm+ */}
+      <div className="flex flex-col gap-3">
+        <div className="relative w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
           <Input 
             placeholder="Search bookings, shops, barbers..." 
-            className="pl-12 bg-white/5 border-white/5 rounded-2xl h-12 text-sm focus:border-orange-500/50"
+            className="pl-12 bg-white/5 border-white/5 rounded-2xl h-11 text-sm focus:border-orange-500/50 w-full"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -37,77 +38,76 @@ export function AppointmentsPage() {
         <div className="flex items-center gap-2">
           <Button 
             variant="outline" 
-            className="rounded-2xl h-12 border-white/5 bg-white/5 px-6 text-xs font-bold text-white/40"
+            className="flex-1 rounded-2xl h-11 border-white/5 bg-white/5 text-xs font-bold text-white/40"
           >
-            <Filter className="w-4 h-4 mr-2" />
+            <Filter className="w-4 h-4 mr-2 shrink-0" />
             Last 30 Days
           </Button>
           <Button 
             onClick={() => router.push("/app")}
-            className="rounded-2xl h-12 bg-orange-500 hover:bg-orange-400 text-black px-6 text-xs font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95"
+            className="flex-1 rounded-2xl h-11 bg-orange-500 hover:bg-orange-400 text-black text-xs font-black shadow-lg shadow-orange-500/20 transition-all active:scale-95"
           >
-            New Appointment
+            + New
           </Button>
         </div>
       </div>
 
       <div className="space-y-3">
         {appointmentsQuery.data?.content.map((appointment) => (
-          <Card className="rounded-3xl bg-white/5 border-white/5 p-4 hover:bg-white/8 transition-all group" key={appointment.id}>
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-start gap-4">
-                <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
-                  appointment.status === 'COMPLETED' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
-                  appointment.status === 'CANCELLED' ? 'bg-red-500' :
-                  'bg-orange-500 animate-pulse'
-                }`} />
-                <div className="space-y-0.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-tighter text-white/30">{formatEthiopianDateTime(appointment.scheduledStart)}</span>
-                    <span className="text-[10px] text-white/10">•</span>
-                    <span className={`text-[10px] font-bold uppercase ${
-                      appointment.status === 'COMPLETED' ? 'text-emerald-500/70' : 'text-white/40'
-                    }`}>{appointment.status}</span>
-                  </div>
-                  <h3 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors leading-tight">{appointment.serviceName}</h3>
-                  <p className="text-xs text-white/40 font-medium">
-                    {appointment.shopName} · {appointment.barberName}
-                  </p>
+          <Card className="rounded-2xl bg-white/5 border-white/5 p-4 transition-all group" key={appointment.id}>
+            {/* Top: status dot + service + shop/barber */}
+            <div className="flex items-start gap-3 mb-3">
+              <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                appointment.status === 'COMPLETED' ? 'bg-emerald-500' :
+                appointment.status === 'CANCELLED' ? 'bg-red-500' :
+                'bg-orange-500 animate-pulse'
+              }`} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                  <span className="text-[10px] font-black uppercase tracking-tight text-white/30">{formatEthiopianDateTime(appointment.scheduledStart)}</span>
+                  <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full ${
+                    appointment.status === 'COMPLETED' ? 'bg-emerald-500/10 text-emerald-400' :
+                    appointment.status === 'CANCELLED' ? 'bg-red-500/10 text-red-400' :
+                    'bg-orange-500/10 text-orange-400'
+                  }`}>{appointment.status}</span>
                 </div>
+                <h3 className="text-sm font-black text-white group-hover:text-orange-400 transition-colors leading-tight">{appointment.serviceName}</h3>
+                <p className="text-[11px] text-white/40 font-medium truncate">{appointment.shopName} · {appointment.barberName}</p>
+              </div>
+            </div>
+
+            {/* Bottom: price + actions */}
+            <div className="flex items-center justify-between pl-5 gap-3">
+              <div>
+                <div className="text-[9px] text-white/20 font-bold uppercase">Paid</div>
+                <div className="text-sm font-black text-white">{formatCurrency(appointment.priceCharged)}</div>
               </div>
 
-              <div className="flex items-center justify-between lg:justify-end gap-6 pl-6 lg:pl-0">
-                <div className="text-left lg:text-right">
-                  <div className="text-[9px] text-white/20 font-bold uppercase tracking-tighter">Paid</div>
-                  <div className="text-lg font-black text-white">{formatCurrency(appointment.priceCharged)}</div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  {appointment.status === 'COMPLETED' && (
-                    <Button 
-                      size="sm"
-                      disabled={appointment.reviewed}
-                      className={`${
-                        appointment.reviewed 
-                        ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed' 
-                        : 'bg-orange-500 hover:bg-orange-400 text-black'
-                      } font-black rounded-xl h-9 px-4 text-[11px] transition-all active:scale-95`}
-                      onClick={() => setSelectedAppt({ id: appointment.id, barberName: appointment.barberName || "Barber" })}
-                    >
-                      <Star className={`w-3.5 h-3.5 mr-1.5 ${appointment.reviewed ? 'fill-white/10' : 'fill-current'}`} />
-                      {appointment.reviewed ? "Reviewed" : "Review"}
-                    </Button>
-                  )}
-                  
+              <div className="flex items-center gap-2">
+                {appointment.status === 'COMPLETED' && (
                   <Button 
-                    variant="outline"
                     size="sm"
-                    className="rounded-xl h-9 px-4 border-white/5 bg-white/5 hover:bg-white/10 text-white/60 text-[11px] font-bold"
-                    onClick={() => router.push(`/app/booking?shopId=${appointment.shopId}&barberId=${appointment.barberId}&serviceId=${appointment.serviceId}`)}
+                    disabled={appointment.reviewed}
+                    className={`${
+                      appointment.reviewed 
+                      ? 'bg-white/5 text-white/20 border border-white/5 cursor-not-allowed' 
+                      : 'bg-orange-500 hover:bg-orange-400 text-black'
+                    } font-black rounded-xl h-8 px-3 text-[10px] transition-all active:scale-95`}
+                    onClick={() => setSelectedAppt({ id: appointment.id, barberName: appointment.barberName || "Barber" })}
                   >
-                    Rebook
+                    <Star className={`w-3 h-3 mr-1 shrink-0 ${appointment.reviewed ? 'fill-white/10' : 'fill-current'}`} />
+                    {appointment.reviewed ? "Reviewed" : "Review"}
                   </Button>
-                </div>
+                )}
+                
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl h-8 px-3 border-white/5 bg-white/5 hover:bg-white/10 text-white/60 text-[10px] font-bold"
+                  onClick={() => router.push(`/app/booking?shopId=${appointment.shopId}&barberId=${appointment.barberId}&serviceId=${appointment.serviceId}`)}
+                >
+                  Rebook
+                </Button>
               </div>
             </div>
           </Card>

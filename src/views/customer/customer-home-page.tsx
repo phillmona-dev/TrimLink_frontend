@@ -63,34 +63,34 @@ export function CustomerHomePage() {
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="space-y-10 pb-20"
+      className="space-y-6 md:space-y-10 pb-20"
     >
       {/* ── Hero Section ── */}
       <motion.section variants={itemVariants} className="relative">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-white/5 p-6 md:p-10 shadow-2xl">
+        <div className="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] border border-white/5 p-5 md:p-10 shadow-2xl">
           {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-orange-500/10 blur-[100px] -mr-24 -mt-24 rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[250px] h-[250px] bg-blue-500/5 blur-[80px] -ml-12 -mb-12 rounded-full pointer-events-none" />
+          <div className="absolute top-0 right-0 w-[250px] md:w-[400px] h-[250px] md:h-[400px] bg-orange-500/10 blur-[80px] md:blur-[100px] -mr-16 -mt-16 rounded-full pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-[150px] md:w-[250px] h-[150px] md:h-[250px] bg-blue-500/5 blur-[60px] md:blur-[80px] -ml-8 -mb-8 rounded-full pointer-events-none" />
           
-          <div className="relative z-10 max-w-2xl">
+          <div className="relative z-10">
             <motion.div 
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              className="flex items-center gap-2 text-orange-500 mb-4"
+              className="flex items-center gap-2 text-orange-500 mb-3"
             >
-              <Sparkles className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-[0.3em]">Premium Grooming Network</span>
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">Premium Grooming Network</span>
             </motion.div>
             
-            <h1 className="text-3xl md:text-5xl font-black text-white leading-[1.1] tracking-tight mb-4">
+            <h1 className="text-2xl md:text-5xl font-black text-white leading-[1.1] tracking-tight mb-3">
               Style that <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">Defines</span> You.
             </h1>
             
-            <p className="text-base text-white/50 leading-relaxed mb-8 max-w-lg">
+            <p className="text-sm text-white/50 leading-relaxed mb-5 max-w-lg">
               Skip the wait. Discover the best barbershops in Ethiopia and book your next session in seconds.
             </p>
             
-            <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+            <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
               <div className="relative flex-1 group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-orange-500 transition-colors" />
                 <input 
@@ -101,16 +101,15 @@ export function CustomerHomePage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       setActiveQuery(search);
-                      // Scroll to results
                       document.getElementById("shops-section")?.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
-                  className="w-full h-12 pl-12 pr-6 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-orange-500/30 transition-all text-base"
+                  className="w-full h-11 pl-12 pr-4 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-orange-500/30 transition-all text-sm"
                 />
               </div>
               <Link href="/app/shops" className="contents">
-                <button className="h-12 px-6 bg-orange-500 hover:bg-orange-600 text-black font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 active:scale-95 text-sm">
-                  Explore Now <ArrowRight className="w-4 h-4" />
+                <button className="h-11 px-5 bg-orange-500 hover:bg-orange-600 active:scale-95 text-black font-black rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 text-sm">
+                  Explore <ArrowRight className="w-4 h-4 shrink-0" />
                 </button>
               </Link>
             </div>
@@ -119,35 +118,34 @@ export function CustomerHomePage() {
       </motion.section>
 
       {/* ── Awareness Strip ── */}
-      <motion.section variants={itemVariants} className="flex flex-wrap items-center gap-3 px-2">
-        <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mr-2">Quick Access:</span>
+      <motion.section variants={itemVariants} className="flex flex-wrap items-center gap-2 px-1">
+        <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em] mr-1">Quick:</span>
         <AwarenessLink label="Book Appointment" href="#shops-section" />
         <AwarenessLink label="Live Queue" href="#shops-section" />
-        <AwarenessLink label="Top Rated Barbers" href="#barbers-section" />
+        <AwarenessLink label="Top Barbers" href="#barbers-section" />
       </motion.section>
 
-
       {/* ── Recommended Shops ── */}
-      <motion.section id="shops-section" variants={itemVariants} className="space-y-6">
-        <div className="flex items-end justify-between px-2">
+      <motion.section id="shops-section" variants={itemVariants} className="space-y-4">
+        <div className="flex items-end justify-between px-1">
           <div>
-            <h2 className="text-3xl font-black text-white tracking-tight">Nearby Masterpieces</h2>
-            <p className="text-white/40 mt-1">Exceptional barbershops around your location.</p>
+            <h2 className="text-xl md:text-3xl font-black text-white tracking-tight">Nearby Masterpieces</h2>
+            <p className="text-white/40 text-sm mt-0.5">Exceptional barbershops near you.</p>
           </div>
-          <Link href="/app/shops" className="text-orange-500 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all group">
+          <Link href="/app/shops" className="text-orange-500 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all group shrink-0">
             See all <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence mode="popLayout">
             {shopsQuery.data?.content.map((shop) => (
               <ShopCard key={shop.id} shop={shop} />
             ))}
           </AnimatePresence>
-          {shopsQuery.isLoading && [1,2,3].map(i => <div key={i} className="h-[300px] bg-white/5 rounded-[2rem] animate-pulse" />)}
+          {shopsQuery.isLoading && [1,2,3].map(i => <div key={i} className="h-[180px] bg-white/5 rounded-[1.5rem] animate-pulse" />)}
           {shopsQuery.data?.content.length === 0 && (
-            <div className="col-span-full py-12 text-center border border-dashed border-white/10 rounded-[2rem] text-white/30 italic">
+            <div className="col-span-full py-10 text-center border border-dashed border-white/10 rounded-[1.5rem] text-white/30 italic text-sm">
               No shops found matching "{activeQuery}"
             </div>
           )}
@@ -155,25 +153,25 @@ export function CustomerHomePage() {
       </motion.section>
 
       {/* ── Top Barbers ── */}
-      <motion.section id="barbers-section" variants={itemVariants} className="space-y-6">
-        <div className="flex items-end justify-between px-2">
+      <motion.section id="barbers-section" variants={itemVariants} className="space-y-4">
+        <div className="flex items-end justify-between px-1">
           <div>
-            <h2 className="text-3xl font-black text-white tracking-tight">Expert Hands</h2>
-            <p className="text-white/40 mt-1">Highly skilled barbers rated by the community.</p>
+            <h2 className="text-xl md:text-3xl font-black text-white tracking-tight">Expert Hands</h2>
+            <p className="text-white/40 text-sm mt-0.5">Highly skilled barbers rated by the community.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {barbersQuery.data?.content.map((barber) => (
             <BarberCard key={barber.id} barber={barber} />
           ))}
         </div>
       </motion.section>
 
-      {/* ── Live Status / Queue ── */}
-      <motion.section variants={itemVariants} className="pt-10 border-t border-white/5">
-        <div className="mb-6 px-2">
-          <h2 className="text-xl font-black text-white/30 uppercase tracking-widest">My Active Queue</h2>
+      {/* ── My Active Queue ── */}
+      <motion.section variants={itemVariants} className="pt-6 border-t border-white/5">
+        <div className="mb-4 px-1">
+          <h2 className="text-sm font-black text-white/30 uppercase tracking-widest">My Active Queue</h2>
         </div>
         <QueueWidget ticket={null} />
       </motion.section>
@@ -257,20 +255,20 @@ function BarberCard({ barber }: { barber: BarberProfile }) {
   return (
     <Link href={targetHref}>
       <Card className="group p-4 hover:bg-white/[0.02] border-white/5 hover:border-orange-500/20 transition-all cursor-pointer rounded-[1.5rem]">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-2xl font-black text-black">
+        <div className="flex items-center gap-3">
+          <div className="relative shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-xl font-black text-black">
               {barber.user.firstName?.[0]}
             </div>
-            <div className="absolute -bottom-1 -right-1 bg-green-500 border-[3px] border-[#121212] w-5 h-5 rounded-full" />
+            <div className="absolute -bottom-1 -right-1 bg-green-500 border-[2px] border-[#121212] w-4 h-4 rounded-full" />
           </div>
           
-          <div className="flex-1">
-            <div className="flex items-center justify-between mb-0.5">
-              <h4 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-0.5 gap-2">
+              <h4 className="text-sm font-black text-white group-hover:text-orange-400 transition-colors truncate">
                 {barber.user.firstName} {barber.user.lastName}
               </h4>
-              <div className="flex items-center gap-1 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">
+              <div className="flex items-center gap-1 bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20 shrink-0">
                 <Star className="w-3 h-3 text-orange-500 fill-current" />
                 <span className="text-[10px] font-black text-orange-500">{barber.averageRating}</span>
               </div>
@@ -282,11 +280,11 @@ function BarberCard({ barber }: { barber: BarberProfile }) {
 
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 text-[9px] text-white/30 uppercase font-black tracking-widest">
-                <ShieldCheck className="w-3 h-3 text-blue-500" />
+                <ShieldCheck className="w-3 h-3 text-blue-500 shrink-0" />
                 Verified
               </div>
               <div className="flex items-center gap-1 text-[9px] text-white/30 uppercase font-black tracking-widest">
-                <Clock className="w-3 h-3 text-emerald-500" />
+                <Clock className="w-3 h-3 text-emerald-500 shrink-0" />
                 Available
               </div>
             </div>
