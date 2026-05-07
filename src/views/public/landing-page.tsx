@@ -27,6 +27,8 @@ import { AnimatePresence } from "framer-motion";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
 import { useChat } from "@/context/ChatContext";
+import { Marquee } from "@/components/common/marquee";
+import { HaircutCard } from "@/components/common/haircut-card";
 
 export function LandingPage() {
   const { isAuthenticated, role, logout } = useAuth();
@@ -35,6 +37,7 @@ export function LandingPage() {
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<{ url: string, name: string } | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -152,24 +155,54 @@ export function LandingPage() {
         {/* Main Glass Container */}
         <main className="flex-1 h-full bg-black md:bg-white/5 md:backdrop-blur-3xl border-0 md:border md:border-white/10 shadow-[0_32px_80px_rgba(0,0,0,0.6)] rounded-none md:rounded-[2.5rem] overflow-hidden flex flex-col relative pb-16 md:pb-0">
           
-          {/* Subtle inner glass highlight */}
-          <div className="hidden md:block absolute inset-0 bg-gradient-to-br from-white/[0.08] to-transparent pointer-events-none rounded-[2.5rem]"></div>
+          {/* Brand Header - Full Width */}
+          <div className="shrink-0 p-6 md:px-10 md:pt-10 flex items-center justify-between border-b border-white/5 bg-white/[0.02] backdrop-blur-md relative z-20">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.4)]">
+                <Scissors className="h-6 w-6 md:h-7 md:h-7 text-black" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none">
+                  Trim<span className="text-orange-500">Link</span>
+                </h1>
+                <p className="hidden sm:block text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-white/30 font-bold mt-1">
+                  Premium Grooming Marketplace
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <Link href="/auth/login">
+                <Button variant="outline" className="hidden sm:flex rounded-full border-white/10 text-white/60 hover:text-white h-9 px-5 text-xs font-bold uppercase tracking-widest">
+                  Login
+                </Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button className="rounded-full bg-orange-500 text-black hover:bg-orange-400 h-9 px-5 text-xs font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20">
+                  Join Now
+                </Button>
+              </Link>
+            </div>
+          </div>
 
           <div className="flex-1 overflow-y-auto p-4 md:p-10 flex flex-col lg:flex-row gap-8 md:gap-10 relative z-10 custom-scrollbar">
             
             {/* Left Column (Feed) */}
-            <div className="flex-1 flex flex-col gap-8 max-w-2xl">
+            <div className="flex-1 flex flex-col gap-10 max-w-2xl">
               
-              {/* Search Form */}
+              {/* Elegant Small Search Bar */}
               <form 
-                className="flex items-center gap-2 md:gap-4 border-b border-white/10 pb-6 w-full"
+                className="flex items-center gap-3 w-full bg-black/40 backdrop-blur-md border border-white/10 hover:border-white/20 rounded-[1.5rem] p-2 transition-all focus-within:border-orange-500/50 focus-within:bg-black/60 shadow-[0_10px_30px_rgba(0,0,0,0.3)] mb-2"
                 onSubmit={(e) => {
                   e.preventDefault();
                   setActiveQuery(query);
                 }}
               >
-                <div className="hidden sm:flex h-10 w-10 rounded-full bg-gradient-to-tr from-orange-600 to-orange-400 items-center justify-center text-white font-bold shrink-0">
-                  <AnimatedIcon icon={User} size={20} animate="rotate" />
+                <div className="hidden sm:flex h-10 w-10 rounded-xl bg-gradient-to-tr from-orange-600 to-orange-400 items-center justify-center text-white shrink-0 ml-1">
+                  <AnimatedIcon icon={Scissors} size={18} animate="wiggle" />
+                </div>
+                <div className="pl-3 sm:pl-1">
+                  <Search className="h-5 w-5 text-white/40 group-focus-within:text-orange-500 transition-colors" />
                 </div>
                 <input
                   id="search-input"
@@ -181,10 +214,10 @@ export function LandingPage() {
                       setActiveQuery("");
                     }
                   }}
-                  placeholder="Search for a barber or shop..."
-                  className="flex-1 min-w-0 h-12 bg-black/40 border border-white/5 rounded-full px-4 md:px-5 flex items-center text-white/90 text-sm focus:outline-none focus:border-orange-500/50 transition"
+                  placeholder="Search for shops or barbers"
+                  className="flex-1 min-w-0 h-10 bg-transparent px-2 text-white/90 text-sm focus:outline-none placeholder:text-white/30"
                 />
-                <Button type="submit" variant="outline" className="shrink-0 rounded-full border-white/10 bg-white/5 hover:bg-white/10 h-10 px-4 md:px-6 text-sm">
+                <Button type="submit" className="shrink-0 rounded-xl bg-orange-500 hover:bg-orange-400 text-black font-bold h-10 px-6 text-sm transition-transform active:scale-95 shadow-md shadow-orange-500/20 mr-1">
                   Search
                 </Button>
               </form>
@@ -258,147 +291,112 @@ export function LandingPage() {
                   )}
                 </div>
               ) : (
-                <div className="flex flex-col gap-8">
-                  {/* Feed Item 1: Hero Feature */}
+                <div className="flex flex-col gap-10">
+                  {/* Showcase Section (Moving Cards) */}
+                  <section className="relative py-4 -mx-4 md:-mx-10 overflow-hidden">
+                    <div className="px-4 md:px-10 mb-6">
+                      <h3 className="text-[10px] font-black text-orange-500/60 uppercase tracking-[0.3em]">
+                        Style Showcase
+                      </h3>
+                      <h2 className="text-xl font-bold text-white mt-1">
+                        Trending Trims
+                      </h2>
+                    </div>
+                    
+                    <Marquee baseVelocity={-3}>
+                      <div className="flex gap-4 pr-4">
+                        <HaircutCard image="/images/haircuts/haircut1.png" name="Sharp Fade" tag="Modern" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut1.png", name: "Sharp Fade" })} />
+                        <HaircutCard image="/images/haircuts/habesha_cut_1.png" name="Curly Top Fade" tag="Habesha Teen" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_1.png", name: "Curly Top Fade" })} />
+                        <HaircutCard image="/images/haircuts/haircut2.png" name="Urban Taper" tag="Teenager" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut2.png", name: "Urban Taper" })} />
+                        <HaircutCard image="/images/haircuts/habesha_cut_2.png" name="Fresh Taper" tag="Habesha Style" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_2.png", name: "Fresh Taper" })} />
+                        <HaircutCard image="/images/haircuts/haircut3.png" name="Habesha Classic" tag="Ethiopian" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut3.png", name: "Habesha Classic" })} />
+                        <HaircutCard image="/images/haircuts/habesha_cut_3.png" name="Sponge Curls" tag="Habesha Teen" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_3.png", name: "Sponge Curls" })} />
+                        <HaircutCard image="/images/haircuts/haircut4.png" name="Design Fade" tag="Street" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut4.png", name: "Design Fade" })} />
+                        <HaircutCard image="/images/haircuts/haircut5.png" name="Skin Fade" tag="Modern" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut5.png", name: "Skin Fade" })} />
+                        <HaircutCard image="/images/haircuts/haircut1.png" name="Textured Crop" tag="Trending" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut1.png", name: "Textured Crop" })} />
+                        <HaircutCard image="/images/haircuts/haircut2.png" name="Curly Top" tag="Habesha" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut2.png", name: "Curly Top" })} />
+                      </div>
+                    </Marquee>
+                  </section>
+
+                  {/* Featured Shop Feature */}
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
-                        <Scissors className="h-5 w-5 text-blue-400" />
+                      <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30">
+                        <Scissors className="h-5 w-5 text-orange-400" />
                       </div>
                       <div className="w-[1px] flex-1 bg-white/10 my-2"></div>
                     </div>
                     <div className="flex-1 pb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-white/90">TrimLink Booking</span>
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-semibold text-white/90">Featured Destination</span>
                         <div className="flex items-center gap-2 text-white/40 text-xs">
-                          <span>Just now</span>
-                          <MoreHorizontal className="h-4 w-4" />
+                          <span>Verified</span>
+                          <Star className="h-3 w-3 fill-orange-400 text-orange-400" />
                         </div>
                       </div>
-                      <p className="text-sm text-white/70 leading-relaxed mb-4">
-                        Book your trim without spending the day waiting. Find trusted barbershops, reserve a slot, and join a live queue.
-                      </p>
                       
-                      {/* Embedded Hero Banner */}
-                      <div className="w-full h-64 rounded-2xl overflow-hidden relative group">
-                        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/80 to-purple-900/80 z-0"></div>
-                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center mix-blend-overlay opacity-50"></div>
-                        <div className="relative z-10 p-8 h-full flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
-                          <div className="bg-orange-500 text-black text-xs font-bold px-3 py-1 rounded-full w-fit mb-3">
-                            Featured Service
-                          </div>
-                          <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 tracking-tight">
-                            The Perfect Fade
+                      <div className="w-full h-72 rounded-3xl overflow-hidden relative group cursor-pointer shadow-2xl border border-white/5">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110" />
+                        <div className="relative z-20 p-8 h-full flex flex-col justify-end">
+                          <h2 className="text-3xl font-black text-white mb-2 tracking-tight">
+                            The Master's Touch
                           </h2>
-                          <p className="text-white/80 text-sm mb-4">
-                            Discover top-rated barbers in your area.
+                          <p className="text-white/60 text-sm mb-6 max-w-sm">
+                            Experience the highest level of craftsmanship in a premium environment.
                           </p>
                           <Link href="/shops">
-                            <Button className="w-fit bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 text-sm font-semibold">
-                              Explore Shops
+                            <Button className="w-fit bg-orange-500 text-black hover:bg-orange-400 rounded-full px-8 h-12 text-sm font-black transition-all hover:scale-105 shadow-[0_10px_20px_rgba(249,115,22,0.3)]">
+                              EXPLORE SHOPS
                             </Button>
                           </Link>
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-6 mt-4 text-white/40">
-                        <AnimatedIcon icon={Heart} size={20} className="hover:text-red-500 cursor-pointer transition" animate="wiggle" />
-                        <AnimatedIcon icon={Bell} size={20} className="hover:text-white/90 cursor-pointer transition" animate="rotate" />
-                        <span className="text-xs ml-auto">8.2k+ bookings weekly</span>
-                      </div>
                     </div>
                   </motion.div>
 
-                  {/* Feed Item 2: Testimonial */}
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-[url('/habesh_man_avatar_1777875648469.png')] bg-cover shrink-0"></div>
-                    </div>
-                    <div className="flex-1 pb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-white/90">Amanuel</span>
-                        <div className="flex items-center gap-2 text-white/40 text-xs">
-                          <span>2h</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </div>
-                      </div>
-                      <p className="text-sm text-white/70 leading-relaxed">
-                        I no longer spend my evening sitting in a crowded waiting area. I book on TrimLink, arrive when it's my turn, and get served instantly. 🔥
-                      </p>
-                    </div>
-                  </motion.div>
 
-                  {/* Feed Item 3: Core Principles */}
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-orange-500/20 flex items-center justify-center shrink-0 border border-orange-500/30">
-                        <Heart className="h-5 w-5 text-orange-400" />
-                      </div>
-                      <div className="w-[1px] flex-1 bg-white/10 my-2"></div>
-                    </div>
-                    <div className="flex-1 pb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-white/90">Why TrimLink</span>
-                        <div className="flex items-center gap-2 text-white/40 text-xs">
-                          <span>4h</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </div>
-                      </div>
-                      <p className="text-sm text-white/70 leading-relaxed mb-4">
-                        Everything customers need, without the noise. Experience a cleaner way to get a haircut.
-                      </p>
-                      
-                      <div className="grid gap-3">
-                        <div className="bg-black/30 border border-white/5 rounded-2xl p-4 flex gap-4 items-center hover:bg-white/5 transition">
-                          <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                            <CalendarDays className="h-5 w-5 text-white/70" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-medium text-white/90">Book in a few taps</h4>
-                            <p className="text-xs text-white/50 mt-1">Choose a shop and lock in a time instantly.</p>
-                          </div>
-                        </div>
-                        <div className="bg-black/30 border border-white/5 rounded-2xl p-4 flex gap-4 items-center hover:bg-white/5 transition">
-                          <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                            <Clock className="h-5 w-5 text-white/70" />
-                          </div>
-                          <div>
-                            <h4 className="text-sm font-medium text-white/90">Join the live queue</h4>
-                            <p className="text-xs text-white/50 mt-1">Track your spot in line from anywhere.</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
 
-                  {/* Feed Item 4: FAQ Accordion */}
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <div className="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center shrink-0 border border-indigo-500/30">
-                        <Search className="h-5 w-5 text-indigo-400" />
-                      </div>
+                  {/* How it Works Section */}
+                  <section className="flex flex-col gap-8">
+                    <div>
+                      <h3 className="text-[10px] font-black text-orange-500/60 uppercase tracking-[0.3em]">
+                        Simplicity Redefined
+                      </h3>
+                      <h2 className="text-xl font-bold text-white mt-1">
+                        How TrimLink Works
+                      </h2>
                     </div>
-                    <div className="flex-1 pb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-semibold text-white/90">Help & Support</span>
-                        <div className="flex items-center gap-2 text-white/40 text-xs">
-                          <span>1d</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </div>
-                      </div>
-                      
-                      <div className="bg-black/20 border border-white/5 rounded-2xl p-5 mt-2 space-y-4">
-                        <div className="border-b border-white/5 pb-3">
-                          <h4 className="text-sm font-medium text-white/80">Can I use TrimLink with weak data?</h4>
-                          <p className="text-xs text-white/50 mt-1">Yes, the experience is designed to stay light and usable on slower connections.</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-white/80">Which payments are supported?</h4>
-                          <p className="text-xs text-white/50 mt-1">We fully support Telebirr and Chapa for trusted digital payments.</p>
-                        </div>
-                      </div>
+
+                    <div className="space-y-6">
+                      {[
+                        { step: "01", title: "Find your shop", desc: "Discover premium barbershops in your area with detailed service listings.", icon: Search },
+                        { step: "02", title: "Pick a slot", desc: "Book your preferred time and barber instantly without the phone calls.", icon: CalendarDays },
+                        { step: "03", title: "Join the queue", desc: "Track your spot in line and arrive just in time for your premium cut.", icon: Clock }
+                      ].map((item, idx) => (
+                        <motion.div 
+                          key={idx}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 * idx }}
+                          className="flex gap-6 items-start group"
+                        >
+                          <div className="text-4xl font-black text-white/5 group-hover:text-orange-500/10 transition-colors">
+                            {item.step}
+                          </div>
+                          <div className="flex-1 pt-2">
+                            <h4 className="text-base font-bold text-white mb-1 group-hover:text-orange-400 transition-colors">
+                              {item.title}
+                            </h4>
+                            <p className="text-sm text-white/50 leading-relaxed">
+                              {item.desc}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                  </motion.div>
+                  </section>
                 </div>
               )}
 
@@ -448,61 +446,8 @@ export function LandingPage() {
                 </div>
               </div>
 
-              {/* Queue Widget */}
-              <div className="bg-black/20 border border-white/5 rounded-[1.5rem] p-5">
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-white/60" />
-                    <h3 className="text-sm font-medium text-white/60">Live Queue Demo</h3>
-                  </div>
-                </div>
-                <p className="text-xs text-white/50 leading-relaxed mb-4">
-                  See how the live queue helps you track your spot without waiting in the shop.
-                </p>
-                <div className="w-full h-32 rounded-xl bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-white/5 p-4 flex flex-col justify-between">
-                  <div className="flex justify-between items-center text-xs text-white/60">
-                    <span>Current Serving: #12</span>
-                    <span>Est. Wait: 15m</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-black text-white/90 tracking-tighter">#15</div>
-                    <div className="text-[10px] uppercase tracking-widest text-orange-400 font-bold mt-1">Your Ticket</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Pricing Widget */}
-              <div className="bg-black/20 border border-white/5 rounded-[1.5rem] p-5">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-sm font-medium text-white/60">For Shop Owners</h3>
-                  <div className="text-[10px] uppercase tracking-wider text-orange-400 bg-orange-500/10 px-2 py-1 rounded border border-orange-500/20">Pricing</div>
-                </div>
-                
-                <div className="space-y-3">
-                  {/* Starter Tier */}
-                  <div className="p-3 rounded-xl bg-white/5 border border-white/5 flex justify-between items-center group cursor-pointer hover:bg-white/10 transition">
-                    <div>
-                      <div className="text-sm font-medium text-white/90">Starter</div>
-                      <div className="text-xs text-white/40">1,250 ETB / mo</div>
-                    </div>
-                    <Link href="/auth/login" className="text-xs bg-white/10 text-white rounded-full px-3 py-1 opacity-0 group-hover:opacity-100 transition">View</Link>
-                  </div>
-                  
-                  {/* Growth Tier (Popular) */}
-                  <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/30 flex justify-between items-center group cursor-pointer hover:bg-orange-500/20 transition relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-10 h-10 bg-orange-500/20 rotate-45 translate-x-5 -translate-y-5 blur-sm"></div>
-                    <div>
-                      <div className="text-sm font-medium text-orange-50 flex items-center gap-2">
-                        Growth
-                        <span className="h-1.5 w-1.5 rounded-full bg-orange-400"></span>
-                      </div>
-                      <div className="text-xs text-orange-200/60">3,900 ETB / mo</div>
-                    </div>
-                    <Link href="/auth/login" className="text-xs bg-orange-500 text-black font-medium rounded-full px-3 py-1">Select</Link>
-                  </div>
-
-                </div>
-              </div>
+              {/* Queue Widget - Removed */}
+              {/* Pricing Widget - Removed */}
 
               {/* Footer Links */}
               <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 px-2">
@@ -702,6 +647,43 @@ export function LandingPage() {
                   </div>
                 </div>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Zoom Modal */}
+      <AnimatePresence>
+        {zoomedImage && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setZoomedImage(null)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 20 }}
+              className="relative max-w-3xl w-full aspect-[4/5] md:aspect-square rounded-[2rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] border border-white/10"
+            >
+              <img 
+                src={zoomedImage.url} 
+                alt={zoomedImage.name} 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
+                <h3 className="text-2xl font-black text-white">{zoomedImage.name}</h3>
+                <p className="text-orange-400 font-bold uppercase tracking-[0.2em] text-xs mt-1">Premium Trim</p>
+              </div>
+              <button 
+                onClick={() => setZoomedImage(null)}
+                className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full text-white transition backdrop-blur-md"
+              >
+                <X size={24} />
+              </button>
             </motion.div>
           </div>
         )}
