@@ -6,13 +6,14 @@ import { usePathname } from "next/navigation";
 import {
   Bell, CalendarDays, Clock, Home, LayoutDashboard,
   LogOut, Scissors, Settings, Users, MessageCircle,
-  CalendarCheck, Wallet
+  CalendarCheck, Wallet, ShieldCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AnimatedIcon } from "@/components/common/animated-icon";
 
 export function Sidebar() {
   const { role, logout } = useAuth();
+  const normalizedRole = role?.toUpperCase();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
@@ -21,7 +22,7 @@ export function Sidebar() {
   }, []);
 
   const links =
-    role === "BARBER"
+    normalizedRole === "BARBER"
       ? [
           { to: "/barber", label: "Dashboard", icon: LayoutDashboard },
           { to: "/barber/queue", label: "Queue", icon: Clock },
@@ -30,7 +31,7 @@ export function Sidebar() {
           { to: "/barber/reviews", label: "Reviews", icon: Bell },
           { to: "/barber/settings", label: "Settings", icon: Settings }
         ]
-      : role === "OWNER"
+      : normalizedRole === "OWNER"
         ? [
             { to: "/owner", label: "Overview", icon: LayoutDashboard },
             { to: "/owner/appointments", label: "Bookings", icon: CalendarCheck },
@@ -42,13 +43,14 @@ export function Sidebar() {
             { to: "/barber/schedule", label: "Schedule", icon: CalendarDays },
             { to: "/owner/settings", label: "Settings", icon: Settings }
           ]
-        : role === "ADMIN"
+        : normalizedRole === "ADMIN"
           ? [
               { to: "/admin", label: "Overview", icon: LayoutDashboard },
               { to: "/admin/appointments", label: "Bookings", icon: CalendarCheck },
               { to: "/admin/finance", label: "Finance", icon: Wallet },
               { to: "/admin/users", label: "Users", icon: Users },
               { to: "/admin/shops", label: "Shops", icon: Home },
+              { to: "/admin/audit-logs", label: "System Audit", icon: ShieldCheck },
               { to: "/admin/support", label: "Support", icon: MessageCircle },
               { to: "/admin/settings", label: "Settings", icon: Settings }
             ]

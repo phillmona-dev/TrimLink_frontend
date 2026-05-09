@@ -64,4 +64,6 @@ export const adminService = {
   getShopFinanceSummaries: () => unwrap<any[]>(http.get("/admin/finance/shops")),
   getTransactions: (params?: { page?: number; size?: number }) => 
     unwrap<PageResponse<any>>(http.get("/admin/finance/transactions", { params })),
+  getAuditLogs: (params?: { page?: number; size?: number; username?: string; action?: string }) =>
+    unwrap<PageResponse<any>>(http.get("/admin/audit-logs", { params })),
 };
