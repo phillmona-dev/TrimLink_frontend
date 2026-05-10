@@ -172,7 +172,7 @@ export function OwnerSettingsPage() {
             </div>
 
             <div className="space-y-4">
-              {localHours.map((h, idx) => (
+              {localHours.map((h: any, idx: number) => (
                 <div 
                   key={h.dayOfWeek}
                   className={`flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 rounded-[2rem] border transition-all ${

@@ -168,7 +168,7 @@ export const AdminFinancePage: React.FC = () => {
                   </tr>
                 ))
               ) : view === "shops" ? (
-                summaries.filter(s => s.shopName.toLowerCase().includes(searchQuery.toLowerCase())).map((item, idx) => (
+                summaries.filter((s: any) => s.shopName.toLowerCase().includes(searchQuery.toLowerCase())).map((item: any, idx: number) => (
                   <tr key={item.shopId} className="group hover:bg-white/[0.02] transition-colors">
                     <td className="px-8 py-6">
                       <span className="text-xs font-mono text-white/20">{idx + 1}</span>
@@ -207,11 +207,11 @@ export const AdminFinancePage: React.FC = () => {
                   </tr>
                 ))
               ) : (
-                transactions.filter(t => 
+                transactions.filter((t: any) => 
                   t.txRef.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   t.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   t.customerName.toLowerCase().includes(searchQuery.toLowerCase())
-                ).map((tx) => (
+                ).map((tx: any) => (
                   <tr key={tx.id} className="group hover:bg-white/[0.02] transition-colors">
                     <td className="px-8 py-6">
                       <p className="text-xs font-mono text-orange-500/60 uppercase">{tx.txRef}</p>

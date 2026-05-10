@@ -36,7 +36,7 @@ export const OwnerAppointmentsPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const handleExportCSV = () => {
-    const data = appointments.map((a, i) => ({
+    const data = appointments.map((a: any, i: number) => ({
       "No": i + 1,
       "Customer": a.customerName || "Walk-in",
       "Barber": a.barberName,
@@ -51,7 +51,7 @@ export const OwnerAppointmentsPage: React.FC = () => {
 
   const handleExportPDF = () => {
     const headers = ["No", "Customer", "Barber / Service", "Schedule", "Status", "Fee"];
-    const rows = appointments.map((a, i) => [
+    const rows = appointments.map((a: any, i: number) => [
       i + 1,
       a.customerName || "Walk-in",
       `${a.barberName}\n${a.serviceName}`,
@@ -187,13 +187,13 @@ export const OwnerAppointmentsPage: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
+                Array.from({ length: 5 }).map((_, i: number) => (
                   <tr key={i} className="animate-pulse">
                     <td colSpan={7} className="px-6 py-6 h-14 bg-white/[0.02]"></td>
                   </tr>
                 ))
               ) : appointments.length > 0 ? (
-                appointments.map((appt, idx) => (
+                appointments.map((appt: any, idx: number) => (
                   <tr key={appt.id} className="group/row hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <span className="text-xs font-mono text-white/20 group-hover/row:text-orange-500/50 transition-colors">

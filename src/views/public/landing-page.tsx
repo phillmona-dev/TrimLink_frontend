@@ -241,7 +241,7 @@ export function LandingPage() {
 
               {isSearchLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3].map(i => <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />)}
+                  {[1, 2, 3].map((i: number) => <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />)}
                 </div>
               ) : searchResults?.content && searchResults.content.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -317,7 +317,7 @@ export function LandingPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {isNearbyLoading ? (
-                    [1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-white/5 animate-pulse rounded-3xl" />)
+                    [1, 2, 3, 4].map((i: number) => <div key={i} className="h-32 bg-white/5 animate-pulse rounded-3xl" />)
                   ) : nearbyShops?.content && nearbyShops.content.length > 0 ? (
                     nearbyShops.content.map((shop: any) => (
                       <div key={shop.id} onClick={() => setSelectedShopId(shop.id)} className="flex items-center gap-4 p-5 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-white/20 hover:bg-white/[0.04] transition-all cursor-pointer group">
@@ -354,7 +354,7 @@ export function LandingPage() {
             <span className="font-bold text-white/80">TrimLink</span>
           </div>
           <div className="flex flex-wrap justify-center gap-6">
-            {["About", "Privacy", "Terms", "Pricing", "Contact", "FAQ"].map(link => (
+            {["About", "Privacy", "Terms", "Pricing", "Contact", "FAQ"].map((link: string) => (
               <Link key={link} href={`/${link.toLowerCase()}`} className="text-xs font-bold uppercase tracking-wider text-white/30 hover:text-white/80 transition">
                 {link}
               </Link>
@@ -426,7 +426,7 @@ export function LandingPage() {
                       
                       <div className="flex-1 lg:overflow-y-auto custom-scrollbar space-y-3 pr-2">
                         {isBarbersLoading ? (
-                          [1, 2].map(i => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-[1.5rem]" />)
+                          [1, 2].map((i: number) => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-[1.5rem]" />)
                         ) : shopBarbers && shopBarbers.length > 0 ? (
                           shopBarbers.map((barber: any) => (
                             <motion.div key={barber.id} className="p-4 bg-black/40 border border-white/5 rounded-2xl flex items-center gap-4 group hover:border-orange-500/30 transition-all duration-300">

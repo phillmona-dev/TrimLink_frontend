@@ -18,7 +18,7 @@ export function OwnerDashboardPage() {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="grid gap-4 md:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
+          {[1, 2, 3, 4].map((i: number) => (
             <div key={i} className="h-32 bg-white/5 rounded-3xl" />
           ))}
         </div>

@@ -16,7 +16,7 @@ export const OwnerFinancePage: React.FC = () => {
 
   const handleExportPDF = () => {
     const headers = ["Barber", "Bookings Today", "Manual Logs", "Avg Rating", "Status"];
-    const rows = barberRevenues.map((b) => [
+    const rows = barberRevenues.map((b: any) => [
       `${b.user?.firstName} ${b.user?.lastName}`,
       b.appBookingsToday,
       b.manualLogsToday,
@@ -118,13 +118,13 @@ export const OwnerFinancePage: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
-                Array.from({ length: 3 }).map((_, i) => (
+                Array.from({ length: 3 }).map((_, i: number) => (
                   <tr key={i} className="animate-pulse">
                     <td colSpan={5} className="px-6 py-6 h-14 bg-white/[0.02]"></td>
                   </tr>
                 ))
               ) : barberRevenues.length > 0 ? (
-                barberRevenues.map((b, idx) => (
+                barberRevenues.map((b: any, idx: number) => (
                   <tr key={b.barberId} className="group hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-4">
                       <span className="text-xs font-mono text-white/20">{idx + 1}</span>

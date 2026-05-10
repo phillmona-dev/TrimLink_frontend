@@ -53,7 +53,7 @@ export function AppointmentsPage() {
       </div>
 
       <div className="space-y-3">
-        {appointmentsQuery.data?.content.map((appointment) => (
+        {appointmentsQuery.data?.content.map((appointment: any) => (
           <Card className="rounded-2xl bg-white/5 border-white/5 p-4 transition-all group" key={appointment.id}>
             {/* Top: status dot + service + shop/barber */}
             <div className="flex items-start gap-3 mb-3">

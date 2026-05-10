@@ -124,7 +124,7 @@ export function OwnerBookingsPage() {
               <p className="font-bold uppercase tracking-widest text-xs">No matching appointments</p>
             </div>
           ) : (
-            bookings.map((appointment) => (
+            bookings.map((appointment: any) => (
               <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 rounded-[2rem] bg-white/[0.03] border border-white/5 p-6 transition-all hover:bg-white/[0.06] group" key={appointment.id}>
                 <div className="flex items-center gap-6">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${

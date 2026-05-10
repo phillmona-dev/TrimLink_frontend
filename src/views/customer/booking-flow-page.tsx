@@ -225,7 +225,7 @@ export function BookingFlowPage() {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                 >
-                  {availableDates.map(date => (
+                  {availableDates.map((date: any) => (
                     <option key={date.value} value={date.value} className="bg-ink-950 text-white">
                       {date.display}
                     </option>

@@ -171,7 +171,7 @@ export function ProfilePage() {
         <h2 className="text-2xl font-black">Notification devices</h2>
         <div className="mt-5 space-y-4">
           {devicesQuery.data?.length ? (
-            devicesQuery.data.map((device) => (
+            devicesQuery.data.map((device: any) => (
               <div className="rounded-3xl border border-border p-4" key={device.id}>
                 <div className="flex items-center justify-between">
                   <div>

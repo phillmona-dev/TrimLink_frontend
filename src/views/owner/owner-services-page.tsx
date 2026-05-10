@@ -147,7 +147,7 @@ export function OwnerServicesPage() {
         <div className="lg:col-span-1 space-y-4">
           <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest px-2">Select Staff</h3>
           <div className="space-y-2">
-            {staff?.map((barber) => (
+            {staff?.map((barber: any) => (
               <div
                 key={barber.barberId}
                 role="button"

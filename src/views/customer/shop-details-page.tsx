@@ -131,7 +131,7 @@ export function ShopDetailsPage() {
             </div>
 
             <div className="space-y-3">
-              {barbersQuery.data?.map((barber) => (
+              {barbersQuery.data?.map((barber: BarberProfile) => (
                 <BarberDetailCard key={barber.id} barber={barber} shopId={shopId!} />
               ))}
               {barbersQuery.isLoading &&
@@ -179,7 +179,7 @@ export function ShopDetailsPage() {
               </div>
 
               <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-                {reviewsQuery.data?.content.map((review) => (
+                {reviewsQuery.data?.content.map((review: any) => (
                   <div
                     key={review.id}
                     className="p-4 rounded-xl bg-white/5 border border-white/5"

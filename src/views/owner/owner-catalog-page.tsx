@@ -93,7 +93,7 @@ export function OwnerCatalogPage() {
     }
   };
 
-  const filteredServices = services?.content.filter(s => 
+  const filteredServices = services?.content.filter((s: any) => 
     s.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

@@ -194,7 +194,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
             <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Barbers</h3>
             <div className="space-y-2">
               {isBarbersLoading
-                ? [1, 2].map((i) => <div key={i} className="h-16 bg-white/5 animate-pulse rounded-2xl" />)
+                ? [1, 2].map((i: number) => <div key={i} className="h-16 bg-white/5 animate-pulse rounded-2xl" />)
                 : shopBarbers && shopBarbers.length > 0
                 ? shopBarbers.map((barber: any) => (
                     <div
@@ -346,13 +346,13 @@ export function ShopsPage() {
         {/* Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            {Array.from({ length: PAGE_SIZE }).map((_, i: number) => (
               <div key={i} className="h-44 bg-white/5 animate-pulse rounded-2xl" />
             ))}
           </div>
         ) : shops?.content && shops.content.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {shops.content.map((shop) => (
+            {shops.content.map((shop: any) => (
               <ShopCard key={shop.id} shop={shop} onSelect={() => setSelectedShopId(shop.id)} />
             ))}
           </div>

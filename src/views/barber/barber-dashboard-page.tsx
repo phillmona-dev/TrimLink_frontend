@@ -174,7 +174,7 @@ export function BarberDashboardPage() {
               {pending?.totalElements ? <Badge className="bg-orange-500 text-black border-none">{pending.totalElements}</Badge> : null}
             </h3>
             <div className="space-y-4">
-              {pending?.content?.map((appt) => (
+              {pending?.content?.map((appt: any) => (
                 <div key={appt.id} className="p-5 rounded-[2.5rem] bg-white/5 border border-white/10 hover:border-orange-500/30 transition-all group">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs font-bold text-white/40">{formatDateTime(appt.scheduledStart)}</span>
@@ -242,7 +242,7 @@ export function BarberDashboardPage() {
 
           <h3 className="text-sm font-bold text-white/30 uppercase tracking-widest px-2">Up Next</h3>
           <div className="space-y-4">
-            {upcoming?.content?.map((appt) => (
+            {upcoming?.content?.map((appt: any) => (
               <div key={appt.id} className="p-5 rounded-[2.5rem] bg-white/5 border border-white/5 hover:border-white/10 transition-all group">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-bold text-orange-400/80">{formatDateTime(appt.scheduledStart)}</span>

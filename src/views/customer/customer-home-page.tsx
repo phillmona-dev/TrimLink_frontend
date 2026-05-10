@@ -139,7 +139,7 @@ export function CustomerHomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence mode="popLayout">
-            {shopsQuery.data?.content.map((shop) => (
+            {shopsQuery.data?.content.map((shop: Shop) => (
               <ShopCard key={shop.id} shop={shop} />
             ))}
           </AnimatePresence>
@@ -162,7 +162,7 @@ export function CustomerHomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {barbersQuery.data?.content.map((barber) => (
+          {barbersQuery.data?.content.map((barber: BarberProfile) => (
             <BarberCard key={barber.id} barber={barber} />
           ))}
         </div>

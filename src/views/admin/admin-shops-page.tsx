@@ -38,7 +38,7 @@ export function AdminShopsPage() {
   });
 
   const allShops = allShopsData?.content || [];
-  const filteredShops = allShops.filter(s => 
+  const filteredShops = allShops.filter((s: Shop) => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     s.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.ownerName?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +65,7 @@ export function AdminShopsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-all-shops"] });
       if (selectedShop) {
-        setSelectedShop(prev => prev ? { ...prev, active: !prev.active } : null);
+        setSelectedShop(prev => (prev ? { ...prev, active: !prev.active } : null) as Shop | null);
       }
     },
   });
@@ -194,7 +194,7 @@ export function AdminShopsPage() {
                   </tr>
                 ))
               ) : filteredShops.length > 0 ? (
-                filteredShops.map((shop) => (
+                filteredShops.map((shop: Shop) => (
                   <tr key={shop.id} className="hover:bg-white/[0.02] transition-colors group">
                     <td className="px-6 py-4">
                       <div className="font-bold text-white group-hover:text-orange-400 transition-colors">{shop.name}</div>

@@ -159,7 +159,7 @@ export const AdminAppointmentsPage: React.FC = () => {
             Shop Collections (Approved)
           </h2>
           <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-            {stats?.shopRevenues.map((shop) => (
+            {stats?.shopRevenues.map((shop: any) => (
               <div key={shop.shopId} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                 <span className="text-white font-medium">{shop.shopName}</span>
                 <span className="text-green-400 font-bold">ETB {shop.revenue.toLocaleString()}</span>
@@ -178,7 +178,7 @@ export const AdminAppointmentsPage: React.FC = () => {
             Barber Earnings (Approved)
           </h2>
           <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-            {stats?.barberRevenues.map((barber) => (
+            {stats?.barberRevenues.map((barber: any) => (
               <div key={barber.barberId} className="flex items-center justify-between p-3 bg-white/5 border border-white/10 rounded-xl">
                 <span className="text-white font-medium">{barber.barberName}</span>
                 <span className="text-orange-400 font-bold">ETB {barber.revenue.toLocaleString()}</span>
@@ -226,7 +226,7 @@ export const AdminAppointmentsPage: React.FC = () => {
               className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3 text-white/70 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all cursor-pointer text-xs appearance-none min-w-[150px]"
             >
               <option value="" className="bg-[#1a1a1a] text-white">All Shops</option>
-              {shops.map(shop => (
+              {shops.map((shop: Shop) => (
                 <option key={shop.id} value={shop.id} className="bg-[#1a1a1a] text-white">{shop.name}</option>
               ))}
             </select>
@@ -276,7 +276,7 @@ export const AdminAppointmentsPage: React.FC = () => {
                   </tr>
                 ))
               ) : appointments.length > 0 ? (
-                appointments.map((appt, idx) => (
+                appointments.map((appt: any, idx: number) => (
                   <tr key={appt.id} className="group/row hover:bg-white/[0.02] transition-colors">
                     <td className="px-6 py-5">
                       <span className="text-xs font-mono text-white/20 group-hover/row:text-orange-500/40 transition-colors">

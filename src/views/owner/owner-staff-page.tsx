@@ -153,10 +153,10 @@ export function OwnerStaffPage() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {isLoading ? (
-            [1, 2, 3].map((i) => (
+            [1, 2, 3].map((i: number) => (
               <div key={i} className="h-64 bg-white/5 animate-pulse rounded-3xl" />
             ))
-          ) : staff?.map((barber, index) => (
+          ) : staff?.map((barber: any, index: number) => (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -387,7 +387,7 @@ export function OwnerStaffPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
-                        {weeklyReport?.map((row) => (
+                        {weeklyReport?.map((row: any) => (
                           <tr key={row.barberId} className="group hover:bg-white/[0.02] transition">
                             <td className="py-6 pr-4">
                               <span className="text-white font-bold text-lg">{row.barberName}</span>

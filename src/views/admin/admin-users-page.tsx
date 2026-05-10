@@ -20,7 +20,7 @@ export function AdminUsersPage() {
 
   const allUsers = usersPage?.content || [];
   const filteredUsers = filterUsername 
-    ? allUsers.filter(u => u.username.toLowerCase() === filterUsername.toLowerCase())
+    ? allUsers.filter((u: any) => u.username.toLowerCase() === filterUsername.toLowerCase())
     : allUsers;
 
   return (
@@ -50,7 +50,7 @@ export function AdminUsersPage() {
                 </tr>
               ))
             ) : filteredUsers.length > 0 ? (
-              filteredUsers.map((user) => (
+              filteredUsers.map((user: any) => (
                 <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 font-medium text-white/90">
                     {user.firstName} {user.lastName}
