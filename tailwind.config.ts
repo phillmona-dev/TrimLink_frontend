@@ -78,7 +78,11 @@ const config: Config = {
           "radial-gradient(circle at 20% 20%, rgba(58,215,223,0.18), transparent 28%), radial-gradient(circle at 80% 10%, rgba(30,153,196,0.16), transparent 24%), radial-gradient(circle at 60% 80%, rgba(80,230,255,0.08), transparent 30%)"
       },
       fontFamily: {
-        sans: ["'Plus Jakarta Sans'", "ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["'Plus Jakarta Sans'", "ui-sans-serif", "system-ui", "sans-serif"],
+        editorial: ["'Playfair Display'", "serif"],
+        display: ["'Cormorant Garamond'", "serif"],
+        body: ["'DM Sans'", "sans-serif"],
+        ui: ["'Inter'", "sans-serif"],
       },
       keyframes: {
         float: {

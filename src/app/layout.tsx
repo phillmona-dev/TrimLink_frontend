@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import { Providers } from "@/app/providers";
-import { AnimatedBackground } from "@/components/common/animated-background";
-import { ChatWidget } from "@/components/common/chat-widget";
+import { TrimShell } from "@/components/common/trim-shell";
 import "@/index.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -11,9 +9,9 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "TrimLink",
+  title: "BeauLink — TrimLink & GlowLink",
   description:
-    "Premium barbershop booking, queue, and payment platform for Ethiopia.",
+    "Ethiopia's premium beauty ecosystem. TrimLink for men's grooming, GlowLink for women's beauty.",
   icons: {
     icon: "/favicon.svg"
   }
@@ -27,13 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${plusJakartaSans.variable} font-sans`}>
-        <Providers>
-          <AnimatedBackground />
-          <div className="relative z-10 w-full h-full min-h-screen">
-            {children}
-          </div>
-          <ChatWidget />
-        </Providers>
+        <TrimShell>
+          {children}
+        </TrimShell>
       </body>
     </html>
   );

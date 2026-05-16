@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -113,3 +115,246 @@ body {
 .section-copy {
   @apply max-w-2xl text-base leading-8 text-muted-foreground md:text-lg;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   GLOWLINK DESIGN TOKENS & STYLES
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --glow-rose:      #C8956C;
+  --glow-blush:     #F4C6C6;
+  --glow-ivory:     #FFF8F0;
+  --glow-plum:      #1A0F1E;
+  --glow-plum-mid:  #2A1A30;
+  --glow-lavender:  rgba(200,149,108,0.08);
+  --glow-sage:      #7CB99A;
+  --glow-text:      #FDF6EE;
+  --glow-muted:     rgba(253,246,238,0.5);
+  --glass-bg:       rgba(253,246,238,0.04);
+  --glass-border:   rgba(200,149,108,0.15);
+  --glass-blur:     20px;
+}
+
+/* ─── GLOWLINK TYPOGRAPHY ─── */
+.font-display   { font-family: 'Cormorant Garamond', serif; }
+.font-editorial { font-family: 'Playfair Display', serif; }
+.font-body      { font-family: 'DM Sans', sans-serif; }
+.font-ui        { font-family: 'Inter', sans-serif; }
+
+/* ─── GLASSMORPHISM ─── */
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.glass-strong {
+  background: rgba(253,246,238,0.07);
+  border: 1px solid rgba(200,149,108,0.25);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+/* ─── GLOW EFFECTS ─── */
+.glow-rose    { box-shadow: 0 0 30px rgba(200,149,108,0.35); }
+.glow-rose-sm { box-shadow: 0 0 15px rgba(200,149,108,0.25); }
+.text-glow    { text-shadow: 0 0 40px rgba(200,149,108,0.5); }
+
+/* ─── GLOW GRADIENTS ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #C8956C, #F4C6C6, #E8B4A0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-btn {
+  background: linear-gradient(135deg, #C8956C 0%, #E8B4A0 100%);
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, #1A0F1E 0%, #2A1A30 50%, #1E1028 100%);
+}
+
+/* ─── GLOW ANIMATIONS ─── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(200,149,108,0.3); }
+  50%       { box-shadow: 0 0 50px rgba(200,149,108,0.6); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  25%       { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  50%       { border-radius: 50% 60% 30% 60% / 40% 30% 60% 50%; }
+  75%       { border-radius: 60% 40% 60% 30% / 70% 50% 40% 60%; }
+}
+
+.animate-float      { animation: floatUp 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-spin-slow  { animation: spin-slow 12s linear infinite; }
+.animate-blob       { animation: blob 8s ease-in-out infinite; }
+
+.shimmer-btn {
+  background: linear-gradient(90deg, #C8956C 0%, #F4C6C6 40%, #E8B4A0 50%, #F4C6C6 60%, #C8956C 100%);
+  background-size: 200% auto;
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* ─── SHIMMER OVERLAY for buttons ─── */
+.shimmer-overlay {
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.18) 50%, transparent 60%);
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ─── GLOW BACKGROUND TRACKS (CSS-only, GPU-accelerated) ─── */
+@keyframes glowTrackLeft {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes glowTrackRight {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+.glow-track-left  { animation: glowTrackLeft 60s linear infinite; will-change: transform; }
+.glow-track-right { animation: glowTrackRight 65s linear infinite; will-change: transform; }
+
+/* ─── GLOW CATEGORY PILL COLORS ─── */
+.glow-pill-hair     { --pill-c1: #C8956C; --pill-c2: #E8B4A0; --pill-glow: rgba(200,149,108,0.45); }
+.glow-pill-makeup   { --pill-c1: #E879F9; --pill-c2: #F0ABFC; --pill-glow: rgba(232,121,249,0.45); }
+.glow-pill-nails    { --pill-c1: #F43F5E; --pill-c2: #FB7185; --pill-glow: rgba(244,63,94,0.45); }
+.glow-pill-spa      { --pill-c1: #7CB99A; --pill-c2: #A7F3D0; --pill-glow: rgba(124,185,154,0.45); }
+.glow-pill-lash     { --pill-c1: #818CF8; --pill-c2: #C4B5FD; --pill-glow: rgba(129,140,248,0.45); }
+.glow-pill-bridal   { --pill-c1: #FFD700; --pill-c2: #FDE68A; --pill-glow: rgba(255,215,0,0.45); }
+.glow-pill-skincare { --pill-c1: #F9A8D4; --pill-c2: #FBCFE8; --pill-glow: rgba(249,168,212,0.45); }
+
+.glow-pill-active {
+  background: linear-gradient(135deg, var(--pill-c1), var(--pill-c2));
+  color: #1A0F1E;
+  box-shadow: 0 0 24px var(--pill-glow), 0 4px 16px rgba(0,0,0,0.3);
+  border-color: transparent;
+  transform: translateY(-1px);
+}
+.glow-pill-idle {
+  background: rgba(253,246,238,0.04);
+  border: 1px solid rgba(253,246,238,0.1);
+  color: rgba(253,246,238,0.55);
+}
+.glow-pill-idle:hover {
+  background: rgba(253,246,238,0.08);
+  border-color: var(--pill-c1, rgba(200,149,108,0.4));
+  color: rgba(253,246,238,0.9);
+  box-shadow: 0 0 16px var(--pill-glow, rgba(200,149,108,0.2));
+}
+
+/* ─── LUXURY SALON CARD ─── */
+.glow-card {
+  background: rgba(253,246,238,0.035);
+  border: 1px solid rgba(200,149,108,0.12);
+  backdrop-filter: blur(16px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.glow-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(200,149,108,0.12);
+  border-color: rgba(200,149,108,0.35);
+}
+
+/* ─── HERO FLOATING BADGE ─── */
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px) rotate(-3deg); }
+  50%       { transform: translateY(-10px) rotate(-3deg); }
+}
+@keyframes floatBadge2 {
+  0%, 100% { transform: translateY(0px) rotate(4deg); }
+  50%       { transform: translateY(-14px) rotate(4deg); }
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes glowPulseStrong {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.08); }
+}
+@keyframes scanLine {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.animate-float-badge  { animation: floatBadge 5s ease-in-out infinite; }
+.animate-float-badge2 { animation: floatBadge2 6s ease-in-out infinite; }
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+.animate-glow-pulse-strong { animation: glowPulseStrong 4s ease-in-out infinite; }
+
+/* ─── LUXURY BORDER GLOW ─── */
+.border-glow-rose {
+  box-shadow: inset 0 0 0 1px rgba(200,149,108,0.3), 0 0 30px rgba(200,149,108,0.15);
+}
+.border-glow-pink {
+  box-shadow: inset 0 0 0 1px rgba(244,63,94,0.3), 0 0 30px rgba(244,63,94,0.1);
+}
+
+/* ─── STAT CARD ─── */
+.glow-stat-card {
+  background: rgba(253,246,238,0.035);
+  border: 1px solid rgba(200,149,108,0.15);
+  backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+.glow-stat-card:hover {
+  background: rgba(200,149,108,0.08);
+  border-color: rgba(200,149,108,0.35);
+  box-shadow: 0 0 30px rgba(200,149,108,0.15);
+}
+
+/* ─── SECTION LABEL ─── */
+.glow-section-label {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  color: rgba(200,149,108,0.6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.glow-section-label::before,
+.glow-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,149,108,0.3), transparent);
+}
+
+/* ─── MASK EDGES for carousel ─── */
+.mask-edges {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+/* ─── SCROLLBAR HIDE ─── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

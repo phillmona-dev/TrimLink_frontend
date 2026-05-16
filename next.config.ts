@@ -10,7 +10,15 @@ const nextConfig: NextConfig = {
         hostname: "**"
       }
     ]
-  }
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/glow-api/:path*",
+        destination: "http://localhost:9090/api/v1/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
