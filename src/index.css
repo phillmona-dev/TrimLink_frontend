@@ -117,8 +117,353 @@ body {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   GLOWLINK DESIGN TOKENS & STYLES
+   GLOWLINK — SOFT FEMININE DESIGN SYSTEM
+   Warm cream palette · Arch cards · Soft shadows · Service bookings
    ═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Backgrounds ── */
+  --g-bg:            #FAF5EE;
+  --g-bg-alt:        #F5EDE0;
+  --g-surface:       #FFFFFF;
+  --g-surface-warm:  #FDF8F3;
+  --g-blush:         #F8EDE8;
+
+  /* ── Brand / Primary ── */
+  --g-primary:       #D4864A;
+  --g-primary-hover: #C07340;
+  --g-primary-soft:  #F5E4D4;
+  --g-primary-pale:  #FBF1E8;
+
+  /* ── Text ── */
+  --g-text:          #2C2416;
+  --g-text-2:        #7A6350;
+  --g-text-muted:    #B5A090;
+  --g-text-light:    #D4C5B5;
+
+  /* ── Borders ── */
+  --g-border:        #E8DDD2;
+  --g-border-strong: #D4C5B5;
+
+  /* ── Accent ── */
+  --g-rose:          #D4847A;
+  --g-rose-soft:     #F5D8D5;
+  --g-sage:          #7A9E7E;
+  --g-sage-soft:     #D8EDD9;
+  --g-gold:          #C8956C;
+  --g-gold-soft:     #F2E0CC;
+  --g-olive:         #4A3728;
+
+  /* ── Legacy (kept for animated-background) ── */
+  --glow-rose:      #C8956C;
+  --glow-text:      #FDF6EE;
+  --glow-plum:      #1A0F1E;
+  --glass-bg:       rgba(253,246,238,0.04);
+  --glass-border:   rgba(200,149,108,0.15);
+}
+
+/* ─── GLOWLINK TYPOGRAPHY ─── */
+.font-display   { font-family: 'Cormorant Garamond', serif; }
+.font-editorial { font-family: 'Cormorant Garamond', serif; }
+.font-body      { font-family: 'DM Sans', sans-serif; }
+.font-ui        { font-family: 'DM Sans', sans-serif; }
+
+/* ─── GLOW THEME WRAPPER ─── */
+.glow-theme {
+  background: var(--g-bg);
+  color: var(--g-text);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ─── HEADER ─── */
+.glow-header {
+  background: rgba(250,245,238,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--g-border);
+}
+
+/* ─── ARCH CARD (signature element) ─── */
+/* Card with arched image top */
+.glow-arch-image {
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+}
+
+/* ─── SURFACE CARD ─── */
+.glow-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(44,36,22,0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.glow-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(44,36,22,0.12);
+}
+
+/* ─── SALON CARD (arch top) ─── */
+.glow-salon-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(44,36,22,0.06);
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.glow-salon-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(44,36,22,0.13);
+}
+.glow-salon-card .card-image {
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+  height: 180px;
+}
+
+/* ─── STAT CARD ─── */
+.glow-stat-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(44,36,22,0.05);
+  transition: all 0.2s ease;
+}
+.glow-stat-card:hover {
+  border-color: var(--g-primary);
+  box-shadow: 0 4px 20px rgba(212,134,74,0.15);
+}
+
+/* ─── PRIMARY BUTTON ─── */
+.glow-btn {
+  background: linear-gradient(135deg, #D4864A 0%, #E09A60 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 20px rgba(212,134,74,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.glow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(212,134,74,0.45);
+}
+.glow-btn:active { transform: translateY(0); }
+
+/* ─── GHOST BUTTON ─── */
+.glow-btn-ghost {
+  background: transparent;
+  color: var(--g-primary);
+  border: 1.5px solid var(--g-primary);
+  border-radius: 999px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.glow-btn-ghost:hover {
+  background: var(--g-primary-pale);
+}
+
+/* ─── INPUT ─── */
+.glow-input {
+  background: var(--g-surface);
+  border: 1.5px solid var(--g-border);
+  border-radius: 14px;
+  color: var(--g-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+}
+.glow-input:focus {
+  border-color: var(--g-primary);
+  box-shadow: 0 0 0 3px rgba(212,134,74,0.12);
+}
+.glow-input::placeholder { color: var(--g-text-muted); }
+
+/* ─── CATEGORY PILLS ─── */
+.glow-pill {
+  background: var(--g-surface);
+  border: 1.5px solid var(--g-border);
+  border-radius: 999px;
+  color: var(--g-text-2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 18px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.glow-pill:hover {
+  border-color: var(--g-primary);
+  color: var(--g-primary);
+  background: var(--g-primary-pale);
+}
+.glow-pill-active-warm {
+  background: var(--g-primary-soft);
+  border-color: var(--g-primary);
+  color: var(--g-primary);
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(212,134,74,0.2);
+}
+
+/* ─── Pill color variants (per category) ─── */
+.glow-pill-hair     { --pill-bg: #FFF0E8; --pill-c: #C8714A; }
+.glow-pill-makeup   { --pill-bg: #FDE8F5; --pill-c: #B8539C; }
+.glow-pill-nails    { --pill-bg: #FDECEE; --pill-c: #C0415A; }
+.glow-pill-spa      { --pill-bg: #E8F5EC; --pill-c: #4A8C56; }
+.glow-pill-lash     { --pill-bg: #EEF0FD; --pill-c: #5462B0; }
+.glow-pill-bridal   { --pill-bg: #FDF8E8; --pill-c: #A0822A; }
+.glow-pill-skincare { --pill-bg: #FDE8F0; --pill-c: #B84478; }
+
+.glow-pill-active {
+  background: var(--pill-bg, var(--g-primary-soft));
+  border-color: var(--pill-c, var(--g-primary));
+  color: var(--pill-c, var(--g-primary));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.glow-pill-idle {
+  background: var(--g-surface);
+  border: 1.5px solid var(--g-border);
+  color: var(--g-text-2);
+}
+.glow-pill-idle:hover {
+  border-color: var(--pill-c, var(--g-primary));
+  color: var(--pill-c, var(--g-primary));
+  background: var(--pill-bg, var(--g-primary-pale));
+}
+
+/* ─── BADGE / STATUS ─── */
+.glow-badge { border-radius: 999px; font-size: 11px; font-weight: 700; padding: 3px 10px; }
+.glow-badge-amber  { background: #FDF0E4; color: #C8714A; }
+.glow-badge-green  { background: #E4F3E6; color: #3E8047; }
+.glow-badge-rose   { background: #FDECEE; color: #C04060; }
+.glow-badge-blue   { background: #E8EFFD; color: #3060B0; }
+
+/* ─── BOTTOM NAV (warm) ─── */
+.glow-bottom-nav {
+  background: rgba(250,245,238,0.97);
+  border-top: 1px solid var(--g-border);
+  backdrop-filter: blur(20px);
+}
+
+/* ─── SECTION LABEL ─── */
+.glow-section-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--g-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.glow-section-label::before,
+.glow-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--g-border);
+}
+
+/* ─── GRADIENT TEXT (warm) ─── */
+.gradient-text {
+  background: linear-gradient(135deg, #D4864A, #C8956C, #E09A60);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── SHIMMER BUTTON (kept for CTA) ─── */
+.shimmer-btn {
+  background: linear-gradient(90deg, #D4864A 0%, #E8B078 40%, #D4864A 80%);
+  background-size: 200% auto;
+  animation: shimmer 2.5s linear infinite;
+  color: white;
+  border-radius: 999px;
+}
+
+/* ─── SHIMMER OVERLAY ─── */
+.shimmer-overlay {
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  background-size: 200% 100%;
+  animation: shimmer 2.2s linear infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ─── LEGACY (kept for shimmer-btn animation) ─── */
+.glass {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+}
+.glass-strong {
+  background: rgba(255,255,255,0.85);
+  border: 1px solid var(--g-border-strong);
+  backdrop-filter: blur(20px);
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+@keyframes floatUp {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0px) rotate(-2deg); }
+  50%       { transform: translateY(-8px) rotate(-2deg); }
+}
+@keyframes floatBadge2 {
+  0%, 100% { transform: translateY(0px) rotate(3deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+@keyframes blob {
+  0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50%       { border-radius: 50% 60% 30% 60% / 40% 30% 60% 50%; }
+}
+@keyframes petalFloat {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0.06; }
+  50%  { transform: translateY(-20px) rotate(180deg); opacity: 0.1; }
+  100% { transform: translateY(0) rotate(360deg); opacity: 0.06; }
+}
+@keyframes glowPulseStrong {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-float        { animation: floatUp 4s ease-in-out infinite; }
+.animate-float-badge  { animation: floatBadge 5s ease-in-out infinite; }
+.animate-float-badge2 { animation: floatBadge2 6s ease-in-out infinite; }
+.animate-blob         { animation: blob 8s ease-in-out infinite; }
+.animate-petal        { animation: petalFloat 8s ease-in-out infinite; }
+.animate-glow-pulse-strong { animation: glowPulseStrong 4s ease-in-out infinite; }
+.animate-spin-slow    { animation: spin-slow 12s linear infinite; }
+
+/* ─── MASK EDGES (carousel) ─── */
+.mask-edges {
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+}
+
+/* ─── SCROLLBAR HIDE ─── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 
 :root {
   --glow-rose:      #C8956C;

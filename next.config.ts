@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/glow-api/:path*",
-        destination: "http://localhost:9090/api/v1/:path*",
+        destination: "http://localhost:9093/api/v1/:path*",
       },
     ];
   },

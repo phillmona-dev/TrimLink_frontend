@@ -55,6 +55,7 @@ interface GlowAuthState {
     shopDescription?: string;
     latitude?: number;
     longitude?: number;
+    platform?: string;
   }) => Promise<AuthResponseData>;
   logout: () => void;
   clearError: () => void;

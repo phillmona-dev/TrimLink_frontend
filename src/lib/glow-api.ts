@@ -249,24 +249,86 @@ export const glowBookingApi = {
 };
 
 export const glowShopApi = {
-  getShopAppointments: async () => {
-    const { data } = await glowApi.get<GlowApiResponse<PageResponse<AppointmentResponse>>>("/shops/my-shop/appointments");
+  // ── Appointments ───────────────────────────────────────────────
+  getShopAppointments: async (params?: {
+    status?: string; query?: string; startDate?: string; endDate?: string;
+    page?: number; size?: number;
+  }) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<AppointmentResponse>>>("/shops/my-shop/appointments", { params });
     return data.data;
   },
+
+  // ── Stats & Finance ────────────────────────────────────────────
   getShopStats: async () => {
-    const { data } = await glowApi.get<GlowApiResponse<ShopStatsResponse>>("/shops/my-shop/stats");
-    return data.data;
-  },
-  getShopStaff: async () => {
-    const { data } = await glowApi.get<GlowApiResponse<StaffPerformanceResponse[]>>("/shops/my-shop/staff");
+    const { data } = await glowApi.get<GlowApiResponse<any>>("/shops/my-shop/stats");
     return data.data;
   },
   getShopFinance: async () => {
-    const { data } = await glowApi.get<GlowApiResponse<{ revenueToday: number; totalRevenue: number }>>("/shops/my-shop/finance");
+    const { data } = await glowApi.get<GlowApiResponse<any>>("/shops/my-shop/finance");
     return data.data;
   },
+
+  // ── Staff Management ───────────────────────────────────────────
+  getShopStaff: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<any[]>>("/shops/my-shop/staff");
+    return data.data;
+  },
+  addStaff: async (phoneNumber: string) => {
+    const { data } = await glowApi.post<GlowApiResponse<any>>("/shops/my-shop/staff", { phoneNumber });
+    return data.data;
+  },
+  toggleStaffAvailability: async (barberId: string, available: boolean) => {
+    const { data } = await glowApi.patch<GlowApiResponse<void>>(`/shops/my-shop/staff/${barberId}/availability`, { available });
+    return data.data;
+  },
+  logDailyWork: async (barberId: string, count: number, notes?: string) => {
+    const { data } = await glowApi.post<GlowApiResponse<void>>(`/shops/my-shop/staff/${barberId}/logs`, { count, notes });
+    return data.data;
+  },
+  getWeeklyReport: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<any[]>>("/shops/my-shop/staff/weekly-report");
+    return data.data;
+  },
+
+  // ── Services ───────────────────────────────────────────────────
+  getPlatformServices: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<{ content: any[] }>>("/services");
+    return data.data;
+  },
+  createShopService: async (service: { name: string; description: string; basePrice: number; durationMinutes: number }) => {
+    const { data } = await glowApi.post<GlowApiResponse<any>>("/services/my-shop", service);
+    return data.data;
+  },
+  getBarberServices: async (barberId: string) => {
+    const { data } = await glowApi.get<GlowApiResponse<any[]>>(`/barber/services/${barberId}`);
+    return data.data;
+  },
+  updateBarberServices: async (barberId: string, assignments: { serviceId: string; customPrice: number }[]) => {
+    const { data } = await glowApi.put<GlowApiResponse<any[]>>(`/barber/services/${barberId}`, { assignments });
+    return data.data;
+  },
+
+  // ── Shop Details & Settings ────────────────────────────────────
+  getMyShopDetails: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<any>>("/shops/my-shop");
+    return data.data;
+  },
+  updateMyShopDetails: async (details: any) => {
+    const { data } = await glowApi.put<GlowApiResponse<any>>("/shops/my-shop", details);
+    return data.data;
+  },
+  getShopHours: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<any[]>>("/shops/my-shop/hours");
+    return data.data;
+  },
+  updateShopHours: async (hours: any[]) => {
+    const { data } = await glowApi.put<GlowApiResponse<any[]>>("/shops/my-shop/hours", hours);
+    return data.data;
+  },
+
+  // ── Public Shop Browsing ───────────────────────────────────────
   searchShops: async (q?: string, city?: string) => {
-    const { data } = await glowApi.get<GlowApiResponse<PageResponse<ShopSearchResponse>>>("/shops", { params: { q, city } });
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<ShopSearchResponse>>>("/shops", { params: { q, city, platform: "GLOWLINK" } });
     return data.data;
   },
   getShopDetails: async (id: string) => {
@@ -280,7 +342,118 @@ export const glowShopApi = {
   getShopServices: async (id: string) => {
     const { data } = await glowApi.get<GlowApiResponse<Service[]>>(`/services/shop/${id}`);
     return data.data;
-  }
+  },
+};
+
+export interface AdminDashboardStats {
+  totalUsers: number;
+  totalBarbers: number;
+  totalShops: number;
+  totalAppointmentsToday: number;
+  totalAppointmentsThisMonth: number;
+  activeQueueEntries: number;
+  completedServicesToday: number;
+  pendingAppointments: number;
+  revenueToday: number;
+  revenueThisMonth: number;
+}
+
+export interface AdminUserResponse {
+  id: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  email: string | null;
+  role: string;
+  active: boolean;
+  approvalStatus: string;
+  createdAt: string;
+}
+
+export interface AdminAppointmentStats {
+  totalApproved: number;
+  totalPending: number;
+  totalRejected: number;
+  totalRevenue: number;
+  revenueToday: number;
+  adminShare: number;
+  adminSharePercent: number;
+  shopRevenues: Array<{ shopId: string; shopName: string; revenue: number }>;
+  barberRevenues: Array<{ barberId: string; barberName: string; revenue: number }>;
+}
+
+export const glowAdminApi = {
+  // Dashboard
+  getDashboardStats: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<AdminDashboardStats>>("/admin/dashboard");
+    return data.data;
+  },
+
+  // Users
+  listUsers: async (page = 0, size = 20) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<AdminUserResponse>>>(`/admin/users?page=${page}&size=${size}`);
+    return data.data;
+  },
+  getPendingShops: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<AdminUserResponse[]>>("/admin/users/pending");
+    return data.data;
+  },
+  approveUser: async (id: string) => {
+    const { data } = await glowApi.patch<GlowApiResponse<void>>(`/admin/users/${id}/approve`);
+    return data.data;
+  },
+  rejectUser: async (id: string) => {
+    const { data } = await glowApi.patch<GlowApiResponse<void>>(`/admin/users/${id}/reject`);
+    return data.data;
+  },
+
+  // Shops
+  listAllShops: async (page = 0, size = 50) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<ShopSearchResponse>>>(`/shops/admin/all?page=${page}&size=${size}`);
+    return data.data;
+  },
+
+  // Appointments
+  getAppointments: async (params?: {
+    shopId?: string;
+    barberId?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    query?: string;
+    page?: number;
+    size?: number;
+  }) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<AppointmentResponse>>>("/admin/appointments", { params });
+    return data.data;
+  },
+  getAppointmentStats: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<AdminAppointmentStats>>("/admin/appointments/stats");
+    return data.data;
+  },
+
+  // Finance
+  getShopFinanceSummaries: async () => {
+    const { data } = await glowApi.get<GlowApiResponse<any[]>>("/admin/finance/shops");
+    return data.data;
+  },
+  getTransactions: async (params?: { page?: number; size?: number }) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<any>>>("/admin/finance/transactions", { params });
+    return data.data;
+  },
+
+  // Audit Logs
+  getAuditLogs: async (params?: { page?: number; size?: number; username?: string; action?: string }) => {
+    const { data } = await glowApi.get<GlowApiResponse<PageResponse<any>>>("/admin/audit-logs", { params });
+    return data.data;
+  },
+
+  // Settings
+  updateSetting: async (key: string, value: string) => {
+    const { data } = await glowApi.patch<GlowApiResponse<void>>(`/admin/settings/${key}?value=${encodeURIComponent(value)}`);
+    return data.data;
+  },
 };
 
 export default glowApi;

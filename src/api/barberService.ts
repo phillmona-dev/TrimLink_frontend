@@ -4,7 +4,7 @@ import type { ApiResponse, BarberProfile, PageResponse, Review, Service, Shop } 
 
 export const barberService = {
   listShops: (params?: { q?: string; city?: string; page?: number; size?: number }) =>
-    unwrap<PageResponse<Shop>>(http.get("/shops", { params })),
+    unwrap<PageResponse<Shop>>(http.get("/shops", { params: { ...params, platform: "TRIMLINK" } })),
 
   getShop: (id: string) => unwrap<Shop>(http.get(`/shops/${id}`)),
 

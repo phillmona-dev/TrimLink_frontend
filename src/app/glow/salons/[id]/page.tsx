@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { glowShopApi, glowBookingApi, ShopSearchResponse, BarberResponse, Service, TimeSlotResponse } from "@/lib/glow-api";
 
 const REVIEWS_MOCK = [
@@ -71,91 +72,86 @@ function BookingPanel({ shop, service, barbers, onClose }: { shop: ShopSearchRes
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6"
-      style={{ background: "rgba(8,4,14,0.88)", backdropFilter: "blur(16px)" }}
+      style={{ background: "rgba(92, 68, 59, 0.6)", backdropFilter: "blur(16px)" }}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <motion.div initial={{ y: 100, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", damping: 25 }}
         className="w-full max-w-lg rounded-t-3xl md:rounded-3xl overflow-hidden relative"
-        style={{ background: "rgba(15,8,24,0.97)", border: "1px solid rgba(200,149,108,0.22)" }}>
-        {/* Shimmer top line */}
-        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(200,149,108,0.7), transparent)" }} />
-        {/* Ambient glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-24 -translate-y-1/2 opacity-20 pointer-events-none"
-          style={{ background: "radial-gradient(circle, rgba(200,149,108,0.8), transparent 70%)", filter: "blur(20px)" }} />
-        <div className="flex items-center justify-between p-6 border-b border-[rgba(200,149,108,0.1)] relative">
+        style={{ background: "#FDF6F0", border: "1px solid #e8cdb9" }}>
+        
+        <div className="flex items-center justify-between p-6 border-b border-[#f0e4db]">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] mb-1 font-black" style={{ color: "rgba(200,149,108,0.6)" }}>Booking</p>
-            <h3 className="font-black text-white font-editorial text-xl">{service.name}</h3>
+            <p className="text-[10px] uppercase tracking-[0.2em] mb-1 font-bold text-[#9e5d41]">Booking</p>
+            <h3 className="font-bold text-[#3c2a23]" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: "24px" }}>{service.name}</h3>
           </div>
           <button onClick={onClose}
-            className="p-2 rounded-xl transition-all"
-            style={{ background: "rgba(253,246,238,0.05)", border: "1px solid rgba(200,149,108,0.15)", color: "rgba(253,246,238,0.6)" }}>
+            className="p-2 rounded-xl transition-all bg-white border border-[#e8cdb9] text-[#8e5238] hover:bg-[#f9ebe2]">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="flex gap-1.5 px-6 py-4">
           {(["staff", "datetime", "confirm"] as const).map((s, i) => (
             <div key={s} className="h-1 flex-1 rounded-full transition-all duration-500"
-              style={{ background: (step === "staff" ? 0 : step === "datetime" ? 1 : 2) >= i ? "linear-gradient(90deg,#C8956C,#E8B4A0)" : "rgba(200,149,108,0.2)" }} />
+              style={{ background: (step === "staff" ? 0 : step === "datetime" ? 1 : 2) >= i ? "#9e5d41" : "#e8cdb9" }} />
           ))}
         </div>
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
+        <div className="p-6 max-h-[60vh] overflow-y-auto bg-white">
           <AnimatePresence mode="wait">
             {step === "staff" && (
               <motion.div key="staff" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <p className="text-sm font-semibold mb-4" style={{ color: "rgba(253,246,238,0.6)" }}>Choose your stylist</p>
+                <p className="text-sm font-semibold mb-4 text-[#8e5238]">Choose your specialist</p>
                 <div className="flex flex-col gap-3">
                   <button onClick={() => setSelectedStaff("any")}
-                    className="flex items-center gap-3 p-4 rounded-2xl text-left transition-all"
-                    style={{ background: selectedStaff === "any" ? "rgba(200,149,108,0.1)" : "rgba(253,246,238,0.03)", border: `1px solid ${selectedStaff === "any" ? "rgba(200,149,108,0.5)" : "rgba(200,149,108,0.12)"}` }}>
-                    <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "rgba(200,149,108,0.2)", color: "#C8956C" }}>✦</div>
-                    <div><p className="text-sm font-bold text-white">Any Available Stylist</p><p className="text-xs text-white/40">Best match based on your service</p></div>
-                    {selectedStaff === "any" && <CheckCircle2 className="h-5 w-5 ml-auto" style={{ color: "#C8956C" }} />}
+                    className="flex items-center gap-3 p-4 rounded-xl text-left transition-all"
+                    style={{ background: selectedStaff === "any" ? "#FDF6F0" : "#FFFFFF", border: `1px solid ${selectedStaff === "any" ? "#9e5d41" : "#e8cdb9"}` }}>
+                    <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold bg-[#f9ebe2] text-[#9e5d41]">🌸</div>
+                    <div className="flex-1"><p className="text-sm font-bold text-[#3c2a23]">Any Available Specialist</p><p className="text-xs text-[#8e5238]">Best match based on your service</p></div>
+                    {selectedStaff === "any" && <CheckCircle2 className="h-5 w-5 text-[#9e5d41]" />}
                   </button>
                   {barbers.map(st => (
                     <button key={st.id} onClick={() => setSelectedStaff(st.id)}
-                      className="flex items-center gap-3 p-4 rounded-2xl text-left transition-all"
-                      style={{ background: selectedStaff === st.id ? "rgba(200,149,108,0.1)" : "rgba(253,246,238,0.03)", border: `1px solid ${selectedStaff === st.id ? "rgba(200,149,108,0.5)" : "rgba(200,149,108,0.12)"}` }}>
-                      <div className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-black text-white shrink-0" style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)" }}>{st.firstName[0]}{st.lastName[0]}</div>
-                      <div className="flex-1"><p className="text-sm font-bold text-white">{st.firstName} {st.lastName}</p><p className="text-xs text-white/40">{st.specialty || "Barber"}</p></div>
-                      <div className="flex items-center gap-1 text-xs" style={{ color: "#C8956C" }}><Star className="h-3 w-3 fill-current" />{st.averageRating.toFixed(1)}</div>
-                      {selectedStaff === st.id && <CheckCircle2 className="h-5 w-5" style={{ color: "#C8956C" }} />}
+                      className="flex items-center gap-3 p-4 rounded-xl text-left transition-all"
+                      style={{ background: selectedStaff === st.id ? "#FDF6F0" : "#FFFFFF", border: `1px solid ${selectedStaff === st.id ? "#9e5d41" : "#e8cdb9"}` }}>
+                      <div className="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold text-white bg-[#8e5238]">{st.firstName[0]}{st.lastName[0]}</div>
+                      <div className="flex-1"><p className="text-sm font-bold text-[#3c2a23]">{st.firstName} {st.lastName}</p><p className="text-xs text-[#8e5238]">{st.specialty || "Specialist"}</p></div>
+                      <div className="flex items-center gap-1 text-xs text-[#e5a02e]"><Star className="h-3 w-3 fill-current" />{st.averageRating.toFixed(1)}</div>
+                      {selectedStaff === st.id && <CheckCircle2 className="h-5 w-5 text-[#9e5d41]" />}
                     </button>
                   ))}
                 </div>
                 <button disabled={!selectedStaff} onClick={() => setStep("datetime")}
-                  className="w-full mt-5 h-12 rounded-2xl font-black text-sm uppercase tracking-wider text-[#1A0F1E] disabled:opacity-40 transition-all"
-                  style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)" }}>Next: Pick a Time →</button>
+                  className="w-full mt-6 py-3.5 rounded-md font-bold text-sm text-white disabled:opacity-50 transition-all shadow-md"
+                  style={{ background: "linear-gradient(to right, #9e5d41, #854931)" }}>Next: Pick a Time</button>
               </motion.div>
             )}
             {step === "datetime" && (
               <motion.div key="dt" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <p className="text-sm font-semibold mb-4" style={{ color: "rgba(253,246,238,0.6)" }}>Choose date & time</p>
-                <div className="flex gap-2 overflow-x-auto pb-2 mb-5">
+                <p className="text-sm font-semibold mb-4 text-[#8e5238]">Choose date & time</p>
+                <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
                   {DATES.map(d => (
                     <button key={d.full} onClick={() => handleDateSelect(d.full)}
-                      className="shrink-0 flex flex-col items-center px-4 py-3 rounded-2xl transition-all"
-                      style={{ background: selectedDate === d.full ? "linear-gradient(135deg,#C8956C,#E8B4A0)" : "rgba(253,246,238,0.04)", border: `1px solid ${selectedDate === d.full ? "transparent" : "rgba(200,149,108,0.15)"}` }}>
-                      <span className="text-[10px] font-bold uppercase" style={{ color: selectedDate === d.full ? "#1A0F1E" : "rgba(253,246,238,0.4)" }}>{d.label}</span>
-                      <span className="text-sm font-black mt-0.5" style={{ color: selectedDate === d.full ? "#1A0F1E" : "white" }}>{d.date}</span>
+                      className="shrink-0 flex flex-col items-center px-4 py-3 rounded-xl transition-all shadow-sm"
+                      style={{ background: selectedDate === d.full ? "#8e5238" : "#FFFFFF", border: `1px solid ${selectedDate === d.full ? "transparent" : "#e8cdb9"}` }}>
+                      <span className="text-xs font-semibold uppercase" style={{ color: selectedDate === d.full ? "#FDF6F0" : "#8e5238" }}>{d.label}</span>
+                      <span className="text-sm font-bold mt-1" style={{ color: selectedDate === d.full ? "white" : "#3c2a23" }}>{d.date}</span>
                     </button>
                   ))}
                 </div>
                 {loadingTimes ? (
-                  <div className="text-center py-6 text-white/50 animate-pulse text-sm">Finding available slots...</div>
+                  <div className="text-center py-8 text-[#8e5238] animate-pulse text-sm">Finding available slots...</div>
                 ) : !selectedDate ? (
-                  <div className="text-center py-6 text-white/50 text-sm">Select a date above to view slots</div>
+                  <div className="text-center py-8 text-[#8e5238] text-sm">Select a date above to view slots</div>
                 ) : availableTimes.length === 0 ? (
-                  <div className="text-center py-6 text-red-400 text-sm">No slots available on this date.</div>
+                  <div className="text-center py-8 text-red-500 text-sm">No slots available on this date.</div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2 mb-5">
+                  <div className="grid grid-cols-3 gap-3 mb-6">
                     {availableTimes.map(t => {
                       const timeLabel = new Date(t.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
                       const isSelected = selectedTime?.startTime === t.startTime;
                       return (
                         <button key={t.startTime} onClick={() => setSelectedTime(t)}
-                          className="py-3 rounded-xl text-sm font-bold transition-all"
-                          style={{ background: isSelected ? "linear-gradient(135deg,#C8956C,#E8B4A0)" : "rgba(253,246,238,0.04)", color: isSelected ? "#1A0F1E" : "rgba(253,246,238,0.7)", border: `1px solid ${isSelected ? "transparent" : "rgba(200,149,108,0.15)"}` }}>
+                          className="py-3 rounded-xl text-sm font-bold transition-all shadow-sm"
+                          style={{ background: isSelected ? "#9e5d41" : "#FFFFFF", color: isSelected ? "white" : "#5c443b", border: `1px solid ${isSelected ? "transparent" : "#e8cdb9"}` }}>
                           {timeLabel}
                         </button>
                       );
@@ -163,14 +159,14 @@ function BookingPanel({ shop, service, barbers, onClose }: { shop: ShopSearchRes
                   </div>
                 )}
                 <button disabled={!selectedDate || !selectedTime} onClick={() => setStep("confirm")}
-                  className="w-full h-12 rounded-2xl font-black text-sm uppercase tracking-wider text-[#1A0F1E] disabled:opacity-40"
-                  style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)" }}>Review Booking →</button>
+                  className="w-full py-3.5 rounded-md font-bold text-sm text-white disabled:opacity-50 transition-all shadow-md"
+                  style={{ background: "linear-gradient(to right, #9e5d41, #854931)" }}>Review Booking</button>
               </motion.div>
             )}
             {step === "confirm" && (
               <motion.div key="confirm" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                <p className="text-sm font-semibold mb-4" style={{ color: "rgba(253,246,238,0.6)" }}>Booking Summary</p>
-                <div className="rounded-2xl p-5 mb-4 flex flex-col gap-3" style={{ background: "rgba(200,149,108,0.06)", border: "1px solid rgba(200,149,108,0.2)" }}>
+                <p className="text-sm font-semibold mb-4 text-[#8e5238]">Booking Summary</p>
+                <div className="rounded-xl p-5 mb-6 flex flex-col gap-3 bg-[#FDF6F0] border border-[#e8cdb9]">
                   {[
                     { label: "Service", value: service.name },
                     { label: "Duration", value: `${service.durationMinutes} min` },
@@ -179,39 +175,38 @@ function BookingPanel({ shop, service, barbers, onClose }: { shop: ShopSearchRes
                     { label: "Time", value: selectedTime ? new Date(selectedTime.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : "" },
                   ].map(r => (
                     <div key={r.label} className="flex justify-between">
-                      <span className="text-sm" style={{ color: "rgba(253,246,238,0.45)" }}>{r.label}</span>
-                      <span className="text-sm font-semibold text-white">{r.value}</span>
+                      <span className="text-sm text-[#8e5238]">{r.label}</span>
+                      <span className="text-sm font-bold text-[#3c2a23]">{r.value}</span>
                     </div>
                   ))}
-                  <div className="h-px" style={{ background: "rgba(200,149,108,0.2)" }} />
-                  <div className="flex justify-between">
-                    <span className="font-black text-white">Total</span>
-                    <span className="font-black text-lg" style={{ color: "#C8956C" }}>{service.basePrice.toLocaleString()} ETB</span>
+                  <div className="h-px bg-[#e8cdb9] my-1" />
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold text-[#3c2a23]">Total</span>
+                    <span className="font-bold text-lg text-[#9e5d41]">{service.basePrice.toLocaleString()} ETB</span>
                   </div>
                 </div>
-                <p className="text-xs text-center mb-4" style={{ color: "rgba(253,246,238,0.35)" }}>Pay at the salon · Free cancellation up to 2 hrs before</p>
+                <p className="text-xs text-center mb-6 text-[#8e5238]">Pay at the salon · Free cancellation up to 2 hrs before</p>
                 <button onClick={handleConfirmBooking} disabled={creating}
-                  className="w-full h-12 rounded-2xl font-black text-sm uppercase tracking-wider text-[#1A0F1E]"
-                  style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)", boxShadow: "0 0 30px rgba(200,149,108,0.3)" }}>
-                  {creating ? "Booking..." : "Confirm Booking ✓"}
+                  className="w-full py-3.5 rounded-md font-bold text-sm text-white shadow-md transition-all"
+                  style={{ background: "linear-gradient(to right, #9e5d41, #854931)" }}>
+                  {creating ? "Booking..." : "Confirm Booking"}
                 </button>
               </motion.div>
             )}
             {step === "done" && (
-              <motion.div key="done" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-6">
+              <motion.div key="done" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-8">
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className="h-20 w-20 rounded-full flex items-center justify-center mb-4"
-                  style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)", boxShadow: "0 0 40px rgba(200,149,108,0.4)" }}>
-                  <CheckCircle2 className="h-10 w-10 text-white" />
+                  className="h-20 w-20 rounded-full flex items-center justify-center mb-6 bg-[#FDF6F0] shadow-md border border-[#e8cdb9]">
+                  <CheckCircle2 className="h-10 w-10 text-[#9e5d41]" />
                 </motion.div>
-                <h3 className="text-2xl font-black text-white font-editorial mb-2">Booking Confirmed!</h3>
-                <p className="text-sm mb-6" style={{ color: "rgba(253,246,238,0.55)" }}>
-                  {service.name} at {shop.name}<br />
+                <h3 className="text-3xl font-bold text-[#3c2a23] mb-2" style={{ fontFamily: "'Cormorant Garamond', serif" }}>Booking Confirmed!</h3>
+                <p className="text-sm mb-8 text-[#8e5238] leading-relaxed">
+                  <span className="font-bold">{service.name}</span> at {shop.name}<br />
                   {DATES.find(d => d.full === selectedDate)?.date} · {selectedTime ? new Date(selectedTime.startTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }) : ""}
                 </p>
                 <button onClick={() => { onClose(); router.push("/glow/dashboard"); }}
-                  className="px-8 py-3 rounded-2xl font-black text-sm uppercase tracking-wider text-[#1A0F1E]"
-                  style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)" }}>Go to Dashboard</button>
+                  className="px-8 py-3 rounded-md font-bold text-sm text-white shadow-md transition-all"
+                  style={{ background: "linear-gradient(to right, #9e5d41, #854931)" }}>Go to Dashboard</button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -223,6 +218,7 @@ function BookingPanel({ shop, service, barbers, onClose }: { shop: ShopSearchRes
 
 export default function SalonDetailPage() {
   const { id } = useParams() as { id: string };
+  const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [activeTab, setActiveTab] = useState<"services" | "staff" | "reviews">("services");
   const [shop, setShop] = useState<ShopSearchResponse | null>(null);
@@ -240,205 +236,163 @@ export default function SalonDetailPage() {
     ]).finally(() => setLoading(false));
   }, [id]);
 
-  const svcGradients = [
-    ["rgba(200,149,108,0.12)", "rgba(200,149,108,0.06)"],
-    ["rgba(232,121,249,0.1)",  "rgba(232,121,249,0.05)"],
-    ["rgba(244,63,94,0.1)",   "rgba(244,63,94,0.05)"],
-    ["rgba(124,185,154,0.1)", "rgba(124,185,154,0.05)"],
-    ["rgba(129,140,248,0.1)", "rgba(129,140,248,0.05)"],
-    ["rgba(255,215,0,0.1)",   "rgba(255,215,0,0.05)"],
-  ];
-  const svcAccents = ["#C8956C","#E879F9","#F43F5E","#7CB99A","#818CF8","#FFD700"];
-
   if (loading || !shop) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-16 w-16 rounded-3xl flex items-center justify-center animate-pulse"
-            style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)", boxShadow: "0 0 40px rgba(200,149,108,0.4)" }}>
-            <Sparkles className="h-8 w-8 text-white" />
+      <div className="min-h-screen bg-transparent flex items-center justify-center p-4">
+        <div className="flex flex-col items-center gap-4 bg-white p-12 rounded-2xl shadow-xl">
+          <div className="h-16 w-16 rounded-full flex items-center justify-center animate-pulse bg-[#FDF6F0]">
+            <Sparkles className="h-8 w-8 text-[#9e5d41]" />
           </div>
-          <p className="text-sm font-black uppercase tracking-widest animate-pulse" style={{ color: "rgba(200,149,108,0.6)" }}>Loading Salon…</p>
+          <p className="text-sm font-bold text-[#8e5238] animate-pulse">Loading Salon...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen">
-      {/* ── HERO BANNER ── */}
-      <div className="relative h-72 md:h-96 overflow-hidden">
-        {/* Layered gradient background */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, #2D1020 0%, #1A0F2E 40%, #0F1A2E 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 80% 60% at 30% 40%, rgba(200,149,108,0.3), transparent 60%)" }} />
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 50% at 80% 70%, rgba(180,60,140,0.2), transparent 55%)" }} />
-        {/* Decorative glow orb */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full"
-          style={{ background: "radial-gradient(circle, rgba(200,149,108,0.15), transparent 70%)", filter: "blur(40px)" }} />
-        {/* Sparkles watermark */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-10">
-          <Sparkles className="h-48 w-48 text-white" />
-        </div>
-        {/* Pattern dots */}
-        <div className="absolute inset-0 opacity-5"
-          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
+    <div className="min-h-screen relative p-4 md:p-12 flex justify-center items-center font-sans text-[#5c443b] bg-transparent">
+      <div className="w-full max-w-[1400px] bg-white rounded-[32px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)] relative z-10 transform transition-transform hover:scale-[1.005] duration-700 flex flex-col">
+        
+        {/* ── HERO BANNER ── */}
+        <div className="relative h-72 md:h-96 overflow-hidden bg-[#FDF6F0]">
+          {/* Main Background Image - Using a generic salon/spa image from public */}
+          <Image src="/glow/spa.png" alt="Salon Header" fill className="object-cover opacity-50" />
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FDF6F0] via-transparent to-[#3c2a23]/30" />
 
-        {/* Top nav */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-5 z-10">
-          <Link href="/glow/discover"
-            className="p-2.5 rounded-xl transition-all"
-            style={{ background: "rgba(15,8,24,0.7)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.12)", color: "white" }}>
-            <ArrowLeft className="h-5 w-5" />
-          </Link>
-          <div className="flex gap-2">
-            <motion.button onClick={() => setLiked(!liked)}
-              className="p-2.5 rounded-xl transition-all"
-              style={{ background: "rgba(15,8,24,0.7)", backdropFilter: "blur(16px)", border: `1px solid ${liked ? "rgba(244,63,94,0.5)" : "rgba(255,255,255,0.12)"}` }}
-              whileTap={{ scale: 0.9 }}>
-              <Heart className={`h-5 w-5 transition-all ${liked ? "fill-rose-400 text-rose-400" : "text-white"}`} />
-            </motion.button>
-            <button className="p-2.5 rounded-xl transition-all"
-              style={{ background: "rgba(15,8,24,0.7)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.12)", color: "white" }}>
-              <Share2 className="h-5 w-5" />
+          {/* Top nav */}
+          <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-6 z-10">
+            <button onClick={() => router.back()}
+              className="p-3 rounded-xl transition-all bg-white/90 backdrop-blur-md border border-white/50 text-[#8e5238] shadow-sm hover:bg-white cursor-pointer">
+              <ArrowLeft className="h-5 w-5" />
             </button>
+            <div className="flex gap-3">
+              <button onClick={() => setLiked(!liked)}
+                className="p-3 rounded-xl transition-all bg-white/90 backdrop-blur-md border border-white/50 shadow-sm hover:bg-white">
+                <Heart className={`h-5 w-5 transition-all ${liked ? "fill-rose-500 text-rose-500" : "text-[#8e5238]"}`} />
+              </button>
+              <button className="p-3 rounded-xl transition-all bg-white/90 backdrop-blur-md border border-white/50 text-[#8e5238] shadow-sm hover:bg-white">
+                <Share2 className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Info card emerging from bottom */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <div className="rounded-t-[2rem] relative overflow-hidden"
-            style={{ background: "rgba(12,6,20,0.97)", backdropFilter: "blur(30px)", borderTop: "1px solid rgba(200,149,108,0.2)" }}>
-            {/* Shimmer top edge */}
-            <div className="absolute top-0 inset-x-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(200,149,108,0.6), transparent)" }} />
-            <div className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <p className="text-[10px] uppercase tracking-[0.35em] mb-1.5 font-black" style={{ color: "rgba(200,149,108,0.6)" }}>
-                    {shop.description || "Premium Beauty Salon"}
-                  </p>
-                  <h1 className="text-2xl font-black text-white font-editorial leading-tight">{shop.name}</h1>
-                </div>
-                <div className="flex flex-col items-end shrink-0">
-                  <div className="flex items-center gap-1 px-2 py-1 rounded-xl"
-                    style={{ background: "rgba(255,215,0,0.12)", border: "1px solid rgba(255,215,0,0.2)" }}>
-                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    <span className="font-black text-sm" style={{ color: "#FFD700" }}>5.0</span>
-                  </div>
-                  <span className="text-[10px] mt-1" style={{ color: "rgba(253,246,238,0.3)" }}>0 reviews</span>
-                </div>
+          {/* Info area */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 z-10">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] mb-2 font-bold text-[#9e5d41]">
+                  {shop.description || "Premium Beauty Spa"}
+                </p>
+                <h1 className="text-4xl md:text-5xl font-bold text-[#3c2a23] drop-shadow-sm" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                  {shop.name}
+                </h1>
               </div>
-              <div className="flex flex-wrap items-center gap-3 mt-3 text-xs" style={{ color: "rgba(253,246,238,0.45)" }}>
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5" style={{ color: "#C8956C" }} /> {shop.address}, {shop.city}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" style={{ color: "#C8956C" }} /> Open until 8 PM
-                </span>
+              <div className="flex flex-col items-end shrink-0">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-md border border-[#e8cdb9]">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  <span className="font-bold text-sm text-[#3c2a23]">5.0</span>
+                </div>
+                <span className="text-xs mt-2 font-medium text-[#8e5238] bg-white/80 px-2 py-0.5 rounded">0 reviews</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── CONTENT ── */}
-      <div className="max-w-2xl mx-auto" style={{ background: "rgba(12,6,20,0.97)" }}>
-        {/* About */}
-        <p className="px-5 pt-4 pb-2 text-sm leading-relaxed" style={{ color: "rgba(253,246,238,0.5)" }}>
-          Experience world-class beauty services at <span className="font-bold" style={{ color: "#C8956C" }}>{shop.name}</span>. Our talented team is dedicated to making you look and feel your absolute best.
-        </p>
+        {/* ── CONTENT ── */}
+        <div className="bg-[#FDF6F0] p-8 border-b border-[#e8cdb9]">
+          <div className="flex flex-wrap items-center gap-6 text-sm font-semibold text-[#8e5238]">
+            <span className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-[#9e5d41]" /> {shop.address}, {shop.city}
+            </span>
+            <span className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-[#9e5d41]" /> Open until 8 PM
+            </span>
+          </div>
+          <p className="mt-4 text-[15px] leading-relaxed text-[#6d4536] max-w-3xl">
+            Experience world-class beauty services at <span className="font-bold text-[#9e5d41]">{shop.name}</span>. Our talented team is dedicated to making you look and feel your absolute best in a relaxing, luxurious environment.
+          </p>
+        </div>
 
         {/* Tabs */}
-        <div className="flex border-b px-5" style={{ borderColor: "rgba(200,149,108,0.1)" }}>
+        <div className="flex px-8 bg-white border-b border-[#f0e4db] pt-2">
           {(["services", "staff", "reviews"] as const).map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className="flex-1 py-4 text-xs font-black uppercase tracking-widest transition-all relative"
-              style={{ color: activeTab === tab ? "#C8956C" : "rgba(253,246,238,0.3)" }}>
+              className="px-6 py-4 text-sm font-bold uppercase tracking-wider transition-all relative"
+              style={{ color: activeTab === tab ? "#9e5d41" : "#b08d7e" }}>
               {tab}
               {activeTab === tab && (
-                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full"
-                  style={{ background: "linear-gradient(90deg, #C8956C, #E8B4A0)" }} />
+                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-1 rounded-t-md bg-[#9e5d41]" />
               )}
             </button>
           ))}
         </div>
 
-        <div className="p-5 pb-36">
+        <div className="p-8 pb-32 bg-white flex-1">
           <AnimatePresence mode="wait">
             {/* Services */}
             {activeTab === "services" && (
-              <motion.div key="services" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-3">
+              <motion.div key="services" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="grid md:grid-cols-2 gap-4">
                 {services.length === 0 && (
-                  <div className="text-center py-12">
-                    <Sparkles className="h-10 w-10 mx-auto mb-3" style={{ color: "rgba(200,149,108,0.25)" }} />
-                    <p className="text-sm" style={{ color: "rgba(253,246,238,0.35)" }}>No services listed yet.</p>
+                  <div className="col-span-2 text-center py-16">
+                    <Sparkles className="h-12 w-12 mx-auto mb-4 text-[#e8cdb9]" />
+                    <p className="text-[#8e5238] font-medium">No services listed yet.</p>
                   </div>
                 )}
-                {services.map((svc, i) => {
-                  const [bg1, bg2] = svcGradients[i % svcGradients.length];
-                  const accent = svcAccents[i % svcAccents.length];
-                  return (
-                    <motion.div key={svc.id}
-                      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                      whileHover={{ scale: 1.015, y: -2 }}
-                      className="flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all"
-                      style={{ background: `linear-gradient(135deg, ${bg1}, ${bg2})`, border: `1px solid ${accent}22` }}
-                      onClick={() => setSelectedService(svc)}>
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0"
-                          style={{ background: `${accent}22`, border: `1px solid ${accent}44` }}>
-                          <Sparkles className="h-4 w-4" style={{ color: accent }} />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-bold text-sm text-white">{svc.name}</p>
-                          <span className="text-xs flex items-center gap-1 mt-0.5" style={{ color: "rgba(253,246,238,0.4)" }}>
-                            <Clock className="h-3 w-3" />{svc.durationMinutes} min
-                          </span>
-                        </div>
+                {services.map((svc, i) => (
+                  <motion.div key={svc.id}
+                    initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
+                    className="flex items-center justify-between p-5 rounded-2xl cursor-pointer transition-all shadow-sm border border-[#f0e4db] bg-[#fdfaf8] hover:shadow-md hover:border-[#e8cdb9]"
+                    onClick={() => setSelectedService(svc)}>
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0 bg-[#FDF6F0] border border-[#e8cdb9] text-[#9e5d41]">
+                        🌸
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="font-black text-sm" style={{ color: accent }}>{svc.basePrice.toLocaleString()} ETB</span>
-                        <div className="h-7 w-7 rounded-lg flex items-center justify-center" style={{ background: `${accent}22` }}>
-                          <ChevronRight className="h-3.5 w-3.5" style={{ color: accent }} />
-                        </div>
+                      <div>
+                        <p className="font-bold text-[#3c2a23]">{svc.name}</p>
+                        <span className="text-xs flex items-center gap-1.5 mt-1 text-[#8e5238] font-medium">
+                          <Clock className="h-3.5 w-3.5" />{svc.durationMinutes} min
+                        </span>
                       </div>
-                    </motion.div>
-                  );
-                })}
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <span className="font-bold text-lg text-[#9e5d41]">${svc.basePrice.toLocaleString()}</span>
+                      <div className="flex items-center text-[10px] font-bold uppercase tracking-wider text-[#8e5238]">
+                        Book <ChevronRight className="h-3 w-3 ml-0.5" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </motion.div>
             )}
 
             {/* Staff */}
             {activeTab === "staff" && (
-              <motion.div key="staff" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-3">
+              <motion.div key="staff" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="grid md:grid-cols-2 gap-4">
                 {barbers.length === 0 && (
-                  <div className="text-center py-12">
-                    <User className="h-10 w-10 mx-auto mb-3" style={{ color: "rgba(200,149,108,0.25)" }} />
-                    <p className="text-sm" style={{ color: "rgba(253,246,238,0.35)" }}>No staff listed yet.</p>
+                  <div className="col-span-2 text-center py-16">
+                    <User className="h-12 w-12 mx-auto mb-4 text-[#e8cdb9]" />
+                    <p className="text-[#8e5238] font-medium">No staff listed yet.</p>
                   </div>
                 )}
                 {barbers.map((st, i) => (
                   <motion.div key={st.id}
                     initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
-                    className="flex items-center gap-4 p-4 rounded-2xl"
-                    style={{ background: "rgba(253,246,238,0.03)", border: "1px solid rgba(200,149,108,0.12)" }}>
+                    className="flex items-center gap-5 p-5 rounded-2xl border border-[#f0e4db] bg-white shadow-sm">
                     <div className="relative shrink-0">
-                      <div className="h-14 w-14 rounded-2xl flex items-center justify-center font-black text-[#1A0F1E] text-sm"
-                        style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)", boxShadow: "0 0 20px rgba(200,149,108,0.3)" }}>
+                      <div className="h-16 w-16 rounded-full flex items-center justify-center font-bold text-white text-lg bg-[#8e5238] shadow-inner">
                         {st.firstName[0]}{st.lastName[0]}
                       </div>
-                      <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 bg-emerald-400"
-                        style={{ borderColor: "rgba(12,6,20,1)" }} />
+                      <div className="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500" />
                     </div>
                     <div className="flex-1">
-                      <p className="font-bold text-white">{st.firstName} {st.lastName}</p>
-                      <p className="text-xs mt-0.5" style={{ color: "rgba(253,246,238,0.45)" }}>{st.specialty || "Beauty Specialist"}</p>
+                      <p className="font-bold text-lg text-[#3c2a23]">{st.firstName} {st.lastName}</p>
+                      <p className="text-sm mt-0.5 text-[#8e5238]">{st.specialty || "Beauty Specialist"}</p>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="flex items-center gap-1 px-2 py-1 rounded-lg"
-                        style={{ background: "rgba(255,215,0,0.1)", border: "1px solid rgba(255,215,0,0.2)" }}>
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-black" style={{ color: "#FFD700" }}>{st.averageRating.toFixed(1)}</span>
-                      </div>
+                    <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#FDF6F0] border border-[#e8cdb9]">
+                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                      <span className="text-sm font-bold text-[#3c2a23]">{st.averageRating.toFixed(1)}</span>
                     </div>
                   </motion.div>
                 ))}
@@ -447,59 +401,54 @@ export default function SalonDetailPage() {
 
             {/* Reviews */}
             {activeTab === "reviews" && (
-              <motion.div key="reviews" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-3">
+              <motion.div key="reviews" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="grid md:grid-cols-2 gap-6">
                 {REVIEWS_MOCK.map((rv, i) => (
                   <motion.div key={i}
                     initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
-                    className="p-5 rounded-2xl relative overflow-hidden"
-                    style={{ background: "rgba(253,246,238,0.03)", border: "1px solid rgba(200,149,108,0.12)" }}>
-                    <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(200,149,108,0.3), transparent)" }} />
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="h-9 w-9 rounded-xl flex items-center justify-center font-black text-[#1A0F1E] text-xs"
-                          style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)" }}>
+                    className="p-6 rounded-2xl bg-[#FDF6F0] border border-[#e8cdb9]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-white text-sm bg-[#9e5d41]">
                           {rv.name.split(" ").map(n => n[0]).join("")}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-white">{rv.name}</p>
-                          <div className="flex gap-0.5 mt-0.5">
+                          <p className="font-bold text-[#3c2a23]">{rv.name}</p>
+                          <div className="flex gap-0.5 mt-1">
                             {Array.from({ length: rv.rating }).map((_, j) => (
-                              <Star key={j} className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                              <Star key={j} className="h-3 w-3 fill-[#e5a02e] text-[#e5a02e]" />
                             ))}
                           </div>
                         </div>
                       </div>
-                      <span className="text-[10px] font-semibold" style={{ color: "rgba(253,246,238,0.3)" }}>{rv.date}</span>
+                      <span className="text-xs font-semibold text-[#b08d7e]">{rv.date}</span>
                     </div>
-                    <p className="text-sm leading-relaxed italic" style={{ color: "rgba(253,246,238,0.6)" }}>“{rv.text}”</p>
+                    <p className="text-[15px] leading-relaxed text-[#6d4536] italic">"{rv.text}"</p>
                   </motion.div>
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-      </div>
 
-      {/* ── STICKY BOOKING CTA ── */}
-      <div className="fixed bottom-0 left-0 right-0 relative overflow-hidden"
-        style={{ background: "rgba(10,5,18,0.97)", backdropFilter: "blur(24px)", borderTop: "1px solid rgba(200,149,108,0.15)" }}>
-        <div className="absolute top-0 inset-x-0 h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(200,149,108,0.5), transparent)" }} />
-        <div className="max-w-2xl mx-auto flex items-center gap-4 p-4">
-          <div>
-            <p className="text-[10px] uppercase tracking-widest font-black" style={{ color: "rgba(253,246,238,0.35)" }}>Starting from</p>
-            <p className="text-xl font-black font-editorial" style={{ color: "#C8956C" }}>
-              {services.length > 0 ? Math.min(...services.map(s => s.basePrice)).toLocaleString() : 0} ETB
-            </p>
+        {/* ── STICKY BOOKING CTA ── */}
+        <div className="sticky bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#f0e4db] shadow-[0_-10px_40px_rgba(142,82,56,0.05)]">
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-6 p-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-[#b08d7e] mb-1">Starting from</p>
+              <p className="text-2xl font-bold text-[#3c2a23]" style={{ fontFamily: "'Cormorant Garamond', serif" }}>
+                ${services.length > 0 ? Math.min(...services.map(s => s.basePrice)).toLocaleString() : 0}
+              </p>
+            </div>
+            <motion.button
+              onClick={() => { if (services.length > 0) setSelectedService(services[0]); }}
+              className="px-10 py-4 rounded-md font-bold text-[15px] text-white shadow-lg flex items-center gap-2"
+              style={{ background: "linear-gradient(to right, #9e5d41, #854931)" }}
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              Book Appointment <ChevronRight className="h-5 w-5" />
+            </motion.button>
           </div>
-          <motion.button
-            onClick={() => { if (services.length > 0) setSelectedService(services[0]); }}
-            className="relative flex-1 h-13 py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-[#1A0F1E] overflow-hidden"
-            style={{ background: "linear-gradient(135deg,#C8956C,#E8B4A0)", boxShadow: "0 0 30px rgba(200,149,108,0.35), 0 4px 20px rgba(200,149,108,0.25)" }}
-            whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <div className="absolute inset-0 shimmer-overlay" />
-            Book a Service
-          </motion.button>
         </div>
+
       </div>
 
       <AnimatePresence>

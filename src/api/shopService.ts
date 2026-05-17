@@ -20,12 +20,12 @@ export type Shop = {
 export const shopService = {
   /** Fetch all active shops (paginated) */
   list: (page = 0, size = 20) =>
-    unwrap<PageResponse<Shop>>(http.get(`/shops?page=${page}&size=${size}`)),
+    unwrap<PageResponse<Shop>>(http.get(`/shops?page=${page}&size=${size}&platform=TRIMLINK`)),
 
   /** Search shops by name, city, or address keyword */
   search: (q: string, page = 0, size = 10) =>
     unwrap<PageResponse<Shop>>(
-      http.get(`/shops?q=${encodeURIComponent(q)}&page=${page}&size=${size}`)
+      http.get(`/shops?q=${encodeURIComponent(q)}&page=${page}&size=${size}&platform=TRIMLINK`)
     ),
 
   /** Get a single shop by ID */

@@ -57,7 +57,7 @@ export const authService = {
 
   registerShop: async (payload: ShopRegistrationPayload) => {
     const data = await unwrap<AuthApiPayload>(
-      http.post("/auth/register/shop", payload)
+      http.post("/auth/register/shop", { ...payload, platform: "TRIMLINK" })
     );
     return data;
   },
