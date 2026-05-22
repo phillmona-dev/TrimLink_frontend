@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { bookingService } from "@/api/bookingService";
 import { barberService } from "@/api/barberService";
+import { ownerService } from "@/api/ownerService";
 import { http } from "@/api/http";
 import { Button } from "@/components/common/button";
 import { Card } from "@/components/common/card";
@@ -18,11 +19,16 @@ import {
   ChevronRight,
   CheckCircle2,
   CalendarCheck,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  X,
+  Image as ImageIcon,
+  Loader2
 } from "lucide-react";
 import { formatCurrency, formatEthiopianTime } from "@/utils/format";
 import { motion, AnimatePresence } from "framer-motion";
 import { EthDateTime } from 'ethiopian-calendar-date-converter';
+import { formatImageUrl } from "@/utils/constants";
 
 export function BookingFlowPage() {
   const searchParams = useSearchParams();
@@ -31,6 +37,11 @@ export function BookingFlowPage() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Style reference states
+  const [styleReferenceUrl, setStyleReferenceUrl] = useState("");
+  const [isUploadingStyle, setIsUploadingStyle] = useState(false);
+  const [styleSelectionSource, setStyleSelectionSource] = useState<"library" | "custom" | null>(null);
 
   const availableDates = Array.from({ length: 14 }).map((_, i) => {
     const d = new Date();
@@ -70,6 +81,16 @@ export function BookingFlowPage() {
     queryFn: () => barberService.getService(serviceId!),
     enabled: !!serviceId
   });
+
+  // Fetch barber service assignments to extract linked hairstyles
+  const { data: assignments } = useQuery({
+    queryKey: ["barber-assignments", barberId],
+    queryFn: () => ownerService.getBarberServices(barberId!),
+    enabled: !!barberId
+  });
+
+  const selectedAssignment = assignments?.find((a: any) => a.serviceId === serviceId);
+  const linkedStyles = selectedAssignment?.styleImageUrls || [];
 
   // Fetch Slots
   const { data: slots, isLoading: isLoadingSlots, error: slotsError } = useQuery({
@@ -126,9 +147,37 @@ export function BookingFlowPage() {
       shopId,
       serviceId,
       scheduledStart: selectedSlot,
-      notes: "",
-      receiptImageUrl: receiptImageUrl
+      notes: styleSelectionSource === "custom"
+        ? "Custom hairstyle reference attached by client."
+        : styleSelectionSource === "library"
+          ? "Hairstyle selected from library."
+          : "",
+      receiptImageUrl: receiptImageUrl,
+      styleReferenceUrl: styleReferenceUrl
     });
+  };
+
+  const handleStyleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingStyle(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await http.post("/uploads/receipt", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+
+      setStyleReferenceUrl(data.data.url);
+      setStyleSelectionSource("custom");
+    } catch (err) {
+      console.error("Style upload error:", err);
+      alert("Failed to upload style reference. Please try again.");
+    } finally {
+      setIsUploadingStyle(false);
+    }
   };
 
   const [receiptImageUrl, setReceiptImageUrl] = useState("");
@@ -280,6 +329,111 @@ export function BookingFlowPage() {
                 </div>
               )}
             </Card>
+
+            {/* HAIRSTYLE INSPIRATION / ATTACHMENT SECTION */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Scissors className="w-5 h-5 text-orange-400" />
+                <h3 className="text-lg font-black text-white">Select Hairstyle Reference (Optional)</h3>
+              </div>
+              <p className="text-xs text-white/40">
+                Choose a style from the barber's portfolio or upload your own to show the barber exactly what you want.
+              </p>
+
+              {/* Selection preview */}
+              {styleReferenceUrl && (
+                <div className="relative group rounded-3xl overflow-hidden aspect-[4/3] w-full max-w-[320px] bg-black/40 border border-orange-500/20 shadow-xl shadow-orange-500/5 mx-auto">
+                  <img 
+                    src={formatImageUrl(styleReferenceUrl)} 
+                    alt="Selected Style Reference" 
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center gap-2">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-orange-400 bg-orange-500/10 px-3 py-1 rounded-full">
+                      {styleSelectionSource === "custom" ? "Custom Reference Loaded" : "Barber Catalog Style"}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 h-9 px-4 rounded-xl text-xs font-bold"
+                      onClick={() => {
+                        setStyleReferenceUrl("");
+                        setStyleSelectionSource(null);
+                      }}
+                    >
+                      <X className="w-3.5 h-3.5 mr-1" />
+                      Clear Selection
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Options list */}
+              {!styleReferenceUrl && (
+                <div className="space-y-4">
+                  {/* Barber linked styles list */}
+                  {linkedStyles.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-white/30 px-1">Barber's Style Catalog</p>
+                      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin">
+                        {linkedStyles.map((url: string, index: number) => (
+                          <div 
+                            key={index}
+                            onClick={() => {
+                              setStyleReferenceUrl(url);
+                              setStyleSelectionSource("library");
+                            }}
+                            className="relative shrink-0 w-28 h-28 rounded-2xl bg-black/40 border border-white/5 overflow-hidden cursor-pointer hover:border-orange-500/50 hover:scale-102 transition-all active:scale-98"
+                          >
+                            <img 
+                              src={formatImageUrl(url)} 
+                              alt={`Catalog style ${index + 1}`} 
+                              className="w-full h-full object-cover" 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Custom upload container */}
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-white/30 px-1">Upload Your Own Image</p>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      id="custom-style-upload"
+                      className="hidden"
+                      onChange={handleStyleFileChange}
+                      disabled={isUploadingStyle}
+                    />
+                    <label 
+                      htmlFor="custom-style-upload"
+                      className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-[2rem] transition-all cursor-pointer ${
+                        isUploadingStyle
+                          ? "border-orange-500/30 bg-orange-500/5"
+                          : "border-white/10 bg-white/5 hover:border-orange-500/50 hover:bg-orange-500/5"
+                      }`}
+                    >
+                      {isUploadingStyle ? (
+                        <div className="flex flex-col items-center gap-2">
+                          <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
+                          <span className="text-[10px] font-black uppercase tracking-wider text-orange-400">Uploading style...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <Upload className="w-5 h-5 text-white/30 mb-2" />
+                          <span className="text-xs font-bold text-white/60 text-center">Click to select a hairstyle photo</span>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="pt-2"></div>
             
             <Button 
               className="w-full h-14 bg-orange-500 hover:bg-orange-400 text-black font-black rounded-2xl shadow-xl shadow-orange-500/20 disabled:opacity-50 disabled:grayscale transition-all active:scale-[0.98]"
@@ -326,8 +480,12 @@ export function BookingFlowPage() {
               </div>
 
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40">
-                  <User className="h-6 w-6" />
+                <div className="h-12 w-12 rounded-2xl overflow-hidden bg-white/5 flex items-center justify-center border border-white/5">
+                  {barber?.user?.avatarUrl ? (
+                    <img src={formatImageUrl(barber.user.avatarUrl)} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <User className="h-6 w-6 text-white/40" />
+                  )}
                 </div>
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Barber</p>
@@ -352,6 +510,20 @@ export function BookingFlowPage() {
                   </div>
                 </div>
               </div>
+
+              {styleReferenceUrl && (
+                <div className="flex items-center gap-4 border-t border-white/5 pt-4">
+                  <div className="h-12 w-12 rounded-2xl overflow-hidden bg-white/5 border border-white/5 flex items-center justify-center">
+                    <img src={formatImageUrl(styleReferenceUrl)} alt="Style attachment" className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Hairstyle Attachment</p>
+                    <p className="font-bold text-white">
+                      {styleSelectionSource === "custom" ? "Custom Reference Image" : "Barber Catalog Hairstyle"}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               <div className="pt-4 border-t border-white/5 space-y-3">
                 <div className="flex justify-between items-center text-sm">
@@ -492,7 +664,7 @@ export function BookingFlowPage() {
                             <div className="space-y-4">
                               <div className="relative group w-full">
                                 <img 
-                                  src={receiptImageUrl} 
+                                  src={formatImageUrl(receiptImageUrl)} 
                                   alt="Receipt Preview" 
                                   className="w-full h-48 object-cover rounded-[2rem] border-2 border-green-500/30 shadow-2xl shadow-green-500/10"
                                 />

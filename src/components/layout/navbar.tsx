@@ -3,7 +3,7 @@
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Scissors } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/common/button";
 import { ThemeToggle } from "@/components/common/theme-toggle";
@@ -16,7 +16,8 @@ const navItems = [
   { label: "Benefits", href: "#features" },
   { label: "How it works", href: "#how-it-works" },
   { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" }
+  { label: "FAQ", href: "#faq" },
+  { label: "Styles Library", href: "/styles-library" }
 ];
 
 export function Navbar() {
@@ -35,15 +36,26 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-10 lg:flex absolute left-1/2 -translate-x-1/2">
-          {navItems.map((item) => (
-            <a
-              className="text-sm font-medium text-white/80 transition hover:text-white"
-              href={item.href}
-              key={item.label}
-            >
-              {item.label}
-            </a>
-          ))}
+          {navItems.map((item) =>
+            item.href.startsWith("/") ? (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="text-sm font-bold text-orange-400 border border-orange-400/30 bg-orange-500/10 hover:bg-orange-500/20 px-4 py-1.5 rounded-full transition-all flex items-center gap-1.5"
+              >
+                <Scissors className="h-3.5 w-3.5" />
+                {item.label}
+              </Link>
+            ) : (
+              <a
+                className="text-sm font-medium text-white/80 transition hover:text-white"
+                href={item.href}
+                key={item.label}
+              >
+                {item.label}
+              </a>
+            )
+          )}
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">

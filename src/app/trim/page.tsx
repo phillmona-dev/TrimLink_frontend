@@ -1,10 +1,12 @@
-import { PublicLayout } from "@/layouts/public-layout";
+"use client";
+
+import { Providers } from "@/app/providers";
 import { LandingPage } from "@/views/public/landing-page";
 
 export default function TrimHomePage() {
   return (
-    <PublicLayout>
+    <Providers>
       <LandingPage />
-    </PublicLayout>
+    </Providers>
   );
 }

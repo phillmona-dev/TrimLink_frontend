@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,8 @@ type FormValues = z.infer<typeof schema>;
 
 export function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get("redirect");
   const [serverMessage, setServerMessage] = useState<{ text: string, type: 'success' | 'error' | 'info' } | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
@@ -57,7 +59,7 @@ export function LoginPage() {
       setServerMessage({ text: "Login successful! Redirecting...", type: 'success' });
 
       // Redirect based on role using the canonical role→path map
-      const destination = dashboardRoleMap[auth.role as keyof typeof dashboardRoleMap] ?? "/app";
+      const destination = redirectUrl || (dashboardRoleMap[auth.role as keyof typeof dashboardRoleMap] ?? "/app");
       router.push(destination);
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Failed to login";

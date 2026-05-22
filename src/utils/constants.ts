@@ -23,3 +23,14 @@ export const dashboardRoleMap = {
   OWNER: "/owner",
   ADMIN: "/admin"
 } as const;
+
+export function formatImageUrl(url?: string | null): string {
+  if (!url) return "";
+  if (url.startsWith("/")) {
+    return `${API_BASE_URL}${url}`;
+  }
+  if (url.includes("localhost:9090/api/v1") || url.includes("127.0.0.1:9090/api/v1")) {
+    return url.replace(/https?:\/\/(localhost|127\.0\.0\.1):9090\/api\/v1/, API_BASE_URL);
+  }
+  return url;
+}

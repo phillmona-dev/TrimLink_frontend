@@ -23,6 +23,7 @@ import { Badge } from "@/components/common/badge";
 import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
+import { formatImageUrl } from "@/utils/constants";
 
 function ShopCard({ shop, onSelect }: { shop: Shop; onSelect: () => void }) {
   return (
@@ -191,30 +192,77 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
 
           {/* Barbers */}
           <div>
-            <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Barbers</h3>
-            <div className="space-y-2">
+            <h3 className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] mb-3">Barbers & Services</h3>
+            <div className="space-y-3">
               {isBarbersLoading
                 ? [1, 2].map((i: number) => <div key={i} className="h-16 bg-white/5 animate-pulse rounded-2xl" />)
                 : shopBarbers && shopBarbers.length > 0
                 ? shopBarbers.map((barber: any) => (
                     <div
                       key={barber.id}
-                      className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex items-center gap-4"
+                      className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex flex-col gap-3"
                     >
-                      <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center border border-white/5">
-                        <User className="h-5 w-5 text-white/20" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-bold text-white truncate">
-                          {barber.user?.firstName} {barber.user?.lastName}
-                        </h4>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Star size={10} className="text-orange-400 fill-orange-400" />
-                          <span className="text-[10px] text-white/30">
-                            {barber.averageRating?.toFixed(1)} Rating
-                          </span>
+                      <div className="flex items-center gap-4">
+                        <div className="h-10 w-10 rounded-xl overflow-hidden bg-zinc-800 flex items-center justify-center border border-white/5">
+                          {barber.user?.avatarUrl ? (
+                            <img src={formatImageUrl(barber.user.avatarUrl)} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <User className="h-5 w-5 text-white/20" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-bold text-white truncate">
+                            {barber.user?.firstName} {barber.user?.lastName}
+                          </h4>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Star size={10} className="text-orange-400 fill-orange-400" />
+                            <span className="text-[10px] text-white/30">
+                              {barber.averageRating?.toFixed(1)} Rating
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Services for this barber */}
+                      {barber.serviceAssignments && barber.serviceAssignments.length > 0 ? (
+                        <div className="space-y-1.5 pt-2 border-t border-white/5">
+                          {barber.serviceAssignments.map((assignment: any) => (
+                            <div
+                              key={assignment.id}
+                              className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/[0.02] border border-white/5 hover:border-orange-500/30 transition-all"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-white text-xs truncate">{assignment.serviceName}</p>
+                                <p className="text-[10px] text-orange-400/70 font-bold mt-0.5">{assignment.durationMinutes}min</p>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <span className="text-xs font-black text-white whitespace-nowrap">
+                                  ETB {assignment.effectivePrice}
+                                </span>
+                                {isAuthenticated ? (
+                                  <Link
+                                    href={`/app/booking?shopId=${shopId}&barberId=${barber.id}&serviceId=${assignment.serviceId}`}
+                                  >
+                                    <button className="px-2.5 py-1 bg-orange-500 hover:bg-orange-400 text-black font-black text-[9px] rounded-lg transition-all">
+                                      BOOK
+                                    </button>
+                                  </Link>
+                                ) : (
+                                  <Link
+                                    href={`/auth/login?redirect=/app/booking?shopId=${shopId}%26barberId=${barber.id}%26serviceId=${assignment.serviceId}`}
+                                  >
+                                    <button className="px-2.5 py-1 bg-orange-500 hover:bg-orange-400 text-black font-black text-[9px] rounded-lg transition-all">
+                                      BOOK
+                                    </button>
+                                  </Link>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-[10px] text-white/30 italic">No services assigned yet.</p>
+                      )}
                     </div>
                   ))
                 : (
@@ -233,7 +281,7 @@ function ShopDetailModal({ shopId, onClose }: { shopId: string; onClose: () => v
               </Button>
             </Link>
           ) : (
-            <Link href="/auth/login">
+            <Link href={`/auth/login?redirect=/app/shops/${shopId}`}>
               <Button className="w-full bg-orange-500 hover:bg-orange-400 active:scale-[0.98] text-black font-black h-14 rounded-2xl shadow-xl text-base transition-all">
                 Login to Book
               </Button>
@@ -284,7 +332,7 @@ export function ShopsPage() {
     <div className="min-h-[100dvh] w-full relative overflow-hidden">
       <AnimatedBackground />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 pt-6 pb-24 sm:pt-12 sm:pb-12">
+      <div className="relative z-10 max-w-[1650px] mx-auto px-4 pt-6 pb-24 sm:pt-12 sm:pb-12">
 
         {/* Top Bar */}
         <div className="flex items-center gap-3 mb-8">

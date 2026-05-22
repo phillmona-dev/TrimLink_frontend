@@ -15,6 +15,7 @@ import { Badge } from "@/components/common/badge";
 import Link from "next/link";
 import { formatCurrency } from "@/utils/format";
 import { type Shop, type BarberProfile, type ServiceAssignment } from "@/types";
+import { formatImageUrl } from "@/utils/constants";
 
 export function ShopDetailsPage() {
   const params = useParams<{ shopId: string }>();
@@ -235,9 +236,17 @@ function BarberDetailCard({ barber, shopId }: { barber: BarberProfile; shopId: s
       {/* Barber header row — always horizontal */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative shrink-0">
-          <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-xl md:text-2xl font-black text-black">
-            {barber.user.firstName?.[0]}
-          </div>
+          {barber.user.avatarUrl ? (
+            <img 
+              src={formatImageUrl(barber.user.avatarUrl)} 
+              alt={`${barber.user.firstName} ${barber.user.lastName}`}
+              className="w-14 h-14 md:w-16 md:h-16 rounded-2xl object-cover border border-white/10"
+            />
+          ) : (
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-xl md:text-2xl font-black text-black">
+              {barber.user.firstName?.[0]}
+            </div>
+          )}
           <div
             className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[#121212] ${
               barber.available ? "bg-green-500" : "bg-red-500"

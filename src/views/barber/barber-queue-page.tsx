@@ -24,7 +24,7 @@ import {
   SelectValue 
 } from "@/components/common/select";
 import { Textarea } from "@/components/common/textarea";
-import { Search, Filter, AlertCircle, CheckCircle2, Clock, XCircle, Copy, Eye, Phone, User, CalendarDays } from "lucide-react";
+import { Search, Filter, AlertCircle, CheckCircle2, Clock, XCircle, Copy, Eye, Phone, User, CalendarDays, Scissors } from "lucide-react";
 
 import { useQuery } from "@tanstack/react-query";
 import { bookingService } from "@/api/bookingService";
@@ -127,6 +127,7 @@ export function BarberQueuePage() {
   };
 
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
+  const [selectedStyleUrl, setSelectedStyleUrl] = useState<string | null>(null);
 
   return (
     <div className="space-y-6">
@@ -229,6 +230,12 @@ export function BarberQueuePage() {
                       Payment Proof
                     </div>
                   )}
+                  {booking.styleReferenceUrl && (
+                    <div className="flex items-center gap-1.5 text-purple-400 bg-purple-400/10 w-fit px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-widest mt-2 border border-purple-400/20">
+                      <Scissors className="w-2.5 h-2.5" />
+                      Style Ref Attached
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2 w-full lg:w-auto">
                   <Button onClick={() => setSelectedDetailBooking(booking)} variant="outline" className="h-9 text-xs rounded-xl border-white/10 text-white hover:bg-white/10 flex-1 lg:flex-none font-bold">
@@ -238,6 +245,12 @@ export function BarberQueuePage() {
                   {booking.receiptImageUrl && (
                     <Button onClick={() => setSelectedReceipt(booking.receiptImageUrl)} variant="outline" className="h-9 text-xs rounded-xl border-white/10 text-white hover:bg-white/10 flex-1 lg:flex-none font-bold">
                       View Receipt
+                    </Button>
+                  )}
+                  {booking.styleReferenceUrl && (
+                    <Button onClick={() => setSelectedStyleUrl(booking.styleReferenceUrl)} variant="outline" className="h-9 text-xs rounded-xl border-purple-500/30 text-purple-400 hover:bg-purple-500/10 flex-1 lg:flex-none font-bold">
+                      <Scissors className="w-3.5 h-3.5 mr-1.5" />
+                      View Style
                     </Button>
                   )}
                   {booking.status === "PENDING" && (
@@ -337,6 +350,35 @@ export function BarberQueuePage() {
         </div>
       )}
 
+      {/* Style Reference Preview Modal */}
+      {selectedStyleUrl && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+          onClick={() => setSelectedStyleUrl(null)}
+        >
+          <div className="relative max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={() => setSelectedStyleUrl(null)}
+              className="absolute -top-5 -right-2 w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center hover:bg-purple-400 transition-all shadow-2xl z-[110]"
+              aria-label="Close"
+            >
+              <XCircle className="w-6 h-6" />
+            </button>
+            <div className="bg-white/5 border border-purple-500/20 p-4 rounded-[2.5rem]">
+              <img 
+                src={selectedStyleUrl} 
+                alt="Client's Requested Style" 
+                className="w-full h-auto rounded-[2rem] shadow-2xl"
+              />
+              <div className="mt-4 text-center flex items-center justify-center gap-2">
+                <Scissors className="w-4 h-4 text-purple-400" />
+                <p className="text-white/40 text-xs font-bold uppercase tracking-widest">Client's Requested Hairstyle Reference</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Detail Modal */}
       <Dialog open={!!selectedDetailBooking} onOpenChange={(open) => !open && setSelectedDetailBooking(null)}>
         <DialogContent className="bg-ink-950 border-white/10 text-white rounded-[2rem] sm:max-w-[500px]">
@@ -393,6 +435,29 @@ export function BarberQueuePage() {
                 <div className="p-4 bg-white/[0.02] border border-white/5 rounded-2xl space-y-1">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Customer Notes</p>
                   <p className="text-sm text-white/70 italic">"{selectedDetailBooking.notes}"</p>
+                </div>
+              )}
+
+              {selectedDetailBooking.styleReferenceUrl && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-purple-400/70 flex items-center gap-1.5">
+                    <Scissors className="w-3 h-3" /> Client's Requested Hairstyle
+                  </p>
+                  <div 
+                    className="relative group overflow-hidden rounded-2xl border border-purple-500/20 cursor-pointer"
+                    onClick={() => setSelectedStyleUrl(selectedDetailBooking.styleReferenceUrl)}
+                  >
+                    <img 
+                      src={selectedDetailBooking.styleReferenceUrl} 
+                      alt="Client Style Reference" 
+                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-3">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">
+                        Click to expand
+                      </span>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

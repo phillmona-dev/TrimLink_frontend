@@ -6,6 +6,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen">
       <NetworkBanner />
+      <Navbar />
       <main>{children}</main>
     </div>
   );

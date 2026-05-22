@@ -58,6 +58,7 @@ export function Sidebar() {
               { to: "/app", label: "Home", icon: Home },
               { to: "/app/appointments", label: "Appointments", icon: CalendarCheck },
               { to: "/app/queue", label: "Queue", icon: Clock },
+              { to: "/styles-library", label: "Styles", icon: Scissors },
               { to: "/app/profile", label: "Profile", icon: Settings }
             ];
 

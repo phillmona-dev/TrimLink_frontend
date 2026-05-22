@@ -10,6 +10,7 @@ export const bookingService = {
     scheduledStart: string;
     notes?: string;
     receiptImageUrl?: string;
+    styleReferenceUrl?: string;
   }) => unwrap<Appointment>(http.post("/bookings", payload)),
 
   getMine: (page = 0, query = "", since = "") => {

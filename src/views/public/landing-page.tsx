@@ -3,46 +3,37 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { shopService } from "@/api/shopService";
+import { barberService } from "@/api/barberService";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Bell,
-  CalendarDays,
-  Clock,
-  Heart,
-  Home,
-  MapPin,
-  Search,
-  User,
-  Scissors,
-  X,
-  Star,
-  ExternalLink,
-  LogOut,
-  Menu
+  Bell, Heart, Home, MapPin, Search, User, Scissors, X, Star,
+  ExternalLink, CalendarDays, Clock, MoreHorizontal, Ticket, MessageSquare, Repeat2, Send, Plus, SquarePen, Image, LogOut, Menu
 } from "lucide-react";
 import { Button } from "@/components/common/button";
-import { AnimatedIcon } from "@/components/common/animated-icon";
-import { AnimatedBackground } from "@/components/common/animated-background";
 import { useAuth } from "@/hooks/use-auth";
-import { useChat } from "@/context/ChatContext";
 import { Marquee } from "@/components/common/marquee";
 import { HaircutCard } from "@/components/common/haircut-card";
+import { formatImageUrl } from "@/utils/constants";
 
+/* ─── Integrated Landing Page ────────────────────────────────────────── */
 export function LandingPage() {
+  const router = useRouter();
   const { isAuthenticated, role, logout } = useAuth();
-  const { openChat } = useChat();
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [selectedShopId, setSelectedShopId] = useState<string | null>(null);
-  const [zoomedImage, setZoomedImage] = useState<{ url: string, name: string } | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // States for searching barbers
+  const [barberSearchQuery, setBarberSearchQuery] = useState("");
+  const [debouncedBarberQuery, setDebouncedBarberQuery] = useState("");
 
+  useEffect(() => { setMounted(true); }, []);
+
+  // Debounced search query trigger
   useEffect(() => {
     const timer = setTimeout(() => {
       setActiveQuery(query);
@@ -50,18 +41,37 @@ export function LandingPage() {
     return () => clearTimeout(timer);
   }, [query]);
 
+  // Debounced barber search trigger
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedBarberQuery(barberSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [barberSearchQuery]);
+
+  const haircuts = [
+    { name: "Curly Top Fade", tag: "Habesha Teen", image: "/images/haircuts/habesha_cut_1.png" },
+    { name: "Textured Crop", tag: "Trending", image: "/images/haircuts/haircut1.png" },
+    { name: "Urban Taper", tag: "Teenager", image: "/images/haircuts/haircut2.png" },
+    { name: "Fresh Taper", tag: "Habesha Style", image: "/images/haircuts/habesha_cut_2.png" },
+    { name: "Sharp Fade", tag: "Modern", image: "/images/haircuts/haircut3.png" },
+    { name: "Curly Top Fade", tag: "Habesha Teen", image: "/images/haircuts/habesha_cut_3.png" },
+    { name: "Textured Crop", tag: "Trending", image: "/images/haircuts/haircut4.png" },
+    { name: "Urban Taper", tag: "Modern", image: "/images/haircuts/haircut5.png" }
+  ];
+
   const { data: searchResults, isLoading: isSearchLoading } = useQuery({
     queryKey: ["search-shops", activeQuery],
     queryFn: () => shopService.search(activeQuery),
     enabled: !!activeQuery,
   });
 
-  const { data: nearbyShops, isLoading: isNearbyLoading } = useQuery({
+  const { data: nearbyShops } = useQuery({
     queryKey: ["nearby-shops"],
-    queryFn: () => shopService.list(0, 8), // Fetch more for grid
+    queryFn: () => shopService.list(0, 8),
   });
-  
-  const { data: shopDetail, isLoading: isDetailLoading } = useQuery({
+
+  const { data: shopDetail } = useQuery({
     queryKey: ["shop-detail", selectedShopId],
     queryFn: () => shopService.getById(selectedShopId!),
     enabled: !!selectedShopId,
@@ -73,35 +83,76 @@ export function LandingPage() {
     enabled: !!selectedShopId,
   });
 
+  // Query platform barbers for "Featured Barbers" list using debounced query
+  const { data: platformBarbersResponse } = useQuery({
+    queryKey: ["featured-barbers", debouncedBarberQuery],
+    queryFn: () => barberService.listBarbers({ q: debouncedBarberQuery, size: 6 }),
+  });
+
+  const fallbackBarbers = [
+    { id: "1", user: { firstName: "Jane", lastName: "Cooper", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.9, shopId: nearbyShops?.content?.[0]?.id },
+    { id: "2", user: { firstName: "Arlene", lastName: "McCoy", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.8, shopId: nearbyShops?.content?.[0]?.id },
+    { id: "3", user: { firstName: "Cody", lastName: "Fisher", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.7, shopId: nearbyShops?.content?.[1]?.id },
+    { id: "4", user: { firstName: "Cameron", lastName: "Williamson", avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.9, shopId: nearbyShops?.content?.[1]?.id },
+    { id: "5", user: { firstName: "Arlene", lastName: "McCoy", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.6, shopId: nearbyShops?.content?.[2]?.id },
+    { id: "6", user: { firstName: "Darlene", lastName: "Robertson", avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=100" }, averageRating: 4.8, shopId: nearbyShops?.content?.[2]?.id }
+  ];
+
+  const featuredBarbers = platformBarbersResponse?.content?.length 
+    ? platformBarbersResponse.content.slice(0, 6) 
+    : fallbackBarbers;
+
   const handleOpenMap = (shop: any) => {
-    if (shop.latitude && shop.longitude) {
-      const query = encodeURIComponent(`${shop.name} ${shop.latitude},${shop.longitude}`);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+    if (shop?.latitude && shop?.longitude) {
+      const q = encodeURIComponent(`${shop.name} ${shop.latitude},${shop.longitude}`);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
     }
   };
 
   return (
-    <div className="min-h-screen w-full bg-black relative flex flex-col">
-      <AnimatedBackground />
+    <div className="min-h-screen w-full relative text-white flex flex-col overflow-x-hidden">
+      {/* Inject custom style to hide scrollbars */}
+      <style jsx global>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+
 
       {/* COMPREHENSIVE TOP NAVIGATION BAR */}
-      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/60 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl">
         <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-3 md:h-20 flex flex-wrap md:flex-nowrap items-center justify-between gap-y-3 gap-x-4">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.4)]">
-              <Scissors className="h-6 w-6 md:h-7 md:w-7 text-black" />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none">
-                Trim<span className="text-orange-500">Link</span>
-              </h1>
-              <p className="hidden md:block text-[9px] uppercase tracking-[0.4em] text-white/30 font-bold mt-1">
-                Premium Grooming
-              </p>
+          <div className="flex items-center gap-6">
+            <Link href="/trim" className="flex items-center gap-3">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(249,115,22,0.4)]">
+                <Scissors className="h-6 w-6 md:h-7 md:w-7 text-black" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none">
+                  Trim<span className="text-orange-500">Link</span>
+                </h1>
+                <p className="hidden md:block text-[9px] uppercase tracking-[0.4em] text-white/30 font-bold mt-1">
+                  Premium Grooming
+                </p>
+              </div>
+            </Link>
+
+            <div className="hidden lg:flex items-center gap-6 ml-6 border-l border-white/10 pl-6">
+              <Link href="/shops" className="text-xs font-bold uppercase tracking-wider text-white/60 hover:text-orange-500 transition-colors">
+                Explore All Shops
+              </Link>
+              <Link href="/styles-library" className="text-xs font-bold uppercase tracking-wider text-orange-400 hover:text-orange-300 transition-colors flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 px-3.5 py-1.5 rounded-full">
+                <Scissors className="w-3.5 h-3.5" />
+                Styles Library
+              </Link>
             </div>
           </div>
 
-          {/* Search Bar - Now Responsive */}
+          {/* Search Bar */}
           <div className="flex order-3 md:order-2 w-full md:flex-1 md:max-w-xl md:mx-8">
             <form 
               className="flex items-center gap-2 w-full bg-white/[0.05] border border-white/10 hover:border-white/20 rounded-full p-1 transition-all focus-within:border-orange-500/50 focus-within:bg-white/[0.08]"
@@ -130,7 +181,7 @@ export function LandingPage() {
             </form>
           </div>
 
-          {/* Actions (Auth & Menu) - Visible on all screens */}
+          {/* Actions */}
           <div className="flex items-center gap-1.5 md:gap-4 order-2 ml-auto md:ml-0">
             {mounted && isAuthenticated && (
               <button className="hidden md:block p-2.5 text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-full transition">
@@ -185,11 +236,13 @@ export function LandingPage() {
           >
             <div className="flex flex-col gap-4">
               <Link href="/" className="text-lg font-bold text-white p-2">Explore</Link>
-              <Link href="/shops" className="text-lg font-bold text-white/60 p-2">Shops</Link>
+              <Link href="/shops" className="text-lg font-bold text-white/60 p-2">Explore All Shops</Link>
+              <Link href="/styles-library" className="text-lg font-bold text-orange-400 p-2 flex items-center gap-2">
+                <Scissors className="w-5 h-5" />
+                Styles Library
+              </Link>
               {mounted && isAuthenticated ? (
-                <>
-                  <Link href="/app/appointments" className="text-lg font-bold text-white/60 p-2">Appointments</Link>
-                </>
+                <Link href="/app" className="text-lg font-bold text-white/60 p-2">Dashboard</Link>
               ) : null}
             </div>
           </motion.div>
@@ -197,41 +250,10 @@ export function LandingPage() {
       </AnimatePresence>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 relative z-10 max-w-[1600px] w-full mx-auto px-4 md:px-8 py-6 md:py-12 flex flex-col gap-8 md:gap-16">
+      <main className="flex-1 relative z-10 max-w-[1600px] w-full mx-auto px-4 md:px-8 py-6 md:py-10 flex flex-col gap-8 md:gap-12">
         
-        {/* HIGH-FIDELITY HERO SECTION */}
-        <section className="w-full h-[35vh] md:h-[55vh] min-h-[240px] md:min-h-[380px] rounded-[1.5rem] md:rounded-[3rem] overflow-hidden relative group shadow-[0_20px_60px_rgba(0,0,0,0.5)] border border-white/10">
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent z-10" />
-          <motion.div 
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center" 
-          />
-          
-          <div className="relative z-20 h-full flex flex-col justify-end p-5 md:p-14">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-[9px] font-black uppercase tracking-widest mb-3">
-                <Star className="h-2.5 w-2.5 fill-orange-400" /> Featured
-              </div>
-              <h2 className="text-2xl md:text-5xl font-black text-white mb-1 md:mb-3 tracking-tight leading-tight">
-                The Master's Touch
-              </h2>
-              <p className="hidden md:block text-base text-white/60 mb-6 max-w-sm">
-                Premium cuts. Skilled barbers. Book instantly.
-              </p>
-              <Link href="/shops">
-                <Button className="bg-orange-500 text-black hover:bg-orange-400 rounded-full px-6 md:px-10 h-9 md:h-12 text-xs md:text-sm font-black transition-all hover:scale-105 shadow-[0_10px_25px_rgba(249,115,22,0.3)]">
-                  Explore Shops
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* SEARCH RESULTS AND FEED */}
-        <section className="flex flex-col gap-8">
+        {/* SEARCH RESULTS OR SOCIAL THREADS CONTAINER */}
+        <section className="relative w-full">
           {activeQuery ? (
             <div className="bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 md:p-10">
               <div className="flex justify-between items-center mb-8">
@@ -241,7 +263,7 @@ export function LandingPage() {
 
               {isSearchLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[1, 2, 3].map((i: number) => <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />)}
+                  {[1, 2, 3].map((i) => <div key={i} className="h-40 bg-white/5 animate-pulse rounded-3xl" />)}
                 </div>
               ) : searchResults?.content && searchResults.content.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -272,74 +294,206 @@ export function LandingPage() {
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-10 md:gap-16">
+            /* Layout Container - Left Sidebar icons removed */
+            <div className="w-full max-w-[1380px] mx-auto">
               
-              {/* TRENDING TRIMS SHOWCASE */}
-              <section className="relative overflow-hidden -mx-4 md:mx-0">
-                <div className="px-4 md:px-0 mb-8 flex items-end justify-between">
-                  <div>
-                    <h3 className="text-[11px] font-black text-orange-500/60 uppercase tracking-[0.4em] mb-1">Style Showcase</h3>
-                    <h2 className="text-3xl font-bold text-white tracking-tight">Trending Trims</h2>
-                  </div>
-                </div>
+              {/* Glassmorphic Container matching mockup color combinations */}
+              <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 rounded-[2.5rem] bg-white/[0.04] backdrop-blur-[35px] border border-white/[0.08] p-6 sm:p-8 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.85)] overflow-hidden">
                 
-                <Marquee baseVelocity={-0.8}>
-                  <div className="flex gap-6 pr-6">
-                    <HaircutCard image="/images/haircuts/haircut1.png" name="Sharp Fade" tag="Modern" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut1.png", name: "Sharp Fade" })} />
-                    <HaircutCard image="/images/haircuts/habesha_cut_1.png" name="Curly Top Fade" tag="Habesha Teen" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_1.png", name: "Curly Top Fade" })} />
-                    <HaircutCard image="/images/haircuts/ext_cut_1.jpg" name="Textured Crop" tag="Trending" onClick={() => setZoomedImage({ url: "/images/haircuts/ext_cut_1.jpg", name: "Textured Crop" })} />
-                    
-                    <HaircutCard image="/images/haircuts/haircut2.png" name="Urban Taper" tag="Teenager" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut2.png", name: "Urban Taper" })} />
-                    <HaircutCard image="/images/haircuts/habesha_cut_2.png" name="Fresh Taper" tag="Habesha Style" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_2.png", name: "Fresh Taper" })} />
-                    <HaircutCard image="/images/haircuts/ext_cut_2.jpg" name="Classic Pomp" tag="Classic" onClick={() => setZoomedImage({ url: "/images/haircuts/ext_cut_2.jpg", name: "Classic Pomp" })} />
-                    
-                    <HaircutCard image="/images/haircuts/haircut3.png" name="Habesha Classic" tag="Ethiopian" onClick={() => setZoomedImage({ url: "/images/haircuts/haircut3.png", name: "Habesha Classic" })} />
-                    <HaircutCard image="/images/haircuts/habesha_cut_3.png" name="Sponge Curls" tag="Habesha Teen" onClick={() => setZoomedImage({ url: "/images/haircuts/habesha_cut_3.png", name: "Sponge Curls" })} />
-                    <HaircutCard image="/images/haircuts/ext_cut_3.jpg" name="Slick Back" tag="Elegant" onClick={() => setZoomedImage({ url: "/images/haircuts/ext_cut_3.jpg", name: "Slick Back" })} />
-                    
-                    <HaircutCard image="/images/haircuts/ext_cut_5.jpg" name="Burst Fade" tag="Modern" onClick={() => setZoomedImage({ url: "/images/haircuts/ext_cut_5.jpg", name: "Burst Fade" })} />
-                    <HaircutCard image="/images/haircuts/ext_cut_8.jpg" name="Clean Buzz" tag="Minimalist" onClick={() => setZoomedImage({ url: "/images/haircuts/ext_cut_8.jpg", name: "Clean Buzz" })} />
-                  </div>
-                </Marquee>
-              </section>
+                {/* Feed Column */}
+                <div className="lg:col-span-2 flex flex-col gap-6 max-h-[800px] overflow-y-auto pr-1 no-scrollbar">
 
-              {/* GRID LAYOUT: NEARBY SHOPS */}
-              <section>
-                <div className="mb-8 flex items-end justify-between">
-                  <div>
-                    <h3 className="text-[11px] font-black text-orange-500/60 uppercase tracking-[0.4em] mb-1">Local Excellence</h3>
-                    <h2 className="text-3xl font-bold text-white tracking-tight">Nearby Shops</h2>
-                  </div>
-                  <Link href="/shops" className="text-sm font-bold text-white/50 hover:text-white transition flex items-center gap-1">
-                    View Directory
-                  </Link>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {isNearbyLoading ? (
-                    [1, 2, 3, 4].map((i: number) => <div key={i} className="h-32 bg-white/5 animate-pulse rounded-3xl" />)
-                  ) : nearbyShops?.content && nearbyShops.content.length > 0 ? (
-                    nearbyShops.content.map((shop: any) => (
-                      <div key={shop.id} onClick={() => setSelectedShopId(shop.id)} className="flex items-center gap-4 p-5 rounded-3xl bg-white/[0.02] border border-white/5 hover:border-white/20 hover:bg-white/[0.04] transition-all cursor-pointer group">
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); handleOpenMap(shop); }}
-                          className="h-14 w-14 rounded-[1rem] bg-black/50 flex items-center justify-center shrink-0 border border-white/10 group-hover:bg-orange-500/20 group-hover:border-orange-500/30 transition shadow-inner"
-                        >
-                          <MapPin className="h-6 w-6 text-white/40 group-hover:text-orange-400 transition" />
-                        </button>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-lg font-bold text-white/90 truncate mb-1">{shop.name}</div>
-                          <div className="text-sm text-white/40 truncate">{shop.address}</div>
-                        </div>
+                  {/* Post 1: TrimLink Info Card */}
+                  <div className="bg-white/[0.01] border border-white/[0.04] rounded-2xl p-5 flex flex-col gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center border border-white/10 shrink-0">
+                        <Scissors size={14} className="text-black" />
                       </div>
-                    ))
-                  ) : (
-                    <div className="col-span-full text-center py-12 text-white/40 border border-dashed border-white/10 rounded-3xl">
-                      No nearby shops found.
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">TrimLink Guide</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black text-orange-500/60 uppercase tracking-widest">Official</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-white/70 mt-1 leading-relaxed">
+                          Welcome to TrimLink. Our premium digital marketplace connects clients with local grooming experts. Browse active barber profiles, view verified ratings, and schedule your appointment online without the hassle of waiting in queues.
+                        </p>
+                      </div>
                     </div>
-                  )}
+
+                    {/* Featured The Master's Touch Card inside the Post — Minimized height & redirects to shops list */}
+                    <Link 
+                      href="/shops"
+                      className="relative rounded-2xl overflow-hidden h-36 border border-white/10 group cursor-pointer block"
+                    >
+                      <img
+                        src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?q=80&w=800&auto=format&fit=crop"
+                        alt="The Master's Touch"
+                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      <div className="absolute inset-0 p-4 flex flex-col justify-end items-start gap-0.5">
+                        <span className="bg-[#f97316] text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full mb-1 group-hover:bg-orange-400 transition-colors">
+                          Book Now
+                        </span>
+                        <h3 className="text-sm font-black text-white leading-tight">The Master's Touch</h3>
+                        <p className="text-[10px] text-white/70">Discover top-rated barbers. Book your slot in seconds.</p>
+                      </div>
+                    </Link>
+                  </div>
+
+                  {/* Post 2: Jerome Bell - Moving Marquee Pictures side-to-side */}
+                  <div className="bg-white/[0.01] border border-white/[0.04] rounded-2xl p-5 flex flex-col gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="h-8 w-8 rounded-full bg-orange-500/20 flex items-center justify-center border border-white/10 shrink-0">
+                        <Star size={14} className="text-orange-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-white">Style Directory</span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-black text-orange-500/60 uppercase tracking-widest font-mono">Trends</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-white/70 mt-1 leading-relaxed">
+                          Explore our interactive style showcase. Scroll through trending haircuts below, select your desired style, and instantly discover skilled barbers in your area who specialize in that cut.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Moving Marquee Pictures Side-to-Side */}
+                    <div className="w-full overflow-hidden select-none py-2 bg-black/10 rounded-2xl border border-white/5">
+                      <Marquee baseVelocity={-1.5}>
+                        <div className="flex gap-4 pr-4">
+                          {haircuts.map((cut, index) => (
+                            <HaircutCard
+                              key={index}
+                              image={cut.image}
+                              name={cut.name}
+                              tag={cut.tag}
+                              onClick={() => setSelectedShopId(nearbyShops?.content?.[0]?.id || null)}
+                            />
+                          ))}
+                        </div>
+                      </Marquee>
+                    </div>
+                  </div>
+
+                  {/* Explore All Shops Call-To-Action Card */}
+                  <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/5 border border-orange-500/20 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shrink-0">
+                        <Scissors size={20} className="text-orange-400" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-white">Looking for a specific Barbershop?</h4>
+                        <p className="text-xs text-white/60 mt-1">Browse our complete directory of premium local shops.</p>
+                      </div>
+                    </div>
+                    <Link href="/shops">
+                      <Button className="bg-orange-500 hover:bg-orange-400 text-black font-black px-6 py-2.5 rounded-full text-xs uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)] shrink-0">
+                        Explore All Shops
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Pagination Indicators */}
+                  <div className="flex items-center justify-center gap-1.5 py-2">
+                    <div className="h-1.5 w-6 rounded-full bg-white/80" />
+                    <div className="h-1.5 w-1.5 rounded-full bg-white/20" />
+                  </div>
+
                 </div>
-              </section>
+
+                {/* Suggestions Column (Featured Barbers) */}
+                <div className="flex flex-col gap-6 lg:border-l lg:border-white/10 lg:pl-6">
+                  
+                  {/* Widget 1: Featured Barbers */}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-white/80 tracking-wider">Featured Barbers</h3>
+                      <Link href="/shops" className="text-[9px] font-bold text-white/50 bg-white/10 px-2.5 py-1 rounded-full hover:text-white transition">View All</Link>
+                    </div>
+                    
+                    {/* Barber search input box */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-white/30" />
+                      <input
+                        type="text"
+                        value={barberSearchQuery}
+                        onChange={(e) => setBarberSearchQuery(e.target.value)}
+                        placeholder="Search barbers..."
+                        className="w-full bg-white/[0.03] border border-white/5 focus:border-orange-500/50 rounded-xl py-2 pl-9 pr-4 text-xs text-white placeholder-white/25 focus:outline-none transition-all"
+                      />
+                      {barberSearchQuery && (
+                        <button onClick={() => setBarberSearchQuery("")} className="absolute right-3 top-2.5 text-white/30 hover:text-white">
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-3.5">
+                      {featuredBarbers.map((barber: any, idx: number) => {
+                        const name = barber.user ? `${barber.user.firstName} ${barber.user.lastName}` : "Professional Barber";
+                        const avatar = formatImageUrl(barber.user?.avatarUrl) || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100";
+                        const rating = barber.averageRating || 4.8;
+                        const targetShopId = barber.shopId || nearbyShops?.content?.[0]?.id || "";
+
+                        return (
+                          <div key={idx} className="flex items-center justify-between group">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <img src={avatar} alt={name} className="h-8 w-8 rounded-full object-cover border border-white/10 shrink-0" />
+                              <div className="min-w-0">
+                                <div className="text-xs font-bold text-white/90 truncate">{name}</div>
+                                <div className="flex items-center gap-1 text-[9px] text-white/40">
+                                  <Star size={10} className="text-orange-400 fill-orange-400" />
+                                  <span>{rating.toFixed(1)} Rating</span>
+                                </div>
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => {
+                                if (targetShopId) {
+                                  setSelectedShopId(targetShopId);
+                                }
+                              }}
+                              className="text-[9px] font-black text-white bg-white/10 hover:bg-orange-500 hover:text-black border border-white/10 px-3.5 py-1.5 rounded-full transition"
+                            >
+                              Book
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Widget 2: Today on TrimLink */}
+                  <div className="flex flex-col gap-4 border-t border-white/10 pt-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-white/80 tracking-wider">Today on TrimLink</h3>
+                      <span className="text-[9px] font-bold text-white/50 bg-white/10 px-2.5 py-1 rounded-full">View All</span>
+                    </div>
+                    
+                    <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="h-6 w-6 rounded-full bg-orange-500/10 flex items-center justify-center border border-white/10 shrink-0">
+                          <Scissors size={10} className="text-orange-400" />
+                        </div>
+                        <span className="text-[10px] font-bold text-white/80">Queue Management</span>
+                      </div>
+                      <p className="text-[10px] text-white/60 leading-relaxed font-medium">
+                        Discover top-rated barbers, join the virtual queue remotely to save time, and book your next appointment seamlessly from any device.
+                      </p>
+                      <div className="h-28 rounded-xl overflow-hidden relative border border-white/10">
+                        <img src="/images/barber-bg.jpg" className="w-full h-full object-cover" alt="Barber tools" />
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
 
             </div>
           )}
@@ -347,8 +501,8 @@ export function LandingPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="w-full border-t border-white/5 bg-black/80 mt-12 relative z-10">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="w-full border-t border-white/5 bg-black/40 mt-12 relative z-10">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Scissors className="h-5 w-5 text-orange-500" />
             <span className="font-bold text-white/80">TrimLink</span>
@@ -361,7 +515,7 @@ export function LandingPage() {
             ))}
           </div>
           <div className="text-xs text-white/20">
-            © 2026 TrimLink Inc.
+            © 2026 TrimLink Inc. All rights reserved.
           </div>
         </div>
       </footer>
@@ -370,139 +524,108 @@ export function LandingPage() {
       <AnimatePresence>
         {selectedShopId && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setSelectedShopId(null)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-[20px]"
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.98, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98, y: 30 }}
-              className="relative w-full max-w-5xl bg-black md:bg-white/5 border-0 md:border md:border-white/10 rounded-none md:rounded-[3rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.9)] h-[100dvh] md:h-[85vh] flex flex-col"
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedShopId(null)} className="absolute inset-0 bg-black/60 backdrop-blur-xl" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
+              className="relative w-full max-w-2xl bg-[#211917] border border-white/10 rounded-3xl overflow-hidden shadow-2xl max-h-[85vh] flex flex-col z-10"
             >
-              <div className="absolute inset-0 z-0 overflow-hidden bg-black/40">
-                <div className="hidden md:block"><AnimatedBackground /></div>
-              </div>
-
-              <div className="relative z-10 flex-1 flex flex-col p-6 md:p-12 overflow-hidden">
-                <div className="flex justify-between items-start mb-8">
-                  <div className="flex items-center gap-6">
-                    <div className="h-16 w-16 rounded-3xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30 shadow-[0_0_30px_rgba(249,115,22,0.2)]">
-                      <Scissors className="h-8 w-8 text-orange-400" />
-                    </div>
-                    <div>
-                      <h2 className="text-3xl md:text-4xl font-black text-white leading-tight tracking-tight mb-2">{shopDetail?.name || "Loading..."}</h2>
-                      <div className="flex items-center gap-2 text-white/40">
-                        <MapPin className="h-4 w-4 text-orange-500/60" />
-                        <span className="text-sm font-bold uppercase tracking-wider">{shopDetail?.city}</span>
-                      </div>
-                    </div>
+              <div className="p-6 border-b border-white/[0.07] flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-orange-500/20 flex items-center justify-center border border-orange-500/30">
+                    <Scissors size={22} className="text-orange-400" />
                   </div>
-                  <button onClick={() => setSelectedShopId(null)} className="p-3 bg-white/5 border border-white/10 rounded-full text-white/50 hover:text-white hover:bg-white/20 transition">
-                    <X size={24} />
-                  </button>
+                  <div>
+                    <h2 className="text-xl font-black text-white">{shopDetail?.name || "Loading..."}</h2>
+                    <div className="flex items-center gap-1.5 text-white/40 text-xs mt-0.5"><MapPin size={12} />{shopDetail?.city}</div>
+                  </div>
                 </div>
-
-                <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-8 min-h-0 overflow-y-auto lg:overflow-hidden custom-scrollbar pb-8 lg:pb-0">
-                  
-                  <div className="lg:col-span-3 flex flex-col gap-8 lg:min-h-0">
-                    <section className="shrink-0 bg-white/[0.02] border border-white/5 rounded-3xl p-6">
-                      <h3 className="text-xs font-black text-orange-500/60 uppercase tracking-[0.3em] mb-4">The Experience</h3>
-                      <p className="text-lg text-white/80 leading-relaxed font-medium">
-                        {shopDetail?.description || "A premium destination for modern grooming, combining traditional techniques with contemporary style."}
-                      </p>
-                      <Button variant="ghost" onClick={() => handleOpenMap(shopDetail)} className="mt-4 p-0 h-auto text-orange-400 hover:text-orange-300 flex items-center gap-2 text-sm font-black uppercase tracking-widest">
-                        <ExternalLink size={16} /> Locate on Map
-                      </Button>
-                    </section>
-
-                    <section className="flex-1 flex flex-col lg:min-h-0 bg-white/[0.02] border border-white/5 rounded-3xl p-6">
-                      <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xs font-black text-white/40 uppercase tracking-[0.3em]">Master Barbers</h3>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 rounded-full border border-emerald-500/20">
-                          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                          <span className="text-emerald-400 text-[10px] font-black uppercase tracking-widest">Active Now</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex-1 lg:overflow-y-auto custom-scrollbar space-y-3 pr-2">
-                        {isBarbersLoading ? (
-                          [1, 2].map((i: number) => <div key={i} className="h-20 bg-white/5 animate-pulse rounded-[1.5rem]" />)
-                        ) : shopBarbers && shopBarbers.length > 0 ? (
-                          shopBarbers.map((barber: any) => (
-                            <motion.div key={barber.id} className="p-4 bg-black/40 border border-white/5 rounded-2xl flex items-center gap-4 group hover:border-orange-500/30 transition-all duration-300">
-                              <div className="h-12 w-12 rounded-[1rem] bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border border-white/10 shadow-inner">
-                                <User className="h-6 w-6 text-white/30" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-base font-bold text-white truncate mb-1">{barber.user.firstName} {barber.user.lastName}</h4>
-                                <div className="flex items-center gap-1.5">
-                                  <Star size={12} className="text-orange-400 fill-orange-400" />
-                                  <span className="text-xs text-white/40 font-bold">{barber.averageRating.toFixed(1)} Rating</span>
-                                </div>
-                              </div>
-                              <Button size="sm" variant="outline" onClick={() => openChat(barber.user.id, `${barber.user.firstName} ${barber.user.lastName}`)} className="opacity-0 lg:group-hover:opacity-100 transition-opacity border-white/20 hover:bg-white/10 rounded-full px-5 font-bold">
-                                Chat
-                              </Button>
-                            </motion.div>
-                          ))
-                        ) : (
-                          <div className="h-40 flex flex-col items-center justify-center border border-dashed border-white/10 rounded-3xl bg-black/20">
-                            <p className="text-white/30 font-black uppercase tracking-widest text-xs">No staff listed</p>
+                <button onClick={() => setSelectedShopId(null)} className="p-2 bg-white/5 rounded-full text-white/40 hover:text-white transition"><X size={20} /></button>
+              </div>
+              <div className="p-6 overflow-y-auto flex-1 flex flex-col gap-5">
+                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
+                  <h3 className="text-xs font-black text-orange-500/60 uppercase tracking-widest mb-2">About</h3>
+                  <p className="text-sm text-white/70 leading-relaxed">{shopDetail?.description || "A premium barbershop destination."}</p>
+                  {shopDetail?.latitude && (
+                    <button onClick={() => handleOpenMap(shopDetail)} className="mt-3 flex items-center gap-1.5 text-xs font-bold text-orange-400 hover:text-orange-300 transition">
+                      <ExternalLink size={14} /> Open in Maps
+                    </button>
+                  )}
+                </div>
+                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
+                  <h3 className="text-xs font-black text-white/40 uppercase tracking-widest mb-3">Barbers & Services</h3>
+                  {isBarbersLoading ? (
+                    <div className="space-y-2">{[1,2].map(i => <div key={i} className="h-14 bg-white/5 animate-pulse rounded-xl" />)}</div>
+                  ) : shopBarbers?.length > 0 ? (
+                    <div className="space-y-3">
+                      {shopBarbers.map((barber: any) => (
+                        <div key={barber.id} className="p-4 bg-white/[0.03] border border-white/5 rounded-2xl flex flex-col gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="h-9 w-9 rounded-xl overflow-hidden bg-white/5 flex items-center justify-center border border-white/5">
+                              {barber.user?.avatarUrl ? (
+                                <img src={formatImageUrl(barber.user.avatarUrl)} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <User size={16} className="text-white/30" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-bold text-white truncate">{barber.user.firstName} {barber.user.lastName}</div>
+                              <div className="flex items-center gap-1"><Star size={10} className="text-orange-400 fill-orange-400" /><span className="text-[10px] text-white/40">{barber.averageRating?.toFixed(1)} Rating</span></div>
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </section>
-                  </div>
 
-                  <div className="lg:col-span-2 flex flex-col">
-                    <section className="flex-1 min-h-[350px] flex flex-col justify-center relative overflow-hidden group rounded-[2.5rem] border border-orange-500/20 bg-gradient-to-b from-orange-500/10 to-black p-8 md:p-10 text-center shadow-2xl shadow-orange-500/5">
-                      <motion.div animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }} transition={{ duration: 4, repeat: Infinity }} className="absolute inset-0 bg-orange-500/10 blur-[100px] rounded-full" />
-                      <div className="relative z-10">
-                        <div className="w-20 h-20 bg-orange-500 rounded-[1.5rem] flex items-center justify-center text-black mx-auto mb-8 shadow-[0_20px_50px_rgba(249,115,22,0.4)]">
-                          <CalendarDays size={40} />
+                          {/* Services for this barber */}
+                          {barber.serviceAssignments && barber.serviceAssignments.length > 0 ? (
+                            <div className="space-y-1.5 pt-2 border-t border-white/5">
+                              {barber.serviceAssignments.map((assignment: any) => (
+                                <div
+                                  key={assignment.id}
+                                  className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white/[0.02] border border-white/5 hover:border-orange-500/30 transition-all"
+                                >
+                                  <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-white text-xs truncate">{assignment.serviceName}</p>
+                                    <p className="text-[10px] text-orange-400/70 font-bold mt-0.5">{assignment.durationMinutes}min</p>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span className="text-xs font-black text-white whitespace-nowrap">
+                                      ETB {assignment.effectivePrice}
+                                    </span>
+                                    {mounted && isAuthenticated ? (
+                                      <Link
+                                        href={`/app/booking?shopId=${selectedShopId}&barberId=${barber.id}&serviceId=${assignment.serviceId}`}
+                                      >
+                                        <button className="px-2.5 py-1 bg-orange-500 hover:bg-orange-400 text-black font-black text-[9px] rounded-lg transition-all">
+                                          BOOK
+                                        </button>
+                                      </Link>
+                                    ) : (
+                                      <Link
+                                        href={`/auth/login?redirect=/app/booking?shopId=${selectedShopId}%26barberId=${barber.id}%26serviceId=${assignment.serviceId}`}
+                                      >
+                                        <button className="px-2.5 py-1 bg-orange-500 hover:bg-orange-400 text-black font-black text-[9px] rounded-lg transition-all">
+                                          BOOK
+                                        </button>
+                                      </Link>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-white/30 italic">No services assigned yet.</p>
+                          )}
                         </div>
-                        <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Ready to book?</h3>
-                        <p className="text-white/60 text-sm mb-10 max-w-[200px] mx-auto leading-relaxed">
-                          Join the digital queue at <span className="text-white font-bold">{shopDetail?.name}</span> and skip the wait.
-                        </p>
-                        {(mounted && isAuthenticated) ? (
-                          <Link href={role === 'CUSTOMER' ? '/app' : '/owner'} className="block">
-                            <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-16 rounded-[1.25rem] shadow-xl shadow-orange-500/20 text-lg transition-transform active:scale-95">
-                              {role === 'CUSTOMER' ? 'Book Appointment' : 'Go to Dashboard'}
-                            </Button>
-                          </Link>
-                        ) : (
-                          <Link href="/auth/login" className="block">
-                            <Button className="w-full bg-white hover:bg-gray-200 text-black font-black h-16 rounded-[1.25rem] shadow-xl text-lg transition-transform active:scale-95">
-                              Login to Book
-                            </Button>
-                          </Link>
-                        )}
-                        <p className="text-xs text-white/30 mt-8 font-bold uppercase tracking-[0.2em]">Open 7 days a week</p>
-                      </div>
-                    </section>
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-xs text-white/30 py-4">No staff listed.</p>
+                  )}
                 </div>
+                <Link href={mounted && isAuthenticated ? (role === 'CUSTOMER' ? `/app/shops/${selectedShopId}` : '/owner') : `/auth/login?redirect=/app/shops/${selectedShopId}`} className="block">
+                  <Button className="w-full bg-orange-500 hover:bg-orange-400 text-black font-black h-12 rounded-2xl text-sm">
+                    {mounted && isAuthenticated ? 'Book Appointment' : 'Login to Book'}
+                  </Button>
+                </Link>
               </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* IMAGE ZOOM MODAL */}
-      <AnimatePresence>
-        {zoomedImage && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setZoomedImage(null)} className="absolute inset-0 bg-black/95 backdrop-blur-xl" />
-            <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="relative max-w-4xl w-full aspect-[4/5] md:aspect-video rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.8)] border border-white/10">
-              <img src={zoomedImage.url} alt={zoomedImage.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 p-10 bg-gradient-to-t from-black via-black/80 to-transparent">
-                <h3 className="text-4xl font-black text-white mb-2">{zoomedImage.name}</h3>
-                <p className="text-orange-400 font-bold uppercase tracking-[0.3em] text-sm">Premium Style</p>
-              </div>
-              <button onClick={() => setZoomedImage(null)} className="absolute top-8 right-8 p-4 bg-black/40 hover:bg-black/60 border border-white/20 rounded-full text-white transition backdrop-blur-md">
-                <X size={24} />
-              </button>
             </motion.div>
           </div>
         )}
