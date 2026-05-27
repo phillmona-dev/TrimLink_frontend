@@ -1,4 +1,4 @@
-"use client";
+  "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
@@ -237,13 +237,47 @@ export const OwnerAppointmentsPage: React.FC = () => {
                             <button className="w-full px-4 py-2.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-2">
                               <Eye className="w-4 h-4" /> View Details
                             </button>
-                            <button className="w-full px-4 py-2.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-green-500" /> Confirm
-                            </button>
+                            
+                            {appt.status === 'PENDING' && (
+                              <button 
+                                onClick={async () => {
+                                  if (window.confirm("Confirm this appointment?")) {
+                                    try {
+                                      const { bookingService } = await import("@/api/bookingService");
+                                      await bookingService.confirmAppointment(appt.id);
+                                      fetchData();
+                                    } catch (err) {
+                                      alert("Failed to confirm");
+                                    }
+                                  }
+                                }}
+                                className="w-full px-4 py-2.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white flex items-center gap-2"
+                              >
+                                <CheckCircle2 className="w-4 h-4 text-green-500" /> Confirm
+                              </button>
+                            )}
+
                             <div className="h-px bg-white/5 my-1" />
-                            <button className="w-full px-4 py-2.5 text-left text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2">
-                              <XCircle className="w-4 h-4" /> Reject
-                            </button>
+                            
+                            {(appt.status === 'PENDING' || appt.status === 'CONFIRMED') && (
+                              <button 
+                                onClick={async () => {
+                                  const reason = window.prompt("Reason for rejection?", "Slot unavailable");
+                                  if (reason) {
+                                    try {
+                                      const { bookingService } = await import("@/api/bookingService");
+                                      await bookingService.rejectAppointment(appt.id, reason);
+                                      fetchData();
+                                    } catch (err) {
+                                      alert("Failed to reject");
+                                    }
+                                  }
+                                }}
+                                className="w-full px-4 py-2.5 text-left text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2"
+                              >
+                                <XCircle className="w-4 h-4" /> Reject
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

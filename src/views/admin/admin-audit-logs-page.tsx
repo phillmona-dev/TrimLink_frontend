@@ -18,11 +18,32 @@ import {
   Info
 } from "lucide-react";
 import { format } from "date-fns";
+import { AuditHistoryTimeline } from "@/components/admin/audit-history-timeline";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/common/dialog";
+import { History as HistoryIcon } from "lucide-react";
 
 export function AdminAuditLogsPage() {
   const [page, setPage] = useState(0);
   const [username, setUsername] = useState("");
   const [action, setAction] = useState("");
+  const [historyTarget, setHistoryTarget] = useState<{ id: string, type: string, name: string } | null>(null);
+
+  const { data: historyData, isLoading: isLoadingHistory } = useQuery({
+    queryKey: ["entity-history", historyTarget?.id],
+    queryFn: () => {
+      if (!historyTarget) return [];
+      if (historyTarget.type === "BOOKING") return adminService.getAppointmentHistory(historyTarget.id);
+      if (historyTarget.type === "SHOP") return adminService.getShopHistory(historyTarget.id);
+      if (historyTarget.type === "USER") return adminService.getUserHistory(historyTarget.id);
+      return [];
+    },
+    enabled: !!historyTarget,
+  });
 
   const { data: logsPage, isLoading, error } = useQuery({
     queryKey: ["admin-audit-logs", page, username, action],
@@ -163,9 +184,19 @@ export function AdminAuditLogsPage() {
                             {log.requestUrl?.split("/api/v1")[1] || log.requestUrl}
                           </span>
                         </div>
-                        <Button variant="ghost" size="sm" className="h-6 px-2 text-[10px] text-white/20 hover:text-white/60">
-                          <Info className="w-3 h-3 mr-1" />
-                          Full Details
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`h-6 px-2 text-[10px] ${log.resourceId ? 'text-indigo-400 hover:text-indigo-300 hover:bg-indigo-500/10' : 'text-white/20'}`}
+                          disabled={!log.resourceId}
+                          onClick={() => setHistoryTarget({ 
+                            id: log.resourceId, 
+                            type: log.resourceType, 
+                            name: log.action 
+                          })}
+                        >
+                          <HistoryIcon className="w-3 h-3 mr-1" />
+                          Time Machine
                         </Button>
                       </div>
                     </td>
@@ -211,6 +242,25 @@ export function AdminAuditLogsPage() {
           </div>
         )}
       </Card>
+
+      {/* History Modal */}
+      <Dialog open={!!historyTarget} onOpenChange={(open) => !open && setHistoryTarget(null)}>
+        <DialogContent className="max-w-4xl bg-slate-950 border-slate-800 p-0 overflow-hidden">
+          <div className="max-h-[80vh] overflow-y-auto custom-scrollbar">
+            {isLoadingHistory ? (
+              <div className="p-20 flex flex-col items-center justify-center gap-4">
+                <div className="w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+                <p className="text-slate-500 animate-pulse">Scanning timeline...</p>
+              </div>
+            ) : (
+              <AuditHistoryTimeline 
+                revisions={historyData || []} 
+                title={`${historyTarget?.type} History: ${historyTarget?.name}`} 
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

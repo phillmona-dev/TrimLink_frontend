@@ -66,4 +66,12 @@ export const adminService = {
     unwrap<PageResponse<any>>(http.get("/admin/finance/transactions", { params })),
   getAuditLogs: (params?: { page?: number; size?: number; username?: string; action?: string }) =>
     unwrap<PageResponse<any>>(http.get("/admin/audit-logs", { params })),
+  
+  // Entity History (Time Machine)
+  getAppointmentHistory: (id: string) => 
+    unwrap<any[]>(http.get(`/admin/audit/history/appointments/${id}`)),
+  getShopHistory: (id: string) => 
+    unwrap<any[]>(http.get(`/admin/audit/history/shops/${id}`)),
+  getUserHistory: (id: string) => 
+    unwrap<any[]>(http.get(`/admin/audit/history/users/${id}`)),
 };

@@ -279,7 +279,7 @@ function BarberDetailCard({ barber, shopId }: { barber: BarberProfile; shopId: s
           <h4 className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em] mb-2">Services</h4>
           {barber.serviceAssignments.map((assignment: ServiceAssignment) => (
             <div
-              key={assignment.id}
+              key={assignment.serviceId}
               className="flex items-center justify-between gap-2 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-orange-500/30 hover:bg-white/10 transition-all"
             >
               {/* Service info */}
