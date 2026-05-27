@@ -540,7 +540,11 @@ body {
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    WEBKIT AUTOFILL TRANSPARENCY OVERRIDES
+   — TrimLink (dark backgrounds): white autofill text
+   — GlowLink (light/cream backgrounds): dark autofill text
    ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* TrimLink dark theme: keep text white on dark autofill backgrounds */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -548,4 +552,15 @@ input:-webkit-autofill:active {
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: #ffffff !important;
   transition: background-color 5000s ease-in-out 0s !important;
+}
+
+/* GlowLink light theme: use dark text + cream background for autofill */
+.glow-theme input:-webkit-autofill,
+.glow-theme input:-webkit-autofill:hover,
+.glow-theme input:-webkit-autofill:focus,
+.glow-theme input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #FAF5EE inset !important;
+  -webkit-text-fill-color: #2C2416 !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  caret-color: #2C2416;
 }
