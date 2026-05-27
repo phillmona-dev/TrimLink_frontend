@@ -18,7 +18,7 @@ export interface GlowApiError {
 
 // ── Axios instance ────────────────────────────────────────────────────────────
 const glowApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_GLOW_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "/glow-api",
+  baseURL: process.env.NEXT_PUBLIC_GLOW_API_URL || "/glow-api",
   timeout: 15_000,
   headers: { "Content-Type": "application/json" },
 });
@@ -96,7 +96,7 @@ glowApi.interceptors.response.use(
       if (!refreshToken) throw new Error("No refresh token");
 
       const { data } = await axios.post<GlowApiResponse<{ accessToken: string; refreshToken: string }>>(
-        `${process.env.NEXT_PUBLIC_GLOW_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "/glow-api"}/auth/token/refresh`,
+        `${process.env.NEXT_PUBLIC_GLOW_API_URL || "/glow-api"}/auth/token/refresh`,
         { refreshToken }
       );
 
