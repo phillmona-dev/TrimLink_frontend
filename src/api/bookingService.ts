@@ -39,6 +39,11 @@ export const bookingService = {
   getSlots: (params: { barberId: string; serviceId: string; date: string }) =>
     unwrap<any[]>(http.get("/bookings/slots", { params })),
 
+  getBarberDaySchedule: (barberId: string, date: string) =>
+    unwrap<{ scheduledStart: string; scheduledEnd: string }[]>(
+      http.get(`/barbers/${barberId}/day-schedule`, { params: { date } })
+    ),
+
   confirmAppointment: (id: string) =>
     unwrap<Appointment>(http.patch(`/bookings/${id}/confirm`)),
 

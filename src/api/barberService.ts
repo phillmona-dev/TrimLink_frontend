@@ -8,6 +8,11 @@ export const barberService = {
 
   getShop: (id: string) => unwrap<Shop>(http.get(`/shops/${id}`)),
 
+  getShopHours: (shopId: string) =>
+    unwrap<{ dayOfWeek: string; openTime: string; closeTime: string; closed?: boolean }[]>(
+      http.get(`/shops/${shopId}/hours`)
+    ),
+
   getShopBarbers: (id: string) => unwrap<BarberProfile[]>(http.get(`/shops/${id}/barbers`)),
 
   listServices: () => unwrap<PageResponse<Service>>(http.get("/services")),

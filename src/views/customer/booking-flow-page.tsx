@@ -37,27 +37,26 @@ export function BookingFlowPage() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const timelineScrollRef = useRef<HTMLDivElement | null>(null);
 
   // Style reference states
   const [styleReferenceUrl, setStyleReferenceUrl] = useState("");
   const [isUploadingStyle, setIsUploadingStyle] = useState(false);
   const [styleSelectionSource, setStyleSelectionSource] = useState<"library" | "custom" | null>(null);
 
-  const availableDates = Array.from({ length: 14 }).map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    let display = d.toLocaleDateString();
+  const selectedDateLabel = (() => {
     try {
+      const d = new Date(`${selectedDate}T00:00:00`);
       const ethDate = EthDateTime.fromEuropeanDate(d);
       const ethMonthNames = ["Meskerem", "Tikimt", "Hidar", "Tahsas", "Tir", "Yekatit", "Megabit", "Miazia", "Genbot", "Sene", "Hamle", "Nehase", "Pagumē"];
-      display = `${ethMonthNames[ethDate.month - 1]} ${ethDate.date}, ${ethDate.year}`;
-      if (i === 0) display += " (Today)";
-      if (i === 1) display += " (Tomorrow)";
-    } catch (e) {
-      console.error(e);
+      const base = `${ethMonthNames[ethDate.month - 1]} ${ethDate.date}, ${ethDate.year}`;
+      const today = new Date().toISOString().split("T")[0];
+      return selectedDate === today ? `${base} (Today)` : base;
+    } catch {
+      return selectedDate;
     }
-    return { value: d.toISOString().split('T')[0], display };
-  });
+  })();
 
   const shopId = searchParams.get("shopId");
   const barberId = searchParams.get("barberId");
@@ -92,21 +91,210 @@ export function BookingFlowPage() {
   const selectedAssignment = assignments?.find((a: any) => a.serviceId === serviceId);
   const linkedStyles = selectedAssignment?.styleImageUrls || [];
 
-  // Fetch Slots
-  const { data: slots, isLoading: isLoadingSlots, error: slotsError } = useQuery({
-    queryKey: ["slots", barberId, serviceId, selectedDate],
-    queryFn: () => bookingService.getSlots({ 
-      barberId: barberId!, 
-      serviceId: serviceId!, 
-      date: selectedDate 
-    }),
-    enabled: !!barberId && !!serviceId && !!selectedDate,
-    retry: false
+  type ShopHour = {
+    dayOfWeek: string;
+    openTime: string;
+    closeTime: string;
+    closed?: boolean;
+  };
+
+  type ScheduleBlock = { scheduledStart: string; scheduledEnd: string };
+
+  const { data: shopHours } = useQuery({
+    queryKey: ["shop-hours", shopId],
+    queryFn: () => barberService.getShopHours(shopId!),
+    enabled: !!shopId,
   });
 
-  const slotsErrorMessage = (slotsError as any)?.response?.data?.message;
+  const { data: barberAppointments, isLoading: isLoadingSchedule, error: scheduleError } = useQuery({
+    queryKey: ["barber-day-schedule", barberId, selectedDate],
+    queryFn: () => bookingService.getBarberDaySchedule(barberId!, selectedDate),
+    enabled: !!barberId && !!selectedDate,
+    retry: false,
+  });
+
+  const scheduleErrorMessage = (scheduleError as any)?.response?.data?.message;
 
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [scheduleToast, setScheduleToast] = useState<string | null>(null);
+
+  const parseIsoToMinutes = (iso: string) => {
+    const hh = Number(iso.substring(11, 13));
+    const mm = Number(iso.substring(14, 16));
+    return hh * 60 + mm;
+  };
+
+  const parseTimeToMinutes = (value: string) => {
+    const [hour, minute] = value.split(":").map(Number);
+    return hour * 60 + minute;
+  };
+
+  const formatMinutesToTime = (minutes: number) => {
+    const hour = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+    return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  };
+
+  const snapMinutes = (minutes: number, step = 15) => {
+    const snapped = Math.round(minutes / step) * step;
+    return Math.max(0, Math.min(24 * 60 - step, snapped));
+  };
+
+  const getDayOfWeekName = (isoDate: string) => {
+    const date = new Date(`${isoDate}T00:00:00`);
+    return ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"][date.getDay()];
+  };
+
+  const selectedDayHours = (() => {
+    const dayName = getDayOfWeekName(selectedDate);
+    return (shopHours as ShopHour[] | undefined)?.find((h) => h.dayOfWeek === dayName) || null;
+  })();
+
+  const displayDuration = service?.durationMinutes || 30;
+
+  const getApptBounds = (appt: ScheduleBlock) => {
+    const startMin = parseIsoToMinutes(appt.scheduledStart);
+    const endMin = appt.scheduledEnd
+      ? parseIsoToMinutes(appt.scheduledEnd)
+      : startMin + displayDuration;
+    return { startMin, endMin };
+  };
+
+  const appointmentsList: ScheduleBlock[] = Array.isArray(barberAppointments) ? barberAppointments : [];
+
+  const overlapsAppointment = (startMin: number, durationMin: number) => {
+    const endMin = startMin + durationMin;
+    return appointmentsList.some((appt) => {
+      const { startMin: s, endMin: e } = getApptBounds(appt);
+      return startMin < e && endMin > s;
+    });
+  };
+
+  const isWithinWorkingHours = (startMin: number, durationMin: number) => {
+    if (!selectedDayHours || selectedDayHours.closed) return false;
+    const openMin = parseTimeToMinutes(selectedDayHours.openTime.substring(0, 5));
+    const closeMin = parseTimeToMinutes(selectedDayHours.closeTime.substring(0, 5));
+    return startMin >= openMin && startMin + durationMin <= closeMin;
+  };
+
+  const slotTimeline = (() => {
+    const defaultStart = 10 * 60;
+    const defaultEnd = 19 * 60;
+    const openMinutes = selectedDayHours && !selectedDayHours.closed
+      ? parseTimeToMinutes(selectedDayHours.openTime.substring(0, 5))
+      : defaultStart;
+    const closeMinutes = selectedDayHours && !selectedDayHours.closed
+      ? parseTimeToMinutes(selectedDayHours.closeTime.substring(0, 5))
+      : defaultEnd;
+
+    let minAppt = Number.POSITIVE_INFINITY;
+    let maxAppt = Number.NEGATIVE_INFINITY;
+    for (const appt of appointmentsList) {
+      const { startMin, endMin } = getApptBounds(appt);
+      minAppt = Math.min(minAppt, startMin);
+      maxAppt = Math.max(maxAppt, endMin);
+    }
+
+    const apptStartMin = Number.isFinite(minAppt) ? Math.floor(minAppt / 60) * 60 : openMinutes;
+    const apptEndMin = Number.isFinite(maxAppt) ? Math.ceil(maxAppt / 60) * 60 : closeMinutes;
+
+    const startMin = Math.min(defaultStart, openMinutes, apptStartMin);
+    const endMin = Math.max(defaultEnd, closeMinutes, apptEndMin);
+    const pxPerMinute = 1.25;
+    const heightPx = Math.max(360, (endMin - startMin) * pxPerMinute);
+    const hours: { minute: number; label: string }[] = [];
+    for (let m = Math.ceil(startMin / 60) * 60; m <= endMin; m += 60) {
+      hours.push({ minute: m, label: formatMinutesToTime(m) });
+    }
+    return { startMin, endMin, pxPerMinute, heightPx, hours, openMinutes, closeMinutes };
+  })();
+
+  const showScheduleToast = (msg: string) => {
+    setScheduleToast(msg);
+    setTimeout(() => setScheduleToast(null), 3000);
+  };
+
+  const changeDate = (days: number) => {
+    const date = new Date(`${selectedDate}T00:00:00`);
+    date.setDate(date.getDate() + days);
+    const dateStr = date.toISOString().split("T")[0];
+    setSelectedDate(dateStr);
+    setCurrentMonth(date);
+    setSelectedSlot(null);
+  };
+
+  const jumpWeeks = (weeks: number) => changeDate(weeks * 7);
+
+  const renderMiniCalendar = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+
+    const days: any[] = [];
+    for (let i = 0; i < firstDayIndex; i++) {
+      days.push(<div key={`empty-${i}`} className="w-8 h-8" />);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const isSelected = dateStr === selectedDate;
+      const isToday = new Date().toISOString().split("T")[0] === dateStr;
+
+      days.push(
+        <button
+          key={day}
+          onClick={() => { setSelectedDate(dateStr); setSelectedSlot(null); }}
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+            isSelected
+              ? "bg-orange-500 text-black shadow-lg shadow-orange-500/35 scale-110 font-black"
+              : isToday
+                ? "border border-orange-500 text-orange-500 font-black"
+                : "text-white/60 hover:bg-white/10 hover:text-white"
+          }`}
+        >
+          {day}
+        </button>
+      );
+    }
+
+    const monthNames = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    return (
+      <div className="space-y-3 p-4 bg-white/[0.03] border border-white/5 rounded-3xl">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-sm font-black text-white">{monthNames[month]} {year}</span>
+          <div className="flex gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentMonth(new Date(year, month - 1, 1))}
+              className="w-8 h-8 rounded-xl hover:bg-white/10 text-white/40 hover:text-white"
+            >
+              ‹
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCurrentMonth(new Date(year, month + 1, 1))}
+              className="w-8 h-8 rounded-xl hover:bg-white/10 text-white/40 hover:text-white"
+            >
+              ›
+            </Button>
+          </div>
+        </div>
+        <div className="grid grid-cols-7 gap-1 text-center">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d, idx) => (
+            <span key={idx} className="text-[10px] font-black text-white/20 uppercase tracking-wider">{d}</span>
+          ))}
+          {days}
+        </div>
+      </div>
+    );
+  };
 
   const mutation = useMutation({
     mutationFn: bookingService.createAppointment,
@@ -241,7 +429,7 @@ export function BookingFlowPage() {
   const canProceedToStep3 = !requiresPayment || (requiresPayment && !!receiptImageUrl);
 
   return (
-    <div className="max-w-xl mx-auto space-y-8">
+    <div className={`mx-auto space-y-8 ${currentStep === 1 ? "max-w-6xl w-full px-2 sm:px-4" : "max-w-xl"}`}>
       {/* Step Progress Indicator */}
       <div className="flex items-center justify-between text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white/40 px-2">
         <span className={currentStep >= 1 ? "text-orange-500" : ""}>1. Time</span>
@@ -269,66 +457,222 @@ export function BookingFlowPage() {
               <h2 className="text-2xl font-black text-white">Choose Time</h2>
               <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-2xl p-2 px-4 focus-within:border-orange-500/50 transition-colors">
                 <CalendarIcon className="h-4 w-4 text-orange-400" />
-                <select 
-                  className="bg-transparent border-none text-white text-sm focus:outline-none appearance-none font-bold pr-4 cursor-pointer"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                >
-                  {availableDates.map((date: any) => (
-                    <option key={date.value} value={date.value} className="bg-ink-950 text-white">
-                      {date.display}
-                    </option>
-                  ))}
-                </select>
+                <span className="text-white text-sm font-bold pr-2">{selectedDateLabel}</span>
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => changeDate(-1)} className="h-8 w-8 rounded-xl hover:bg-white/10 text-white/60 hover:text-white">‹</Button>
+                  <Button variant="ghost" size="icon" onClick={() => changeDate(1)} className="h-8 w-8 rounded-xl hover:bg-white/10 text-white/60 hover:text-white">›</Button>
+                </div>
               </div>
             </div>
 
-            <Card className="min-h-[300px] flex flex-col">
-              {isLoadingSlots ? (
+            <div className="flex flex-col lg:flex-row gap-4 lg:gap-5 items-stretch w-full">
+              {/* Left sidebar (calendar + jump) */}
+              <div className="w-full lg:w-[240px] shrink-0 space-y-4">
+                <Card className="border-white/5 bg-black/40 backdrop-blur-md p-4 rounded-3xl">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-3 px-1">Calendar Picker</span>
+                  {renderMiniCalendar()}
+                </Card>
+
+                <Card className="border-white/5 bg-black/40 backdrop-blur-md p-5 rounded-3xl space-y-3">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block px-1">Jump By Week</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Button variant="outline" size="sm" onClick={() => jumpWeeks(-1)} className="rounded-xl border-white/5 bg-white/5 font-bold hover:bg-white/10 text-xs">
+                      -1 Week
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => jumpWeeks(1)} className="rounded-xl border-white/5 bg-white/5 font-bold hover:bg-white/10 text-xs">
+                      +1 Week
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => jumpWeeks(-2)} className="rounded-xl border-white/5 bg-white/5 font-bold hover:bg-white/10 text-xs">
+                      -2 Weeks
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => jumpWeeks(2)} className="rounded-xl border-white/5 bg-white/5 font-bold hover:bg-white/10 text-xs">
+                      +2 Weeks
+                    </Button>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Timeline card */}
+              <Card className="min-h-[300px] flex flex-col flex-1 min-w-0 w-full">
+              {scheduleToast && (
+                <div className="mx-4 mt-3 px-4 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-300 text-xs font-bold">
+                  {scheduleToast}
+                </div>
+              )}
+              {isLoadingSchedule ? (
                 <div className="flex-1 flex items-center justify-center min-h-[300px]">
                   <div className="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
                 </div>
-              ) : slotsErrorMessage ? (
+              ) : scheduleErrorMessage ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-10 min-h-[300px]">
                   <div className="h-16 w-16 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mb-4">
                     <AlertCircle className="h-8 w-8" />
                   </div>
                   <h3 className="text-xl font-bold text-white/40">Selection Error</h3>
-                  <p className="text-red-400/80 text-sm max-w-xs">{slotsErrorMessage}</p>
+                  <p className="text-red-400/80 text-sm max-w-xs">{scheduleErrorMessage}</p>
                 </div>
-              ) : slots?.length === 0 ? (
+              ) : selectedDayHours?.closed ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-center p-10 min-h-[300px]">
                   <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center text-white/20 mb-4">
                     <Clock className="h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-white/40">No slots available</h3>
-                  <p className="text-white/20 text-sm max-w-xs">This barber is fully booked or unavailable for the selected date.</p>
+                  <h3 className="text-xl font-bold text-white/40">Shop is closed</h3>
+                  <p className="text-white/20 text-sm max-w-xs">This barbershop is closed on the selected day.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 p-2">
-                  {slots?.map((slot: any) => {
-                    const timeStr = formatEthiopianTime(slot.startTime);
-                    const isSelected = selectedSlot === slot.startTime;
-                    return (
-                      <button
-                        key={slot.startTime}
-                        disabled={!slot.available}
-                        onClick={() => setSelectedSlot(slot.startTime)}
-                        className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
-                          !slot.available 
-                            ? "bg-white/[0.02] border-white/5 text-white/10 cursor-not-allowed"
-                            : isSelected
-                              ? "bg-orange-500 border-orange-500 text-black font-bold shadow-lg shadow-orange-500/20"
-                              : "bg-white/5 border-white/5 text-white/60 hover:border-orange-500/30 hover:bg-orange-500/5"
-                        }`}
-                      >
-                        <span className="text-sm">{timeStr}</span>
-                      </button>
-                    );
-                  })}
+                <div className="p-2">
+                  {/* Match barber schedule look/feel */}
+                  <div className="border-white/5 bg-black/30 backdrop-blur-md shadow-2xl p-4 rounded-[2rem] overflow-x-auto">
+                    <div className="flex gap-3 items-stretch">
+                      {/* Time header */}
+                      <div className="w-24 shrink-0 p-2">
+                        <div className="p-3 rounded-2xl text-center bg-white/[0.02] border border-white/5">
+                          <div className="text-[10px] font-black text-white/20 uppercase tracking-widest">Time</div>
+                        </div>
+                      </div>
+
+                      {/* Barber header (single column) */}
+                      <div className="flex-1 p-2">
+                        <div className="flex items-center gap-3 bg-white/[0.02] border border-white/5 p-3 rounded-2xl">
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black shrink-0 bg-white/10 text-white">
+                            {barber?.user?.firstName?.charAt(0) || barber?.user?.username?.charAt(0) || "B"}
+                          </div>
+                          <div className="text-left min-w-0">
+                            <p className="text-sm font-black text-white truncate">
+                              {barber?.user ? `${barber.user.firstName} ${barber.user.lastName}` : "Barber"}
+                            </p>
+                            <p className="text-[10px] font-bold text-white/40 uppercase tracking-wider truncate">
+                              {selectedDayHours
+                                ? `${selectedDayHours.openTime.substring(0, 5)} - ${selectedDayHours.closeTime.substring(0, 5)}`
+                                : service?.durationMinutes
+                                  ? `${service.durationMinutes} min`
+                                  : "Hours"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      ref={timelineScrollRef}
+                      className="mt-3 flex gap-3 items-start overflow-y-auto"
+                      style={{ maxHeight: "56vh" }}
+                    >
+                      {/* Time axis */}
+                      <div className="w-24 shrink-0">
+                        <div className="relative" style={{ height: slotTimeline.heightPx }}>
+                          {slotTimeline.hours.map((h) => {
+                            const top = (h.minute - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                            return (
+                              <div key={h.minute} className="absolute left-0 right-0" style={{ top }}>
+                                <div className="absolute left-0 right-0 border-t border-white/[0.08]" />
+                                <div className="absolute right-2 -translate-y-1/2 pr-1 text-right font-mono text-[11px] text-white/50 bg-black/40 backdrop-blur-sm rounded-md">
+                                  <span className="font-black text-white/70">{h.label}</span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Single timeline column — click anywhere except occupied blocks */}
+                      <div className="flex-1 min-w-0 rounded-3xl border border-white/5 bg-white/[0.02] overflow-hidden">
+                        <div
+                          className="relative cursor-pointer"
+                          style={{ height: slotTimeline.heightPx }}
+                          onMouseDown={(e) => {
+                            const container = e.currentTarget as HTMLDivElement;
+                            const rect = container.getBoundingClientRect();
+                            const scrollTop = timelineScrollRef.current?.scrollTop || 0;
+                            const y = (e.clientY - rect.top) + scrollTop;
+                            const minuteOffset = Math.max(0, Math.min(slotTimeline.heightPx, y)) / slotTimeline.pxPerMinute;
+                            const startMin = snapMinutes(slotTimeline.startMin + minuteOffset, 15);
+
+                            if (overlapsAppointment(startMin, displayDuration)) return;
+                            if (!isWithinWorkingHours(startMin, displayDuration)) {
+                              showScheduleToast("Selected time is outside shop working hours.");
+                              return;
+                            }
+
+                            const startIso = `${selectedDate}T${formatMinutesToTime(startMin)}:00`;
+                            setSelectedSlot(startIso);
+                          }}
+                        >
+                          {/* background grid (hour solid, 15-min dashed — same as barber) */}
+                          <div className="absolute inset-0 pointer-events-none">
+                            {Array.from({ length: Math.ceil((slotTimeline.endMin - slotTimeline.startMin) / 15) + 1 }).map((_, i) => {
+                              const minute = slotTimeline.startMin + i * 15;
+                              const top = (minute - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                              const isHour = minute % 60 === 0;
+                              return (
+                                <div
+                                  key={minute}
+                                  className={`absolute left-0 right-0 ${isHour ? "border-t border-white/[0.08]" : "border-t border-dashed border-white/[0.04]"}`}
+                                  style={{ top }}
+                                />
+                              );
+                            })}
+                          </div>
+
+                          {/* Closed / outside-hours shading */}
+                          {selectedDayHours && !selectedDayHours.closed && (() => {
+                            const topOpen = (slotTimeline.openMinutes - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                            const topClose = (slotTimeline.closeMinutes - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                            const heightBefore = Math.max(0, topOpen);
+                            const heightAfter = Math.max(0, slotTimeline.heightPx - topClose);
+                            return (
+                              <>
+                                {heightBefore > 0 && (
+                                  <div className="absolute left-0 right-0 bg-white/[0.01] opacity-70 pointer-events-none" style={{ top: 0, height: heightBefore }} />
+                                )}
+                                {heightAfter > 0 && (
+                                  <div className="absolute left-0 right-0 bg-white/[0.01] opacity-70 pointer-events-none" style={{ top: topClose, height: heightAfter }} />
+                                )}
+                              </>
+                            );
+                          })()}
+
+                          {/* Occupied appointments (time range only) */}
+                          {appointmentsList.map((appt) => {
+                            const { startMin, endMin } = getApptBounds(appt);
+                            const top = (startMin - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                            const height = Math.max(18, (endMin - startMin) * slotTimeline.pxPerMinute);
+                            const timeRange = `${formatEthiopianTime(appt.scheduledStart)} — ${formatEthiopianTime(appt.scheduledEnd)}`;
+
+                            return (
+                              <div
+                                key={`${appt.scheduledStart}-${appt.scheduledEnd}`}
+                                className="absolute left-2 right-2 z-20 rounded-2xl border border-white/10 bg-white/[0.03] text-white/60 overflow-hidden pointer-events-none"
+                                style={{ top, height }}
+                              >
+                                <div className="p-3 h-full flex items-center">
+                                  <div className="text-[11px] font-black font-mono truncate">{timeRange}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+
+                          {/* Selected time indicator */}
+                          {selectedSlot && (() => {
+                            const startMin = parseIsoToMinutes(selectedSlot);
+                            const endMin = startMin + displayDuration;
+                            const top = (startMin - slotTimeline.startMin) * slotTimeline.pxPerMinute;
+                            const height = Math.max(18, (endMin - startMin) * slotTimeline.pxPerMinute);
+                            return (
+                              <div
+                                className="absolute left-2 right-2 z-10 rounded-2xl border-2 border-orange-500/70 bg-orange-500/10 pointer-events-none"
+                                style={{ top, height }}
+                              />
+                            );
+                          })()}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </Card>
+            </div>
 
             {/* HAIRSTYLE INSPIRATION / ATTACHMENT SECTION */}
             <div className="space-y-4">
@@ -464,7 +808,7 @@ export function BookingFlowPage() {
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Schedule</p>
                   <p className="font-bold text-white">
-                    {selectedSlot ? formatEthiopianTime(selectedSlot) : ""} on {availableDates.find(d => d.value === selectedDate)?.display?.split(' (')[0]}
+                    {selectedSlot ? formatEthiopianTime(selectedSlot) : ""} on {selectedDateLabel.split(" (")[0]}
                   </p>
                 </div>
               </div>
