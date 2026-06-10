@@ -43,7 +43,7 @@ export function RegisterPage() {
     try {
       const { confirmPassword, ...registerData } = values;
       const auth = await authService.register(registerData as any);
-      
+
       if (!auth) {
         setServerMessage({ text: "Registration failed: No session returned", type: 'error' });
         return;
@@ -51,9 +51,9 @@ export function RegisterPage() {
 
       // Save session to store (this handles localStorage correctly)
       setSession(auth);
-      
+
       setServerMessage({ text: "Registration successful! Redirecting...", type: 'success' });
-      
+
       if (auth.role === "BARBER" || auth.role === "OWNER") {
         router.push("/barber/queue");
       } else {
@@ -73,12 +73,12 @@ export function RegisterPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider" htmlFor="register-first-name">First name</label>
-            <Input id="register-first-name" placeholder="e.g. John" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("firstName")} />
+            <Input id="register-first-name" placeholder="e.g. Filmon" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("firstName")} />
             {errors.firstName ? <p className="mt-2 text-sm text-orange-400">{errors.firstName.message}</p> : null}
           </div>
           <div>
             <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider" htmlFor="register-last-name">Last name</label>
-            <Input id="register-last-name" placeholder="e.g. Doe" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("lastName")} />
+            <Input id="register-last-name" placeholder="e.g. K" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("lastName")} />
             {errors.lastName ? <p className="mt-2 text-sm text-orange-400">{errors.lastName.message}</p> : null}
           </div>
         </div>
@@ -89,11 +89,11 @@ export function RegisterPage() {
         </div>
         <div>
           <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider" htmlFor="register-password">Password</label>
-          <Input 
-            id="register-password" 
-            type={showPassword ? "text" : "password"} 
-            className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" 
-            placeholder="Choose a secure password" 
+          <Input
+            id="register-password"
+            type={showPassword ? "text" : "password"}
+            className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4"
+            placeholder="Choose a secure password"
             {...register("password")}
             suffix={
               <button
@@ -109,11 +109,11 @@ export function RegisterPage() {
         </div>
         <div>
           <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider" htmlFor="register-confirm-password">Confirm Password</label>
-          <Input 
-            id="register-confirm-password" 
-            type={showConfirmPassword ? "text" : "password"} 
-            className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" 
-            placeholder="Repeat your password" 
+          <Input
+            id="register-confirm-password"
+            type={showConfirmPassword ? "text" : "password"}
+            className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4"
+            placeholder="Repeat your password"
             {...register("confirmPassword")}
             suffix={
               <button
@@ -133,13 +133,12 @@ export function RegisterPage() {
           {errors.phoneNumber ? <p className="mt-2 text-sm text-orange-400">{errors.phoneNumber.message}</p> : null}
         </div>
         {serverMessage ? (
-          <p className={`rounded-2xl p-4 text-sm border backdrop-blur-md ${
-            serverMessage.type === 'success' 
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
-              : serverMessage.type === 'error'
+          <p className={`rounded-2xl p-4 text-sm border backdrop-blur-md ${serverMessage.type === 'success'
+            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+            : serverMessage.type === 'error'
               ? "bg-red-500/10 text-red-400 border-red-500/20"
               : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-          }`}>
+            }`}>
             {serverMessage.text}
           </p>
         ) : null}
@@ -158,7 +157,7 @@ export function RegisterPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <Button 
+          <Button
             type="button"
             variant="outline"
             onClick={() => window.location.href = OAUTH2_GOOGLE_URL}
@@ -173,14 +172,14 @@ export function RegisterPage() {
             <span className="text-xs">Google</span>
           </Button>
 
-          <Button 
+          <Button
             type="button"
             variant="outline"
             onClick={() => window.location.href = OAUTH2_FACEBOOK_URL}
             className="h-12 rounded-2xl bg-[#1877F2]/10 border-[#1877F2]/20 text-white hover:bg-[#1877F2]/20 font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
           >
             <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
             <span className="text-xs">Facebook</span>
           </Button>

@@ -10,11 +10,27 @@ import { http } from "@/api/http";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Scissors, Plus, ChevronLeft, ChevronRight, X, Info, Sparkles } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/common/dialog";
+import { AIStyleAdvisor } from "@/components/common/ai-style-advisor";
 
 const STYLES = [
+  // Existing static styles
   { id:"h1", name:"Habesha Curly Top Fade", category:"Fade", imageUrl:"/images/haircuts/habesha_cut_1.png", tags:["Habesha","Curly","Fade"], description:"Beautiful natural curly volume on top with clean tapered skin fade on sides." },
   { id:"h2", name:"Habesha Taper Cut", category:"Short", imageUrl:"/images/haircuts/habesha_cut_2.png", tags:["Classic","Taper","Habesha"], description:"Traditional low-taper cut suited for daily formal and casual wear." },
   { id:"h3", name:"Habesha Twist Fade", category:"Fade", imageUrl:"/images/haircuts/habesha_cut_3.png", tags:["Twists","Ethiopian","Fade"], description:"Addis-trending twist curls with a sharp drop skin fade." },
+  
+  // 10 new Habesha styles for all age groups
+  { id:"hab_y1", name:"Habesha Youth High-Top Fade", category:"Fade", imageUrl:"/images/haircuts/habesha_youth_hightop.png", tags:["Habesha","Fade","Youth","Curly"], description:"Natural curly coily afro hair on top with a fresh clean skin fade on the sides. Very popular for teens." },
+  { id:"hab_y2", name:"Habesha Temple Taper", category:"Fade", imageUrl:"/images/haircuts/habesha_temple_fade.png", tags:["Habesha","Taper","Modern","Young Adult"], description:"Sharp clean lines at the temples with a low taper fade and neatly shaped natural coils. Ideal for young adults." },
+  { id:"hab_m1", name:"Habesha Caesar Cut", category:"Short", imageUrl:"/images/haircuts/habesha_caesar.png", tags:["Habesha","Short","Classic","Adult"], description:"Very short uniform length all over the top with a precise lineup and low skin fade. Great clean professional look." },
+  { id:"hab_y3", name:"Habesha Edgar Cut", category:"Modern", imageUrl:"/images/haircuts/habesha_edgar.png", tags:["Habesha","Modern","Crop","Teen"], description:"Straight horizontal blunt fringe across the forehead with a high skin fade and short textured top. Modern youth style." },
+  { id:"hab_o1", name:"Habesha Mature Taper", category:"Short", imageUrl:"/images/haircuts/habesha_mature_taper.png", tags:["Habesha","Classic","Taper","Mature"], description:"Dignified low taper cut with a well-groomed short top and subtle gray blends. Excellent for mature gentlemen." },
+  { id:"hab_a1", name:"Habesha Natural Afro", category:"Modern", imageUrl:"/images/haircuts/habesha_natural_afro.png", tags:["Habesha","Afro","Natural","All Ages"], description:"A gorgeous, perfectly symmetrical rounded natural afro highlighting natural coils. Classic style for all ages." },
+  { id:"hab_c1", name:"Habesha Low Crop", category:"Short", imageUrl:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=540&auto=format&fit=crop&q=90", tags:["Habesha","Short","Clean","Adult"], description:"Ultra-neat low-cropped natural waves with a low shadow taper. Versatile and sharp." },
+  { id:"hab_b1", name:"Habesha Clean Buzz Cut", category:"Short", imageUrl:"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=540&auto=format&fit=crop&q=90", tags:["Habesha","Buzz","Classic","All Ages"], description:"Uniform buzz cut with a crisp hairline and micro-fade on the sideburns. Suited for all age groups." },
+  { id:"hab_mo", name:"Habesha Modern Mohawk Taper", category:"Fade", imageUrl:"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=540&auto=format&fit=crop&q=90", tags:["Habesha","Mohawk","Fade","Modern"], description:"Bold look featuring natural curls tapering down into a high fade, running from forehead to nape." },
+  { id:"hab_tw", name:"Habesha Twist Out", category:"Modern", imageUrl:"https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=540&auto=format&fit=crop&q=90", tags:["Habesha","Twists","Volume","Youth"], description:"Beautifully defined two-strand twist out volume with medium length coils. Trendy and expressive." },
+
+  // Rest of existing static styles
   { id:"t1", name:"Textured Crop", category:"Modern", imageUrl:"/images/haircuts/haircut1.png", tags:["Crop","Textured","Teen"], description:"Blunt messy fringe on top with high bald fade for teenagers." },
   { id:"t2", name:"Urban Shadow Taper", category:"Fade", imageUrl:"/images/haircuts/haircut2.png", tags:["Shadow","Taper","Modern"], description:"Smooth shadow taper fade preserving volume around the crown." },
   { id:"t3", name:"Precise Skin Burst", category:"Fade", imageUrl:"/images/haircuts/haircut3.png", tags:["Burst","Skin","Modern"], description:"Burst fade curving around the ear, creating a clean athletic silhouette." },
@@ -45,6 +61,7 @@ export function StylesLibraryPage() {
   const [toast, setToast] = useState<string|null>(null);
   const [flipDir, setFlipDir] = useState<"n"|"p">("n");
   const [isFlipping, setIsFlipping] = useState(false);
+  const [advisorOpen, setAdvisorOpen] = useState(false);
 
   const { data: dbStyles } = useQuery({ queryKey:["hs"], queryFn: async()=>{ const {data}=await http.get("/haircut-styles"); return data?.data||[]; } });
 
@@ -173,10 +190,40 @@ export function StylesLibraryPage() {
       {/* Toast */}
       <AnimatePresence>{toast && <motion.div initial={{opacity:0,y:-16}} animate={{opacity:1,y:0}} exit={{opacity:0}} className="fixed top-6 right-6 z-[200] bg-orange-500 text-black px-5 py-3 rounded-2xl font-black shadow-2xl flex items-center gap-2"><Sparkles className="w-4 h-4"/>{toast}</motion.div>}</AnimatePresence>
 
-      {/* Category filters */}
+      {/* Category filters + AI button */}
       <div className="relative z-20 flex items-center gap-1.5 pt-4 pb-3 flex-wrap justify-center">
         {CATS.map(c=><button key={c} onClick={()=>{if(!isFlipping){setCat(c);setPg(0);}}} className={`px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${cat===c?"bg-orange-500 text-black border-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]":"bg-black/50 text-white/40 border-white/10 hover:text-white/60"}`}>{c}</button>)}
+
+        {/* AI Style Advisor Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={() => setAdvisorOpen(true)}
+          className="ml-2 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border border-orange-500/40"
+          style={{
+            background: "linear-gradient(135deg, rgba(249,115,22,0.18), rgba(251,146,60,0.10))",
+            color: "#fb923c",
+            boxShadow: "0 0 14px rgba(249,115,22,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
+          }}
+        >
+          <Sparkles className="w-3 h-3" />
+          AI Style Advisor
+        </motion.button>
       </div>
+
+      {/* AI Style Advisor Modal */}
+      <AIStyleAdvisor
+        open={advisorOpen}
+        onClose={() => setAdvisorOpen(false)}
+        styles={list}
+        onStyleSelect={(style) => {
+          setAdvisorOpen(false);
+          // Open the chosen style in the lightbox after a short delay for nice UX
+          setTimeout(() => setZoom(style), 300);
+          setToast(`✨ ${style.name} recommended for you!`);
+          setTimeout(() => setToast(null), 3000);
+        }}
+      />
 
       {/* FLAT TOP-DOWN ALBUM — No full-book rotation, page flippes in the middle */}
       <div className="relative z-10 flex-1 flex items-center justify-center w-full px-4 py-2">
@@ -282,7 +329,11 @@ export function StylesLibraryPage() {
       {/* ZOOM LIGHTBOX */}
       <AnimatePresence>
         {zoom && (
-          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={e=>{if(e.target===e.currentTarget)setZoom(null);}} className="fixed inset-0 bg-black/92 backdrop-blur-2xl z-[100] flex items-center justify-center p-4">
+          <motion.div initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}} onClick={e=>{if(e.target===e.currentTarget)setZoom(null);}} className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={{
+            backgroundImage: "radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.8) 100%), url('/wood_desk_background.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}>
             <motion.div initial={{scale:0.86,y:30,opacity:0}} animate={{scale:1,y:0,opacity:1}} exit={{scale:0.86,y:30,opacity:0}} transition={{type:"spring",stiffness:300,damping:26}} className="relative bg-zinc-950 border border-white/10 rounded-[2.5rem] overflow-hidden w-full max-w-[800px] flex flex-col md:flex-row" style={{boxShadow:"0 40px 80px rgba(0,0,0,0.9)"}}>
               <button onClick={()=>setZoom(null)} className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/75 hover:bg-white/10 text-white/60 hover:text-white transition"><X className="w-5 h-5"/></button>
               <div className="w-full md:w-[55%] overflow-hidden bg-black" style={{minHeight:300}}><img src={zoom.imageUrl} alt={zoom.name} className="w-full h-full object-cover" style={{maxHeight:520}}/></div>

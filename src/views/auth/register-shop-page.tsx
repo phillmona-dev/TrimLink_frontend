@@ -65,9 +65,9 @@ export function RegisterShopPage() {
       const { confirmPassword, ...registerData } = values;
       await authService.registerShop(registerData as any);
       setIsSuccess(true);
-      setServerMessage({ 
-        text: "Registration submitted successfully! Your account is pending admin approval.", 
-        type: 'info' 
+      setServerMessage({
+        text: "Registration submitted successfully! Your account is pending admin approval.",
+        type: 'info'
       });
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "Failed to register shop";
@@ -100,7 +100,7 @@ export function RegisterShopPage() {
     <Card className="mx-auto w-full max-w-lg border-white/5 bg-black/30 backdrop-blur-md shadow-2xl p-8 rounded-[2rem] text-white">
       <h2 className="text-3xl font-normal tracking-tight text-white/90">Register Shop</h2>
       <p className="mt-2 text-sm text-white/50">Submit your barber shop details for admin approval.</p>
-      
+
       <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
         {/* Personal Details Section */}
         <div className="space-y-4">
@@ -108,12 +108,12 @@ export function RegisterShopPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider">First name</label>
-              <Input placeholder="e.g. John" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("firstName")} />
+              <Input placeholder="e.g. Blen" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("firstName")} />
               {errors.firstName && <p className="mt-2 text-xs text-orange-400">{errors.firstName.message}</p>}
             </div>
             <div>
               <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider">Last name</label>
-              <Input placeholder="e.g. Doe" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("lastName")} />
+              <Input placeholder="e.g. M" className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" {...register("lastName")} />
               {errors.lastName && <p className="mt-2 text-xs text-orange-400">{errors.lastName.message}</p>}
             </div>
           </div>
@@ -125,10 +125,10 @@ export function RegisterShopPage() {
             </div>
             <div>
               <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider">Password</label>
-              <Input 
-                type={showPassword ? "text" : "password"} 
-                className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" 
-                {...register("password")} 
+              <Input
+                type={showPassword ? "text" : "password"}
+                className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4"
+                {...register("password")}
                 suffix={
                   <button
                     type="button"
@@ -144,11 +144,11 @@ export function RegisterShopPage() {
           </div>
           <div>
             <label className="mb-2 block text-xs font-medium text-white/70 uppercase tracking-wider">Confirm Password</label>
-            <Input 
-              type={showConfirmPassword ? "text" : "password"} 
-              placeholder="Repeat password" 
-              className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4" 
-              {...register("confirmPassword")} 
+            <Input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Repeat password"
+              className="bg-black/40 border-white/10 text-white placeholder:text-white/30 rounded-xl h-12 px-4"
+              {...register("confirmPassword")}
               suffix={
                 <button
                   type="button"
@@ -214,17 +214,16 @@ export function RegisterShopPage() {
         </div>
 
         {serverMessage && !isSuccess && (
-          <p className={`rounded-2xl p-4 text-sm border backdrop-blur-md ${
-            serverMessage.type === 'success' 
-              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+          <p className={`rounded-2xl p-4 text-sm border backdrop-blur-md ${serverMessage.type === 'success'
+              ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
               : serverMessage.type === 'error'
-              ? "bg-red-500/10 text-red-400 border-red-500/20"
-              : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-          }`}>
+                ? "bg-red-500/10 text-red-400 border-red-500/20"
+                : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+            }`}>
             {serverMessage.text}
           </p>
         )}
-        
+
         <Button className="w-full h-12 rounded-full bg-orange-500 text-black hover:bg-orange-600 font-semibold mt-4" disabled={isSubmitting} type="submit">
           {isSubmitting ? "Submitting..." : "Submit Registration"}
         </Button>
@@ -240,7 +239,7 @@ export function RegisterShopPage() {
 
 
         <div className="grid grid-cols-2 gap-4">
-          <Button 
+          <Button
             type="button"
             variant="outline"
             onClick={() => {
@@ -258,7 +257,7 @@ export function RegisterShopPage() {
             <span className="text-xs">Google</span>
           </Button>
 
-          <Button 
+          <Button
             type="button"
             variant="outline"
             onClick={() => {
@@ -268,13 +267,13 @@ export function RegisterShopPage() {
             className="h-12 rounded-2xl bg-[#1877F2]/10 border-[#1877F2]/20 text-white hover:bg-[#1877F2]/20 font-medium flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
           >
             <svg className="w-5 h-5 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
             </svg>
             <span className="text-xs">Facebook</span>
           </Button>
         </div>
       </form>
-      
+
       <p className="mt-8 text-xs text-white/50 text-center">
         Already have a shop account? <Link className="text-orange-400 hover:text-orange-300 font-medium ml-1 transition" href="/auth/login">Sign in</Link>
       </p>

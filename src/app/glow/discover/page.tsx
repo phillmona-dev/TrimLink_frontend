@@ -40,6 +40,9 @@ export default function DiscoverPage() {
             <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#8e5238]">
               <Link href="/glow/discover" className="hover:opacity-70 transition">Home</Link>
               <Link href="/glow/about" className="hover:opacity-70 transition">About</Link>
+              <Link href="/glow/styles-library" className="hover:opacity-70 transition flex items-center gap-1">
+                🌸 Styles
+              </Link>
               <Link href="/glow/shop" className="hover:opacity-70 transition">Products</Link>
               <Link href="/glow/blog" className="hover:opacity-70 transition">Blog</Link>
             </nav>
@@ -70,10 +73,15 @@ export default function DiscoverPage() {
                 Transform your look with the finest salons and specialists. Seamlessly book your next appointment and discover premium beauty experiences.
               </motion.p>
               
-              <motion.div variants={fadeInUp} className="flex items-center gap-6 mt-10">
+              <motion.div variants={fadeInUp} className="flex items-center gap-4 mt-10 flex-wrap">
                 <Link href="/glow/explore" className="px-8 py-3 rounded-md text-white text-sm font-bold flex items-center gap-2 transition hover:opacity-90"
                   style={{ background: "linear-gradient(to right, #9e5d41, #854931)", boxShadow: "0 4px 14px rgba(158,93,65,0.3)" }}>
                   Book Now
+                </Link>
+                <Link href="/glow/styles-library"
+                  className="px-8 py-3 rounded-md text-sm font-bold flex items-center gap-2 transition hover:opacity-90 border"
+                  style={{ color: "#854931", borderColor: "#9e5d41", background: "rgba(158,93,65,0.06)" }}>
+                  🌸 AI Style Advisor
                 </Link>
                 
                 <div className="flex items-center gap-3">
